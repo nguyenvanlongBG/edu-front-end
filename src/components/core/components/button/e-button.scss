@@ -1,0 +1,67 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5em 1em;
+  font-size: 1em;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  transition: background-color 0.3s ease;
+  border-radius: 12px;
+}
+
+// Kiểu solid
+.button--solid {
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+
+  &:hover {
+    background-color: darken(#007bff, 10%);
+  }
+}
+
+// Kiểu default
+.button--default {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  color: #212529;
+
+  &:hover {
+    background-color: #e2e6ea;
+  }
+}
+
+// Kiểu outline
+.button--outline {
+  background-color: transparent;
+  border: 1px solid #007bff;
+  color: #007bff;
+
+  &:hover {
+    background-color: #007bff;
+    color: #fff;
+  }
+}
+
+.button--readonly {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button--loading {
+  cursor: progress;
+}
+
+.icon {
+  margin: 0 0.5em;
+}
+
+.icon:first-child {
+  margin-left: 0;
+}
+
+.icon:last-child {
+  margin-right: 0;
+}

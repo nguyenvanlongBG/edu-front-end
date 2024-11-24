@@ -1,0 +1,14 @@
+<!-- Checkbox.vue -->
+<label :class="['checkbox', { 'checkbox--readonly': control.readonly }]">
+  <!-- Input checkbox -->
+  <input
+    type="checkbox"
+    :checked="control.checked"
+    :disabled="control.readonly"
+    @change="handleChange"
+  />
+  <!-- Hiển thị nhãn bên cạnh checkbox -->
+  <span class="checkbox-label" :style="{ width: control.labelWidth }"
+    >{{ control.label }}</span
+  >
+</label>

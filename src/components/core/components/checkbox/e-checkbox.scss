@@ -1,0 +1,19 @@
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox input {
+  margin-right: 0.5em;
+}
+
+.checkbox--readonly {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.checkbox-label {
+  font-size: 1em;
+  white-space: nowrap; /* Ngăn nhãn xuống dòng */
+}

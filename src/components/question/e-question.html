@@ -1,0 +1,46 @@
+<div class="e-question">
+  <div class="header"></div>
+  <div class="body">
+    <div class="question-content">
+      <editor :control="questionControl" v-model="question.object_content" />
+    </div>
+    <div>
+      <div
+        v-if="question.type === QuestionType.SingleChoice || question.type === QuestionType.MultiChoice"
+      >
+        <div class="list-option">
+          <div
+            v-for="option in question.options"
+            :key="option.option_question_id"
+            :class="getClassForOption(option)"
+            class="option-question"
+          >
+            <input
+              v-if="question.type === QuestionType.SingleChoice"
+              type="radio"
+              name="question.question_id"
+              :value="option.option_question_id"
+              :disabled="question.mode === QuestionMode.ViewOnly"
+              v-model="singleOptionSelected"
+            />
+            <input
+              v-else-if="question.type === QuestionType.MultiChoice"
+              type="checkbox"
+              name="question.question_id"
+              :value="option.option_question_id"
+              :disabled="question.mode === QuestionMode.ViewOnly"
+              v-model="multiOptionSelected"
+            />
+            <editor
+              :control="questionControl"
+              v-model="option.object_content"
+            />
+          </div>
+        </div>
+      </div>
+      <div v-if="question.type === QuestionType.FillResult">
+        <editor :control="questionControl" v-model="question.object_content" />
+      </div>
+    </div>
+  </div>
+</div>

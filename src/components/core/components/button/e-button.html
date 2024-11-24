@@ -1,0 +1,15 @@
+<button
+  :class="[
+      'button',
+      `button--${control.classType}`, // Áp dụng class tương ứng với classType
+      { 'button--loading': control.isLoading, 'button--readonly': control.readonly }
+    ]"
+  :disabled="control.readonly || control.isLoading"
+  :style="control.style"
+  @click="handleClick"
+>
+  <span v-if="control.iconLeft" :class="['icon', control.iconLeft]"></span>
+  <span v-if="control.isLoading">Loading...</span>
+  <span v-else>{{ control.label }}</span>
+  <span v-if="control.iconRight" :class="['icon', control.iconRight]"></span>
+</button>

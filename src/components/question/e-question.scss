@@ -1,0 +1,27 @@
+.e-question {
+  .body {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+  }
+  .list-option {
+    list-style-type: none;
+    padding-left: 0px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+  }
+  .correct {
+    border: 2px solid green; /* Viền xanh nếu đáp án đúng */
+  }
+  .incorrect {
+    border: 2px solid red; /* Viền đỏ nếu đáp án sai */
+  }
+  .neutral {
+    border: 2px solid grey; /* Viền ghi nếu không rõ đúng sai */
+  }
+  .option-question {
+    display: flex;
+    column-gap: 8px;
+  }
+}
