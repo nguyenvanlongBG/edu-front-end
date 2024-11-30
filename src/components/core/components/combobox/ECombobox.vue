@@ -1,21 +1,38 @@
 <template>
   <div class="e-combobox" :class="isFocus ? 'focus-e-input' : ''">
-    <input class="default-input" :value='getValue' @input="updateValue" :placeholder="placeholder" @blur="blur"
-      @focus="focus" />
+    <input
+      class="default-input"
+      :value="getValue"
+      @input="updateValue"
+      :placeholder="placeholder"
+      @blur="blur"
+      @focus="focus"
+    />
     <div v-if="isFocus" class="options">
-      <div v-for="option in options" :key="option[keyOption]" @click="handleSelect(option)">
+      <div
+        v-for="option in options"
+        :key="option[keyOption]"
+        @click="handleSelect(option)"
+      >
         <slot name="option" :option="optionsSelect">
-          <div class="option" :class="selected && selected[selected] == option[selected] ? 'selected' : ''">{{
-            option[keyValueSelect]
-            }}</div>
+          <div
+            class="option"
+            :class="
+              selected && selected[selected] == option[selected]
+                ? 'selected'
+                : ''
+            "
+          >
+            {{ option[keyValueSelect] }}
+          </div>
         </slot>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { ref } from 'vue';
-import { ResultValidateBase } from '../../models';
+import { ref } from 'vue'
+import { ResultValidateBase } from '../../models'
 export default {
   name: 'ECombobox',
   props: {
@@ -37,66 +54,68 @@ export default {
     rules: {
       type: Array,
       required: false,
-      default: () => []
+      default: () => [],
     },
     preUpdateValue: {
       type: Function,
       required: false,
-      default: (value: string) => { return value }
+      default: (value: string) => {
+        return value
+      },
     },
     options: {
       type: Array,
-      required: true
+      required: true,
     },
     selected: {
       type: Object,
-      required: true
+      required: true,
     },
     keyOption: {
       type: String,
-      required: true
+      required: true,
     },
     keyValueSelect: {
       type: String,
-      required: true
+      required: true,
     },
     keySearch: {
       type: Array,
       required: false,
-      default: () => []
+      default: () => [],
     },
     handleFilter: {
       type: Function,
       required: false,
-    }
+    },
   },
   computed: {
     getValue() {
-      return this.selected && this.selected[this.keyValueSelect] ? this.selected && this.selected[this.keyValueSelect] : ''
-    }
+      return this.selected && this.selected[this.keyValueSelect]
+        ? this.selected && this.selected[this.keyValueSelect]
+        : ''
+    },
   },
-  emits: [
-    'update:inputValue', 'select'
-  ],
+  emits: ['update:inputValue', 'select'],
   created() {
     this.optionsSelect = this.options
   },
   setup(props, ctx) {
-    const value = ref('');
+    const value = ref('')
     const isFocus = ref(false)
     const optionsSelect = ref([])
     function validateRule(value: string) {
-      let resultValidate = {
+      const resultValidate = {
         isValid: true,
-        message: ''
+        message: '',
       } as ResultValidateBase
       if (props.rules && props.rules.length) {
         if (typeof props.rules[0] === 'function') {
           // Hàm validate custom
-          let messagesNotValid = [] as string[]
+          const messagesNotValid = [] as string[]
           props.rules.forEach(rule => {
             if (typeof rule === 'function') {
-              let result = rule(value)
+              const result = rule(value)
               if (result && !result.isValid) {
                 resultValidate.isValid = false
                 messagesNotValid.push(result.message)
@@ -107,9 +126,9 @@ export default {
         } else if (typeof props.rules[0] === 'string') {
           // Chuỗi Regex
           for (let index = 0; index < props.rules.length; index++) {
-            let rule = props.rules[index] as string
-            const regex = new RegExp(rule);
-            let isValid = regex.test(value);
+            const rule = props.rules[index] as string
+            const regex = new RegExp(rule)
+            const isValid = regex.test(value)
             if (!isValid) {
               resultValidate.isValid = false
               resultValidate.message = this.$t('common.NotValid')
@@ -121,7 +140,7 @@ export default {
       return resultValidate
     }
     async function updateValue(event) {
-      let resultValidate = validateRule(event.target.value)
+      const resultValidate = validateRule(event.target.value)
       if (props.handleFilter) {
         this.optionsSelect = await props.handleFilter(event.target.value)
       } else {
@@ -139,9 +158,9 @@ export default {
       ctx.emit('select', option)
     }
     function handleFilterDefault(valueSearch) {
-      let optionsSelect = props.options.filter(option => {
+      const optionsSelect = props.options.filter(option => {
         for (let index = 0; index < props.keySearch.length; index++) {
-          let keySearch = props.keySearch[index]
+          const keySearch = props.keySearch[index]
           if (option && option[keySearch].includes(valueSearch)) {
             return true
           }
@@ -151,9 +170,17 @@ export default {
       return optionsSelect
     }
     return {
-      value, validateRule, updateValue, isFocus, blur, focus, handleSelect, optionsSelect, handleFilterDefault
-    };
+      value,
+      validateRule,
+      updateValue,
+      isFocus,
+      blur,
+      focus,
+      handleSelect,
+      optionsSelect,
+      handleFilterDefault,
+    }
   },
-};
+}
 </script>
-<style src="../../css/e-control.scss" lang="scss"></style>
+<style src="./e-combobox.scss" lang="scss"></style>

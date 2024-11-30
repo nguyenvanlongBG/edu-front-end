@@ -20,6 +20,14 @@ export default defineConfig({
       ),
       '@models': fileURLToPath(new URL('./src/models', import.meta.url)),
       '@enums': fileURLToPath(new URL('./src/enums', import.meta.url)),
+      '@views': fileURLToPath(new URL('./src/views', import.meta.url)),
+    },
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: '@import "@core/styles/global.scss";', // Tự động import file biến SCSS
+      },
     },
   },
 })

@@ -81,9 +81,7 @@
           </li>
         </ul>
         <div class="item-menu">
-          <div class="block-img-menu-item">
-            <q-icon name="expand_less" size="32px"></q-icon>
-          </div>
+          <div class="block-img-menu-item"></div>
           <span calss="title-menu-item">Ẩn bớt</span>
         </div>
       </div>

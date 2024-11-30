@@ -4,4 +4,9 @@ export interface IBaseControl {
   label?: string
   isLoading?: boolean
   labelWidth?: string
+  value?: unknown
+  messageWarning?: string
+  ruleValidate?: (value: unknown) => boolean
+  validate?: (value: unknown) => boolean
+  validateCustom?: (value: unknown) => boolean
 }

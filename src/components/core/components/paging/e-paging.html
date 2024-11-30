@@ -1,0 +1,42 @@
+<div class="pagination">
+  <!-- Nút đến trang đầu -->
+  <button
+    @click="goToPage(1)"
+    :disabled="control.currentPage === 1"
+    class="pagination-button first"
+  >
+    «
+  </button>
+
+  <!-- Nút lùi một trang -->
+  <button
+    @click="goToPage(control.currentPage - 1)"
+    :disabled="control.currentPage === 1"
+    class="pagination-button prev"
+  >
+    ‹
+  </button>
+
+  <!-- Hiển thị số trang hiện tại và tổng số trang -->
+  <span class="pagination-info">
+    {{ control.currentPage }} / {{ control.totalPage }}
+  </span>
+
+  <!-- Nút tới một trang -->
+  <button
+    @click="goToPage(control.currentPage + 1)"
+    :disabled="control.currentPage === control.totalPage"
+    class="pagination-button next"
+  >
+    ›
+  </button>
+
+  <!-- Nút đến trang cuối -->
+  <button
+    @click="goToPage(control.totalPage)"
+    :disabled="control.currentPage === control.totalPage"
+    class="pagination-button last"
+  >
+    »
+  </button>
+</div>

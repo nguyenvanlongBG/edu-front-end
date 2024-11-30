@@ -1,0 +1,13 @@
+<div
+  class="table-list-label"
+  :style="{ gridTemplateColumns: `repeat(${control.numberItemPerRow}, 1fr)` }"
+>
+  <div
+    class="item-table-label"
+    v-for="(item, index) in control.data"
+    :key="item.value"
+    @click="handleClick(item, index)"
+  >
+    {{ item.data ? item.data[control.displayValue] : '' }}
+  </div>
+</div>

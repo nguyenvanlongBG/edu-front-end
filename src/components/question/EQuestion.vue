@@ -4,7 +4,7 @@
 import { defineComponent, ref } from 'vue'
 import { QuestionType, QuestionMode } from '@/enums/question' // Giả sử các enum đã được định nghĩa đúng cách
 import { EditorControl } from '../core/models/editor/editor-control'
-import Editor from '../core/components/rich-editor/Editor.vue'
+import Editor from '@core/components/editor/EEditor.vue'
 import { Question } from '@/models/question/question'
 import type { OptionQuestion } from '@/models/option-question/option-question'
 

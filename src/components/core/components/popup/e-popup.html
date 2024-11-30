@@ -1,0 +1,26 @@
+<div :class="['popup-overlay', control.styleClass]">
+  <div class="popup">
+    <!-- Slot Header -->
+    <div class="popup-header">
+      <slot name="header">
+        <!-- Hiển thị tiêu đề mặc định nếu slot không được cung cấp -->
+      </slot>
+      <button class="popup-close" @click="closePopup">×</button>
+    </div>
+
+    <!-- Slot Body -->
+    <div class="popup-body">
+      <slot name="body">
+        <!-- Hiển thị nội dung mặc định nếu slot không được cung cấp -->
+        <p>Nội dung mặc định của Popup</p>
+      </slot>
+    </div>
+
+    <!-- Slot Footer -->
+    <div class="popup-footer">
+      <slot name="footer">
+        <!-- Hiển thị các nút hành động nếu slot không được cung cấp -->
+      </slot>
+    </div>
+  </div>
+</div>

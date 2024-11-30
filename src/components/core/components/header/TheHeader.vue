@@ -52,9 +52,9 @@
 </template>
 <script lang="ts">
 export default {
-  name: 'the-header',
-};
+  name: 'e-header',
+}
 </script>
 <style>
-@import '../../css/the-header.scss';
+@import './e-header.scss';
 </style>

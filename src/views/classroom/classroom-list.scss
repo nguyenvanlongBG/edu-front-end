@@ -1,0 +1,45 @@
+.classroom-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.search-input {
+  font-size: 16px;
+  width: 50%;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+}
+
+.classroom-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+}
+
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pagination-button {
+  padding: 10px 15px;
+  margin: 0 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: white;
+  transition: all 0.3s;
+}
+
+.pagination-button.active,
+.pagination-button:hover {
+  background-color: #025c94;
+  color: white;
+  border-color: #025c94;
+}

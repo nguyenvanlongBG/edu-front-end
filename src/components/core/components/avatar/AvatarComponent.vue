@@ -5,22 +5,19 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { User } from '../../../core/models/index'
 export default defineComponent({
   props: {
     user: {
-      type: User,
+      type: Object,
       required: false,
-      default: {
-        id: 1,
-        name: 'Test',
-        avatarUrl:
-          'https://haycafe.vn/wp-content/uploads/2021/11/hinh-anh-hoat-hinh-de-thuong-cute-dep-nhat-600x600.jpg',
+      default: () => {
+        // id: 1,
+        // name: 'Test',
+        // avatarUrl:
+        //   'https://haycafe.vn/wp-content/uploads/2021/11/hinh-anh-hoat-hinh-de-thuong-cute-dep-nhat-600x600.jpg',
       },
     },
   },
 })
 </script>
-<style lang="scss">
-@import url(../../css/avatar.scss);
-</style>
+<style lang="scss"></style>

@@ -1,0 +1,20 @@
+<div>
+  <EPopup>
+    <template #header>
+      <h3>{{control.title}}</h3>
+    </template>
+    <template #body>
+      <div>{{control.message}}</div>
+    </template>
+    <template #footer>
+      <div>
+        <EButton
+          v-for="(button, index) in control.buttons"
+          :control="button"
+          :key="index"
+          @click="onBtnClick(button)"
+        />
+      </div>
+    </template>
+  </EPopup>
+</div>

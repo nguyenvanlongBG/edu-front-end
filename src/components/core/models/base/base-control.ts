@@ -1,3 +1,4 @@
+import { useI18n } from 'vue-i18n'
 import commonFunction from '../../commons/CommonFunction'
 import type { IBaseControl } from './i-base-control'
 
@@ -15,9 +16,28 @@ export class BaseControl implements IBaseControl {
       this.id = commonFunction.generateID()
     }
   }
+  value: unknown
   id: string = ''
   readonly: boolean = false
   label?: string = ''
   isLoading: boolean = false
   labelWidth?: string = ''
+  messageWarning: string = ''
+  ruleValidate: (value: unknown) => boolean = () => true
+  validate(value: unknown) {
+    const { t } = useI18n()
+    let isValid = this.ruleValidate(value)
+    if (!isValid) {
+      this.messageWarning = t('i18nCommon.NotValidValueWarning')
+      return false
+    }
+    isValid = this.validateCustom(value)
+    return isValid
+  }
+  validateCustom(_: unknown) {
+    if (_) {
+      return true
+    }
+    return true
+  }
 }

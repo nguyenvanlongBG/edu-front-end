@@ -1,0 +1,30 @@
+<div class="d-flex p-16px">
+  <div class="flex-1">
+    <form @submit.prevent="getQuestion">
+      <div>
+        <label for="fileInput">Chọn tệp:</label>
+        <input type="file" @change="handleFileChange" />
+      </div>
+      <div>
+        <label for="testId">Test ID:</label>
+      </div>
+      <button type="submit">Gửi</button>
+    </form>
+    <div class="list-question">
+      <div
+        v-for="question in questions"
+        :key="question.question_id"
+        :ref="setQuestionRef(question.question_id)"
+      >
+        <EQuestion
+          :question="question"
+          :isShowResult="true"
+          :isShowAnswer="true"
+        />
+      </div>
+    </div>
+  </div>
+  <div>
+    <ETableLabel :control="tableLabel" @selected="onSelectQuestionLabel" />
+  </div>
+</div>

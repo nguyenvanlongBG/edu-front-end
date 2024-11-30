@@ -1,0 +1,23 @@
+<div class="d-flex p-16px">
+  <div class="flex-1">
+    <div class="d-flex-end">
+      <EButton :control="addQuestionBtn" @click="onAddQuestion" />
+    </div>
+    <div class="list-question">
+      <div
+        v-for="question in questions"
+        :key="question.question_id"
+        :ref="setQuestionRef(question.question_id)"
+      >
+        <EQuestion
+          :question="question"
+          :isShowResult="true"
+          :isShowAnswer="true"
+        />
+      </div>
+    </div>
+    <div>
+      <EPaging :control="pagingControl" />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="container-classroom" @click="goToClassroom(1)">
+  <div class="classroom">
+    <div class="box-action-classroom">
+      <i
+        class="fa-solid fa-ellipsis icon-tool-classroom"
+        @click.stop="toggleActionClassroom"
+        >...</i
+      >
+      <ul
+        v-if="state.displayNavClassroom"
+        class="menu-action-classroom"
+        @click.stop
+      >
+        <li>
+          <div class="action-classroom">Chia sẻ</div>
+        </li>
+        <li>
+          <div class="action-classroom">Rời lớp</div>
+        </li>
+        <li>
+          <div class="action-classroom">Xóa</div>
+        </li>
+      </ul>
+    </div>
+    <div class="box-image-classroom">
+      <img class="image-classroom" src="../assets/picture/classroom.png" />
+    </div>
+    <div class="name-classroom">Lớp cô Hoa</div>
+  </div>
+</div>

@@ -31,22 +31,22 @@
   </div>
 </template>
 <script lang="ts">
-import EInput from '../input/EInput.vue';
-import AvatarComponent from '../../../core/components/avatar/AvatarComponent.vue';
-import { ref } from 'vue';
+import EInput from '../input/EInput.vue'
+import AvatarComponent from '../../../core/components/avatar/AvatarComponent.vue'
+import { ref } from 'vue'
 export default {
   components: {
     EInput,
     AvatarComponent,
   },
   setup() {
-    const groups = ref([1, 2, 3, 4]);
-    const focusGroup = ref('1');
+    const groups = ref([1, 2, 3, 4])
+    const focusGroup = ref('1')
     function changeGroup(groupID = '') {
-      focusGroup.value = groupID;
+      focusGroup.value = groupID
     }
-    return { groups, focusGroup, changeGroup };
+    return { groups, focusGroup, changeGroup }
   },
-};
+}
 </script>
-<style src="../../css/the-menu.scss" lang="scss"></style>
+<style src="./left-menu.scss" lang="scss"></style>

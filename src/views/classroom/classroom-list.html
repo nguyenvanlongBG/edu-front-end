@@ -1,0 +1,21 @@
+<div class="classroom-container">
+  <div class="search-bar">
+    <EInput :control="inputControl" v-model="inputControl.value" />
+  </div>
+
+  <div class="">
+    <div class="d-flex-end p-r-8px"><EButton :control="createClassBtn" /></div>
+    <div class="classroom-list">
+      <EClassroom
+        v-for="classroom in classrooms"
+        :key="classroom.id"
+        :classroom="classroom"
+        @goToClassroom="goToClassroom"
+      />
+    </div>
+  </div>
+
+  <div class="pagination">
+    <EPaging :control="pagingControl" @page-changed="changePage" />
+  </div>
+</div>

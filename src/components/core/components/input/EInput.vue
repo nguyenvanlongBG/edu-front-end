@@ -1,10 +1,16 @@
 <template>
-  <div class="e-input" :class="isFocus ? 'focus-e-input' : ''">
+  <div
+    :class="[
+      'e-input p-l-4px',
+      control.styleClass,
+      isFocus ? 'focus-e-input' : '',
+    ]"
+  >
     <input
       class="default-input"
-      :value="inputValue"
+      :value="modelValue"
       @input="updateValue"
-      :placeholder="placeholder"
+      :placeholder="control.placeholder"
       @blur="blur"
       @focus="focus"
     />
@@ -12,85 +18,27 @@
 </template>
 <script lang="ts">
 import { ref } from 'vue'
-import type { ResultValidateBase } from '../../models'
-import { useI18n } from 'vue-i18n'
+// import { useI18n } from 'vue-i18n'
+import { InputControl } from '@core/models/input/input-control'
 export default {
   name: 'EInput',
   props: {
-    inputValue: {
-      type: String,
+    control: {
+      type: InputControl,
       required: true,
-      default: '',
     },
-    qClass: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    placeholder: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    rules: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-    preUpdateValue: {
-      type: Function,
-      required: false,
-      default: (value: string) => {
-        return value
-      },
+    modelValue: {
+      type: String, // Kiểu dữ liệu của modelValue
+      required: true,
     },
   },
-  emits: ['update:inputValue'],
+  emits: ['update:modelValue'],
   setup(props, ctx) {
     const value = ref('')
-    const { t } = useI18n()
+    // const { t } = useI18n()
     const isFocus = ref(false)
-    function validateRule(value: string) {
-      const resultValidate = {
-        isValid: true,
-        message: '',
-      } as ResultValidateBase
-      if (props.rules && props.rules.length) {
-        if (typeof props.rules[0] === 'function') {
-          // Hàm validate custom
-          const messagesNotValid = [] as string[]
-          props.rules.forEach(rule => {
-            if (typeof rule === 'function') {
-              const result = rule(value)
-              if (result && !result.isValid) {
-                resultValidate.isValid = false
-                messagesNotValid.push(result.message)
-              }
-            }
-          })
-          resultValidate.message = messagesNotValid.join('. ')
-        } else if (typeof props.rules[0] === 'string') {
-          // Chuỗi Regex
-          for (let index = 0; index < props.rules.length; index++) {
-            const rule = props.rules[index] as string
-            const regex = new RegExp(rule)
-            const isValid = regex.test(value)
-            if (!isValid) {
-              resultValidate.isValid = false
-              resultValidate.message = t('common.NotValid')
-              return resultValidate
-            }
-          }
-        }
-      }
-      return resultValidate
-    }
     function updateValue(event: Event) {
-      const resultValidate = validateRule(
-        (event.target as HTMLInputElement).value,
-      )
-      console.log(resultValidate)
-      ctx.emit('update:inputValue', event.target as HTMLInputElement)
+      ctx.emit('update:modelValue', (event.target as HTMLInputElement).value)
     }
     function focus() {
       isFocus.value = true
@@ -100,7 +48,6 @@ export default {
     }
     return {
       value,
-      validateRule,
       updateValue,
       isFocus,
       blur,
@@ -109,4 +56,4 @@ export default {
   },
 }
 </script>
-<style src="../../css/e-control.scss" lang="scss"></style>
+<style src="./e-input.scss" lang="scss"></style>

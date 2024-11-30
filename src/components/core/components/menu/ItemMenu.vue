@@ -99,7 +99,7 @@ export default {
     }
   },
   methods: {
-    getClassChild(routerName) {
+    getClassChild(routerName: string) {
       if (routerName == this.$route.path) {
         this.status = 2
       }

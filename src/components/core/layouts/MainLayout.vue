@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="d-flex h-100 w-100">
     <TheMenu />
-    <div>
+    <div class="w-100">
       <the-header />
       <router-view></router-view>
     </div>

@@ -1,7 +1,7 @@
 import { defineComponent, ref } from 'vue'
 import { Menu } from '@core/enums/Menu'
 import GroupMenu from './GroupMenu.vue'
-import router from 'src/router'
+import router from '@/router/index'
 export default defineComponent({
   name: 'left-menu',
   components: {
