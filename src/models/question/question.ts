@@ -20,6 +20,6 @@ export class Question extends BaseEntity {
   type: QuestionType = QuestionType.SingleChoice
   options?: OptionQuestion[] = []
   results?: ResultQuestion[] = []
-  mode?: QuestionMode = QuestionMode.ViewOnly
+  mode?: QuestionMode = QuestionMode.ViewCanEdit
   answers?: AnswerQuestion[]
 }

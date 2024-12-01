@@ -11,4 +11,5 @@ export class EditorControl extends BaseControl {
     )
   }
   value: string = ''
+  isHideToolbar: boolean = false
 }

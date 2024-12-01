@@ -1,5 +1,6 @@
-<div :class="['popup-overlay', control.styleClass]">
-  <div class="popup">
+<div class="popup-overlay">
+  {{control.width}}
+  <div :class="['popup', control.styleClass]" :style="{ width: control.width }">
     <!-- Slot Header -->
     <div class="popup-header">
       <slot name="header">

@@ -1,0 +1,36 @@
+<EPopup :control="control">
+  <template #header>
+    <h3>{{$t("i18nQuestion.AddQuestion")}}</h3>
+  </template>
+  <template #body>
+    <div class="body-container-add-question d-flex-column row-gap-8px">
+      <div class="d-flex-end col-gap-8px">
+        <EButton :control="createQuestionBtn" />
+        <EButton :control="importQuestionBtn" @click="onImportQuestion" />
+        <!-- Input file ẩn -->
+        <input
+          type="file"
+          ref="fileInputRef"
+          style="display: none"
+          @change="handleFileChange"
+          accept=".doc, .docx"
+        />
+      </div>
+      <div class="list-question">
+        <EQuestion
+          v-for="question in questions"
+          :key="question.question_id"
+          :question="question"
+          :isShowResult="true"
+          :isShowAnswer="true"
+        />
+      </div>
+    </div>
+  </template>
+  <template #footer>
+    <div class="d-flex col-gap-8px">
+      <EButton :control="cancelBtn" />
+      <EButton :control="saveBtn" />
+    </div>
+  </template>
+</EPopup>

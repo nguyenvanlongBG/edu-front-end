@@ -89,6 +89,15 @@ export default defineComponent({
       multiOptionSelected,
     }
   },
+  created() {
+    if (
+      this.question &&
+      (this.question.mode == QuestionMode.Do ||
+        this.question.mode == QuestionMode.ViewOnly)
+    ) {
+      this.questionControl.isHideToolbar = true
+    }
+  },
   mounted() {
     if (
       this.question &&

@@ -3,8 +3,7 @@
     <div class="header">
       <span class="title-group-study">Nhóm</span>
       <div class="find-and-add">
-        <EInput />
-        <q-icon name="control_point" size="24px" class="icon-add-group" />
+        <div name="control_point" size="24px" class="icon-add-group" />
       </div>
     </div>
     <template v-for="group in groups" :key="group">

@@ -6,7 +6,27 @@
   font-weight: normal;
   display: flex;
 }
+::-webkit-scrollbar {
+  width: 8px; /* Độ rộng của thanh cuộn dọc */
+  height: 8px; /* Độ cao của thanh cuộn ngang */
+}
 
+/* Đặt style cho phần "rãnh" của thanh cuộn */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Màu nền của rãnh */
+  border-radius: 10px; /* Góc bo tròn */
+}
+
+/* Đặt style cho thanh cuộn */
+::-webkit-scrollbar-thumb {
+  background: #888; /* Màu thanh cuộn */
+  border-radius: 10px; /* Góc bo tròn của thanh cuộn */
+}
+
+/* Hiệu ứng khi hover vào thanh cuộn */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Màu khi hover */
+}
 a,
 .green {
   text-decoration: none;

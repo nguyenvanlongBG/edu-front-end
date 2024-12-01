@@ -241,3 +241,20 @@ $spacing-values: 2, 4, 6, 8, 10, 12, 16, 20, 24, 28;
     padding: #{$value}px !important;
   }
 }
+
+@each $value in $spacing-values {
+  /* Tạo class cho gap */
+  .gap-#{$value}px {
+    gap: #{$value}px !important;
+  }
+
+  /* Tạo class cho column-gap */
+  .col-gap-#{$value}px {
+    column-gap: #{$value}px !important;
+  }
+
+  /* Tạo class cho row-gap */
+  .row-gap-#{$value}px {
+    row-gap: #{$value}px !important;
+  }
+}

@@ -21,12 +21,12 @@ export class InputControl extends BaseControl {
   validateCustom(value: string) {
     const { t } = useI18n()
     if (this.required && !value) {
-      this.messageWarning = t('core.i18nCommon.NotEmptyValueWarning')
+      this.messageWarning = t('i18nCommon.NotEmptyValueWarning')
       return false
     }
     if (this.maxLength && value.length > this.maxLength) {
       this.messageWarning = commonFunction.formatString(
-        t('core.i18nCommon.OverMaxLength'),
+        t('i18nCommon.OverMaxLength'),
         this.maxLength,
       )
       return false

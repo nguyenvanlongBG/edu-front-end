@@ -14,7 +14,7 @@
 /* Popup container */
 .popup {
   background-color: white;
-  width: 400px;
+  max-height: calc(100vh - 100px);
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   display: flex;
@@ -48,6 +48,7 @@
 
 /* Body */
 .popup-body {
+  flex: 1; /* Chiếm phần không gian còn lại */
   padding: 16px;
   font-size: 14px;
   color: #333;

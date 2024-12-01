@@ -18,6 +18,7 @@
             <input
               v-if="question.type === QuestionType.SingleChoice"
               type="radio"
+              class="box-select-option"
               name="question.question_id"
               :value="option.option_question_id"
               :disabled="question.mode === QuestionMode.ViewOnly"
@@ -26,6 +27,7 @@
             <input
               v-else-if="question.type === QuestionType.MultiChoice"
               type="checkbox"
+              class="box-select-option"
               name="question.question_id"
               :value="option.option_question_id"
               :disabled="question.mode === QuestionMode.ViewOnly"

@@ -2,7 +2,7 @@
 <style src="./e-editor.scss" lang="scss" scoped></style>
 <template>
   <div class="container-editor" ref="editContainerRef">
-    <div :id="idToolbar">
+    <div :id="idToolbar" v-show="!control.isHideToolbar">
       <button class="ql-bold"></button>
       <button class="ql-italic"></button>
       <button class="ql-underline"></button>

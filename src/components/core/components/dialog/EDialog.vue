@@ -1,10 +1,10 @@
-<template src="./e-popup.html"></template>
+<template src="./e-dialog.html"></template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-import EButton from '../button/EButton.vue'
-import { DialogControl } from '../../models/dialog/dialog-control'
-import EPopup from '../popup/EPopup.vue'
-import type { ButtonControl } from '../../models/button/button-control'
+import EButton from '@core/components/button/EButton.vue'
+import { DialogControl } from '@core/models/dialog/dialog-control'
+import EPopup from '@core/components/popup/EPopup.vue'
+import type { ButtonControl } from '@core/models/button/button-control'
 
 export default defineComponent({
   components: {
@@ -29,4 +29,4 @@ export default defineComponent({
 })
 </script>
 
-<style src="./e-popup.scss" scoped></style>
+<style src="./e-dialog.scss" scoped></style>

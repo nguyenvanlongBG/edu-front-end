@@ -11,5 +11,6 @@ export class PopupControl extends BaseControl {
       control as unknown as Record<string, unknown>,
     )
   }
+  width: string = '400px'
   styleClass: string = ''
 }

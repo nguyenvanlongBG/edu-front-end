@@ -123,5 +123,5 @@ export default {
 }
 </script>
 
-<template src="./question-library.html"></template>
-<style src="./question-library.scss" lang="scss"></style>
+<template src="./test-library.html"></template>
+<style src="./test-library.scss" lang="scss"></style>

@@ -39,7 +39,7 @@
     </ul>
     <div class="user-toolbar">
       <div class="item-user-toolbar">
-        <q-icon name="notifications" size="32px"></q-icon>
+        <div name="notifications" size="32px"></div>
       </div>
       <div class="item-user-toolbar">
         <img
