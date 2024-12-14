@@ -14,7 +14,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['change'],
+  emits: ['change', 'close'],
   setup(props, { emit }) {
     function handleChange(event: Event) {
       // Chỉ phát sự kiện nếu không ở chế độ readonly
@@ -23,8 +23,10 @@ export default defineComponent({
         emit('change', input.checked)
       }
     }
-
-    return { handleChange }
+    function closePopup() {
+      emit('close')
+    }
+    return { handleChange, closePopup }
   },
 })
 </script>

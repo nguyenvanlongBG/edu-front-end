@@ -11,6 +11,12 @@ import { InputControl } from '@/components/core/models/input/input-control'
 import EButton from '@/components/core/components/button/EButton.vue'
 import { ButtonControl } from '@/components/core/models/button/button-control'
 import { useI18n } from 'vue-i18n'
+import { PagingParam } from '@/components/core/models/paging/paging-param'
+import { Classroom } from '@/models/classroom/classroom'
+import ClassroomService from '@/services/classroom-service'
+import PopupLibrary from '@core/library/popup-library'
+import { PopupControl } from '@/components/core/models/popup/popup-control'
+
 export default {
   name: 'ClassroomList',
   components: {
@@ -21,22 +27,7 @@ export default {
   },
   setup() {
     const { t } = useI18n()
-    const classrooms = ref([
-      { id: 1, name: 'Lớp Toán', image: '../assets/picture/classroom.png' },
-      { id: 2, name: 'Lớp Văn', image: '../assets/picture/classroom.png' },
-      { id: 3, name: 'Lớp Anh', image: '../assets/picture/classroom.png' },
-      { id: 4, name: 'Lớp Lý', image: '../assets/picture/classroom.png' },
-      { id: 5, name: 'Lớp Hóa', image: '../assets/picture/classroom.png' },
-      { id: 6, name: 'Lớp Sinh', image: '../assets/picture/classroom.png' },
-      { id: 7, name: 'Lớp Sử', image: '../assets/picture/classroom.png' },
-      { id: 8, name: 'Lớp Địa', image: '../assets/picture/classroom.png' },
-      { id: 9, name: 'Lớp Tin học', image: '../assets/picture/classroom.png' },
-      {
-        id: 10,
-        name: 'Lớp Nghệ thuật',
-        image: '../assets/picture/classroom.png',
-      },
-    ])
+    const classrooms = ref<Classroom[]>([])
 
     const searchQuery = ref('')
     const inputControl = ref(
@@ -59,14 +50,47 @@ export default {
         classroom.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
       )
     })
-
+    const detailPopupControl = new PopupControl()
     const goToClassroom = (id: string) => {
       alert(`Đi tới lớp học có ID: ${id}`)
     }
     const changePage = (page: number) => {
       currentPage.value = page
     }
+    function onAddClassroom() {
+      const newClassroom = new Classroom()
+      viewDetail(newClassroom as unknown as Record<string, unknown>)
+    }
+    function getComponentDetail() {
+      return import('@views/classroom-detail/ClassroomDetail.vue')
+    }
+    function viewDetail(record: Record<string, unknown>) {
+      const component = getComponentDetail()
+      const props = buildPropsDetail(record)
+      detailPopupControl.show(component, props, event => {
+        if (event === 'close') {
+          detailPopupControl.close() // Đóng popup nếu cần
+        }
+      })
+    }
+    function buildPropsDetail(record: Record<string, unknown>) {
+      return { masterData: record, control: detailPopupControl }
+    }
+    async function loadListData() {
+      const classroomService = new ClassroomService()
+      const pagingParam = buildPagingParam()
+      const data = await classroomService.getPaging(pagingParam)
+    }
+    function buildPagingParam() {
+      const pagingParam = new PagingParam({
+        page: pagingControl.value.currentPage,
+        take: 20,
+      })
+      return pagingParam
+    }
     return {
+      detailPopupControl,
+      onAddClassroom,
       pagingControl,
       createClassBtn,
       inputControl,
@@ -77,7 +101,15 @@ export default {
       filteredClassrooms,
       goToClassroom,
       changePage,
+      loadListData,
+      buildPagingParam,
+      getComponentDetail,
+      buildPropsDetail,
+      viewDetail,
     }
+  },
+  mounted() {
+    this.loadListData()
   },
 }
 </script>

@@ -1,5 +1,10 @@
 /* utilities.scss */
-
+.text-bold {
+  font-weight: 600;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
 /* === Flex Utilities === */
 .d-flex {
   display: flex;

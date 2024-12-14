@@ -8,8 +8,8 @@ import { ButtonControl } from '@core/models/button/button-control'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
 import { useI18n } from 'vue-i18n'
 import type { Question } from '@/models/question/question'
-import uploadFileQuestion from '@/services/file-question-service'
 import EQuestion from '@/components/question/EQuestion.vue'
+import FileQuestionService from '@/services/file-question-service'
 
 export default defineComponent({
   components: {
@@ -61,7 +61,8 @@ export default defineComponent({
           const formData = new FormData()
           formData.append('file', file) // Thêm tệp vào FormData
           formData.append('testId', '12') // Thêm các trường khác nếu cần
-          const result = await uploadFileQuestion(formData)
+          const fileQuestionService = new FileQuestionService()
+          const result = await fileQuestionService.uploadFileQuestion(formData)
           questions.value = result as unknown as Question[]
         }
       } catch (error: unknown) {

@@ -1,0 +1,14 @@
+<EPopup :control="control" @close="onClose">
+  <template #header>
+    <h3>{{getTitle()}}</h3>
+  </template>
+  <template #body>
+    <div>Ok</div>
+  </template>
+  <template #footer>
+    <div class="d-flex col-gap-8px">
+      <EButton :control="cancelBtn" />
+      <EButton :control="saveBtn" />
+    </div>
+  </template>
+</EPopup>

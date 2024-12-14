@@ -1,0 +1,17 @@
+<div :class="['e-date', control.styleClass]">
+  <label v-if="control.placeholder" class="date-label"
+    >{{ control.placeholder }}</label
+  >
+  <input
+    type="date"
+    :min="control.minDate"
+    :max="control.maxDate"
+    v-model="innerValue"
+    @blur="validate"
+    @input="onInput"
+    class="date-input"
+  />
+  <p v-if="control.messageWarning" class="warning-message">
+    {{ control.messageWarning }}
+  </p>
+</div>

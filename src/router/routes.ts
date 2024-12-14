@@ -27,7 +27,27 @@ const routes: RouteRecordRaw[] = [
           {
             path: '',
             name: 'create-test',
-            component: () => import('@views/test/TestView.vue'),
+            component: () => import('@views/test/TestDetail.vue'),
+          },
+          {
+            path: 'list',
+            name: 'list-test',
+            component: () => import('@views/test/TestDetail.vue'),
+          },
+          {
+            path: ':test_id',
+            name: 'view-test',
+            component: () => import('@views/test/TestDetail.vue'),
+          },
+          {
+            path: ':test_id/edit',
+            name: 'edit-test',
+            component: () => import('@views/test/TestDetail.vue'),
+          },
+          {
+            path: ':test_id/history',
+            name: 'history-test',
+            component: () => import('@views/test/TestDetail.vue'),
           },
         ],
       },
@@ -50,6 +70,11 @@ const routes: RouteRecordRaw[] = [
             path: '',
             name: 'question',
             component: () => import('@views/library/QuestionLibrary.vue'),
+          },
+          {
+            path: 'test',
+            name: 'test-library',
+            component: () => import('@views/library/test/TestLibrary.vue'),
           },
         ],
       },

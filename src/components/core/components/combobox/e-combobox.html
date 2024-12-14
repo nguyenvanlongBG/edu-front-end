@@ -1,0 +1,25 @@
+<div class="combobox-container">
+  <div class="e-combobox">
+    <input
+      type="text"
+      v-model="inputValue"
+      @focus="showDropdown = true"
+      @blur="showDropdown = false"
+      class="combobox-input"
+      :disabled="control.isLoading || control.isOnlySelect"
+      :placeholder="control.placeholder"
+    />
+    <span class="dropdown-icon" @click="onShowOptions">▼</span>
+    <div v-if="isLoading" class="loading-indicator">Loading...</div>
+  </div>
+  <div v-if="controlInternal.isOpenSelextBox" class="dropdown-menu">
+    <div
+      v-for="(item, index) in options"
+      :key="index"
+      class="dropdown-item"
+      @click="selectItem(item)"
+    >
+      {{ item[control.displayField] }}
+    </div>
+  </div>
+</div>

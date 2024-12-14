@@ -1,186 +1,60 @@
-<template>
-  <div class="e-combobox" :class="isFocus ? 'focus-e-input' : ''">
-    <input
-      class="default-input"
-      :value="getValue"
-      @input="updateValue"
-      :placeholder="placeholder"
-      @blur="blur"
-      @focus="focus"
-    />
-    <div v-if="isFocus" class="options">
-      <div
-        v-for="option in options"
-        :key="option[keyOption]"
-        @click="handleSelect(option)"
-      >
-        <slot name="option" :option="optionsSelect">
-          <div
-            class="option"
-            :class="
-              selected && selected[selected] == option[selected]
-                ? 'selected'
-                : ''
-            "
-          >
-            {{ option[keyValueSelect] }}
-          </div>
-        </slot>
-      </div>
-    </div>
-  </div>
-</template>
+<template src="./e-combobox.html"></template>
+
 <script lang="ts">
-import { ref } from 'vue'
-import { ResultValidateBase } from '../../models'
+import { reactive, ref } from 'vue'
+import { ComboboxControl } from '../../models/combobox/combobox-control'
+
 export default {
   name: 'ECombobox',
   props: {
-    inputValue: {
-      type: String,
-      required: true,
-      default: '',
-    },
-    qClass: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    placeholder: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    rules: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-    preUpdateValue: {
-      type: Function,
-      required: false,
-      default: (value: string) => {
-        return value
-      },
-    },
-    options: {
-      type: Array,
+    control: {
+      type: ComboboxControl,
       required: true,
     },
-    selected: {
-      type: Object,
-      required: true,
-    },
-    keyOption: {
+    modelValue: {
       type: String,
       required: true,
-    },
-    keyValueSelect: {
-      type: String,
-      required: true,
-    },
-    keySearch: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-    handleFilter: {
-      type: Function,
-      required: false,
     },
   },
-  computed: {
-    getValue() {
-      return this.selected && this.selected[this.keyValueSelect]
-        ? this.selected && this.selected[this.keyValueSelect]
-        : ''
+  watch: {
+    'control.bindingText'(newValue) {
+      this.inputValue = newValue
     },
   },
-  emits: ['update:inputValue', 'select'],
-  created() {
-    this.optionsSelect = this.options
-  },
-  setup(props, ctx) {
-    const value = ref('')
-    const isFocus = ref(false)
-    const optionsSelect = ref([])
-    function validateRule(value: string) {
-      const resultValidate = {
-        isValid: true,
-        message: '',
-      } as ResultValidateBase
-      if (props.rules && props.rules.length) {
-        if (typeof props.rules[0] === 'function') {
-          // Hàm validate custom
-          const messagesNotValid = [] as string[]
-          props.rules.forEach(rule => {
-            if (typeof rule === 'function') {
-              const result = rule(value)
-              if (result && !result.isValid) {
-                resultValidate.isValid = false
-                messagesNotValid.push(result.message)
-              }
-            }
-          })
-          resultValidate.message = messagesNotValid.join('. ')
-        } else if (typeof props.rules[0] === 'string') {
-          // Chuỗi Regex
-          for (let index = 0; index < props.rules.length; index++) {
-            const rule = props.rules[index] as string
-            const regex = new RegExp(rule)
-            const isValid = regex.test(value)
-            if (!isValid) {
-              resultValidate.isValid = false
-              resultValidate.message = this.$t('common.NotValid')
-              return resultValidate
-            }
-          }
-        }
-      }
-      return resultValidate
-    }
-    async function updateValue(event) {
-      const resultValidate = validateRule(event.target.value)
-      if (props.handleFilter) {
-        this.optionsSelect = await props.handleFilter(event.target.value)
+
+  emits: ['update:modelValue'],
+  setup(props, { emit }) {
+    const options = ref(props.control.data as Array<Record<string, unknown>>)
+    const inputValue = ref<string>(props.control.bindingText ?? '')
+    const internalValue = ref(props.modelValue)
+    const isFirstLoad = ref(true)
+    const controlInternal = reactive<ComboboxControl>(props.control)
+    function onShowOptions() {
+      if (controlInternal.isOpenSelextBox) {
+        controlInternal.isOpenSelextBox = false
       } else {
-        this.optionsSelect = handleFilterDefault(event.target.value)
+        controlInternal.isOpenSelextBox = true
       }
-      ctx.emit('update:inputValue', event.target.value)
     }
-    function focus() {
-      isFocus.value = true
-    }
-    function blur() {
-      isFocus.value = false
-    }
-    function handleSelect(option) {
-      ctx.emit('select', option)
-    }
-    function handleFilterDefault(valueSearch) {
-      const optionsSelect = props.options.filter(option => {
-        for (let index = 0; index < props.keySearch.length; index++) {
-          const keySearch = props.keySearch[index]
-          if (option && option[keySearch].includes(valueSearch)) {
-            return true
-          }
-        }
-        return false
-      })
-      return optionsSelect
+    function selectItem(item: Record<string, unknown>) {
+      inputValue.value = item[props.control.displayField] as string
+      controlInternal.isOpenSelextBox = false
+      emit('update:modelValue', item[props.control.valueField])
     }
     return {
-      value,
-      validateRule,
-      updateValue,
-      isFocus,
-      blur,
-      focus,
-      handleSelect,
-      optionsSelect,
-      handleFilterDefault,
+      options,
+      controlInternal,
+      isFirstLoad,
+      inputValue,
+      internalValue,
+      onShowOptions,
+      selectItem,
     }
+  },
+  created() {
+    this.options = this.control.data
   },
 }
 </script>
-<style src="./e-combobox.scss" lang="scss"></style>
+
+<style src="./e-combobox.scss" scoped></style>

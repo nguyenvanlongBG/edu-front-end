@@ -1,47 +1,57 @@
 <div class="e-question">
-  <div class="header"></div>
+  <div class="header">
+    <slot name="header-question">
+      <ECombobox :control="questionTypeControl" v-model="control.value.type" />
+    </slot>
+  </div>
   <div class="body">
     <div class="question-content">
-      <editor :control="questionControl" v-model="question.object_content" />
+      <editor
+        :control="questionEditorControl"
+        v-model="control.value.object_content"
+      />
     </div>
     <div>
       <div
-        v-if="question.type === QuestionType.SingleChoice || question.type === QuestionType.MultiChoice"
+        v-if="control.value.type === QuestionType.SingleChoice || control.value.type === QuestionType.MultiChoice"
       >
         <div class="list-option">
           <div
-            v-for="option in question.options"
+            v-for="option in control.value.options"
             :key="option.option_question_id"
             :class="getClassForOption(option)"
             class="option-question"
           >
             <input
-              v-if="question.type === QuestionType.SingleChoice"
+              v-if="control.value.type === QuestionType.SingleChoice"
               type="radio"
               class="box-select-option"
               name="question.question_id"
               :value="option.option_question_id"
-              :disabled="question.mode === QuestionMode.ViewOnly"
+              :disabled="control.value.mode === QuestionMode.ViewOnly"
               v-model="singleOptionSelected"
             />
             <input
-              v-else-if="question.type === QuestionType.MultiChoice"
+              v-else-if="control.value.type === QuestionType.MultiChoice"
               type="checkbox"
               class="box-select-option"
               name="question.question_id"
               :value="option.option_question_id"
-              :disabled="question.mode === QuestionMode.ViewOnly"
+              :disabled="control.value.mode === QuestionMode.ViewOnly"
               v-model="multiOptionSelected"
             />
             <editor
-              :control="questionControl"
+              :control="questionEditorControl"
               v-model="option.object_content"
             />
           </div>
         </div>
       </div>
-      <div v-if="question.type === QuestionType.FillResult">
-        <editor :control="questionControl" v-model="question.object_content" />
+      <div v-if="control.value.type === QuestionType.FillResult">
+        <editor
+          :control="questionEditorControl"
+          v-model="control.value.object_content"
+        />
       </div>
     </div>
   </div>

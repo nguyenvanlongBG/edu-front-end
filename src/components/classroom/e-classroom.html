@@ -12,19 +12,19 @@
         @click.stop
       >
         <li>
-          <div class="action-classroom">Chia sẻ</div>
+          <div class="action-classroom">{{$t("i18nClassroom.ShareClass")}}</div>
         </li>
         <li>
-          <div class="action-classroom">Rời lớp</div>
+          <div class="action-classroom">{{$t("i18nClassroom.LeaveClass")}}</div>
         </li>
         <li>
-          <div class="action-classroom">Xóa</div>
+          <div class="action-classroom">{{$t("i18nClassroom.LeaveClass")}}</div>
         </li>
       </ul>
     </div>
     <div class="box-image-classroom">
-      <img class="image-classroom" src="../assets/picture/classroom.png" />
+      <img class="image-classroom" :src="avatarClass()" />
     </div>
-    <div class="name-classroom">Lớp cô Hoa</div>
+    <div class="name-classroom">{{classroom.name}}</div>
   </div>
 </div>

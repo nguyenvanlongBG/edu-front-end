@@ -1,0 +1,12 @@
+<div class="skeleton-line" v-if="control.type == LoadingType.Skeleton"></div>
+<div
+  v-else-if="control.type == LoadingType.LoadingNormal"
+  class="loading-text-container"
+>
+  <span>Loading</span>
+  <span class="dots">
+    <span class="dot">.</span>
+    <span class="dot">.</span>
+    <span class="dot">.</span>
+  </span>
+</div>

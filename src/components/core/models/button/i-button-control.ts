@@ -4,6 +4,7 @@ export interface IButtonControl extends IBaseControl {
   label?: string
   iconLeft?: string
   iconRight?: string
+  styleClass?: string
   style?: Record<string, string>
   classType?: string // Thêm classType
 }

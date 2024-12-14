@@ -1,0 +1,8 @@
+.ic-import {
+  width: 24px; /* Đặt chiều rộng của icon */
+  height: 24px; /* Đặt chiều cao của icon */
+  background-image: url('@core/assets/pictures/import.png'); /* Đường dẫn đến ảnh bạn muốn sử dụng */
+  background-size: cover; /* Đảm bảo ảnh che phủ toàn bộ khu vực, bạn cũng có thể sử dụng 'contain' nếu muốn */
+  background-repeat: no-repeat; /* Không lặp lại ảnh nền */
+  display: inline-block; /* Cho phép thiết lập kích thước */
+}

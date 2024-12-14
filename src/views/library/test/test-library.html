@@ -1,15 +1,44 @@
 <div class="d-flex p-16px">
   <div class="d-flex-column flex-1 row-gap-8px">
     <div class="d-flex-end">
-      <EButton :control="addQuestionBtn" @click="onAddQuestion" />
+      <EButton :control="createTestBtn" @click="onCreateTest" />
     </div>
-    <div class="list-question">
-      <div v-for="question in questions" :key="question.question_id">
-        <EQuestion
-          :question="question"
-          :isShowResult="true"
-          :isShowAnswer="true"
-        />
+    <div class="list-test">
+      <div
+        v-for="test in tests"
+        :key="test.test_id"
+        @click.stop="onClickTest(test)"
+      >
+        <div class="exam-card">
+          <h2 class="exam-title">{{ test.name }}</h2>
+          <div class="exam-info">
+            <div class="d-flex col-gap-8px">
+              <p class="text-bold">{{$t('i18nTest.StartTime')}}:</p>
+              <p>{{ formatDateTime(test.start_time) ?? '--' }}</p>
+            </div>
+            <div class="d-flex col-gap-8px">
+              <p class="text-bold">{{$t('i18nTest.FinishTime')}}:</p>
+              <p>{{ formatDateTime(test.finish_time) ?? '--' }}</p>
+            </div>
+            <div class="d-flex col-gap-8px">
+              <p class="text-bold">{{$t('i18nTest.DurationTime')}}:</p>
+              <p>{{ test.duration ?? '--' }}</p>
+            </div>
+          </div>
+          <div class="buttons">
+            <EButton :control="doTestBtn" @click.stop="onDoTest(test)" />
+            <EButton
+              :control="doTestAgainBtn"
+              @click.stop="onDoTestAgain(test)"
+            />
+            <EButton :control="editTestBtn" @click.stop="onEditTest(test)" />
+            <EButton
+              :control="historyTestBtn"
+              @click.stop="onHistoryTest(test)"
+            />
+            <EButton :control="tryTestBtn" @click.stop="onTryTest(test)" />
+          </div>
+        </div>
       </div>
     </div>
     <div>

@@ -1,0 +1,41 @@
+<div class="d-flex p-16px">
+  <div class="d-flex-column flex-1 row-gap-8px">
+    <div class="d-flex">
+      <div class="list-question flex-1 p-x-8px">
+        <div class="d-flex-vcenter d-flex-end col-gap-8px">
+          <EButton :control="addQuestionBtn" @click="onAddQuestion" />
+          <div class="ic-import cursor-pointer" @click="onImportQuestion"></div>
+          <input
+            type="file"
+            ref="fileInputRef"
+            style="display: none"
+            @change="handleFileChange"
+            accept=".doc, .docx"
+          />
+        </div>
+        <div style="height: 36px" v-if="isLoading">
+          <ELoading :control="loadingControl" v-model="isLoading" />
+        </div>
+        <div v-show="!isLoading">
+          <div
+            v-for="question in questions"
+            :key="question.question_id"
+            :ref="setQuestionRef(question.question_id)"
+          >
+            <EQuestion :control="getQuestionControl(question)" />
+          </div>
+        </div>
+      </div>
+      <div class="test-info">
+        <div class="d-flex-column row-gap-8px">
+          <EInput :control="inputControl" v-model="masterData.name" />
+          <EDate :control="startTimeControl" :v-model="masterData.start_time" />
+          <ENumber :control="durationControl" v-mode="masterData.duration" />
+        </div>
+        <div class="table-label-question p-x-8px p-t-8px">
+          <ETableLabel :control="tableLabel" @selected="onSelectLabel" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

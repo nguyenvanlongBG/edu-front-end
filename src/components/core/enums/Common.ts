@@ -53,3 +53,11 @@ export enum FilterOperator {
   /// </summary>
   In,
 }
+export enum ComboboxMode {
+  Local = 1,
+  Remote = 2,
+}
+export enum LoadingType {
+  Skeleton = 1,
+  LoadingNormal = 2,
+}

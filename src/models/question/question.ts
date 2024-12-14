@@ -9,10 +9,14 @@ import type { AnswerQuestion } from '../answer-question/answer-question'
 export class Question extends BaseEntity {
   constructor(question?: IQuestion) {
     super()
-    commonFunction.assignProperties(
-      this as Record<string, unknown>,
-      question as unknown as Record<string, unknown>,
-    )
+    if (question) {
+      commonFunction.assignProperties(
+        this as Record<string, unknown>,
+        question as unknown as Record<string, unknown>,
+      )
+    } else {
+      this.question_id = commonFunction.generateID()
+    }
   }
   question_id: string = ''
   content: string = ''

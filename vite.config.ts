@@ -26,7 +26,8 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: '@import "@core/styles/global.scss";', // Tự động import file biến SCSS
+        additionalData:
+          '@use "@core/styles/global.scss"; @use "@core/styles/variables" as *;', // Tự động import file biến SCSS
       },
     },
   },

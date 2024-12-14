@@ -92,9 +92,4 @@
   </div>
 </template>
 <script src="./left-menu.ts" lang="ts"></script>
-<style lang="scss">
-@import './left-menu.scss';
-.color-icon {
-  color: red;
-}
-</style>
+<style src="./left-menu.scss" lang="scss"></style>

@@ -1,0 +1,96 @@
+.list-test {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Tạo 4 cột có kích thước bằng nhau */
+  gap: 20px; /* Khoảng cách giữa các đề thi */
+  margin: 20px; /* Khoảng cách xung quanh danh sách */
+}
+
+@media (max-width: 1200px) {
+  .list-test {
+    grid-template-columns: repeat(
+      2,
+      1fr
+    ); /* Chỉ hiển thị 2 đề thi mỗi dòng khi màn hình nhỏ */
+  }
+}
+
+@media (max-width: 768px) {
+  .list-test {
+    grid-template-columns: 1fr; /* Chỉ hiển thị 1 đề thi mỗi dòng khi màn hình rất nhỏ */
+  }
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  opacity: 0; /* Ban đầu các button sẽ bị ẩn */
+  visibility: hidden; /* Đảm bảo các nút không ảnh hưởng đến tương tác chuột khi không hiển thị */
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.exam-card:hover .buttons {
+  opacity: 1; /* Hiển thị các button khi hover */
+  visibility: visible; /* Đảm bảo các nút có thể tương tác khi hiển thị */
+}
+
+.exam-card {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.exam-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Tăng độ sâu của bóng khi hover */
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* Các class button khác với màu sắc tương ứng */
+
+.btn-do-test-again {
+  background-color: #6c757d;
+}
+
+.btn-edit-test {
+  background-color: #ffc107;
+}
+
+.btn-history-test {
+  background-color: #17a2b8;
+}
+
+.btn-try-test {
+  background-color: #28a745;
+}
+
+/* Định nghĩa hover cho từng button để thay đổi màu khi hover */
+.btn:hover {
+  background-color: darken(#007bff, 10%);
+}
+.btn-secondary:hover {
+  background-color: darken(#6c757d, 10%);
+}
+.btn-edit:hover {
+  background-color: darken(#ffc107, 10%);
+}
+.btn-history:hover {
+  background-color: darken(#17a2b8, 10%);
+}
+.btn-try:hover {
+  background-color: darken(#28a745, 10%);
+}

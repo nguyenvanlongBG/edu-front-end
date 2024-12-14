@@ -15,6 +15,7 @@ export class ButtonControl extends BaseControl {
   }
   iconLeft?: string
   iconRight?: string
+  styleClass: string = ''
   style: Record<string, string> = {}
   classType: 'solid' | 'default' | 'outline' = 'default' // Thêm classType
 }

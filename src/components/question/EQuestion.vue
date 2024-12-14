@@ -5,65 +5,71 @@ import { defineComponent, ref } from 'vue'
 import { QuestionType, QuestionMode } from '@/enums/question' // Giả sử các enum đã được định nghĩa đúng cách
 import { EditorControl } from '../core/models/editor/editor-control'
 import Editor from '@core/components/editor/EEditor.vue'
-import { Question } from '@/models/question/question'
 import type { OptionQuestion } from '@/models/option-question/option-question'
+import ECombobox from '../core/components/combobox/ECombobox.vue'
+import { QuestionControl } from '@/models/question/question-control'
+import { ComboboxControl } from '../core/models/combobox/combobox-control'
 
 export default defineComponent({
   name: 'EQuestion',
   components: {
     Editor,
+    ECombobox,
   },
   props: {
-    question: {
-      type: Question,
+    control: {
+      type: QuestionControl,
       required: true,
-      default: () => new Question(),
-    },
-    isShowAnswer: {
-      type: Boolean,
-      default: false,
-    },
-    isShowResult: {
-      type: Boolean,
-      default: false,
     },
   },
   setup(props) {
-    const questionControl = ref(new EditorControl())
+    const questionEditorControl = ref(new EditorControl())
+    const questionTypeControl = ref(
+      new ComboboxControl({
+        data: [
+          {
+            display: 'Single',
+            value: QuestionType.SingleChoice,
+          },
+          {
+            display: 'Multi',
+            value: QuestionType.MultiChoice,
+          },
+        ],
+      }),
+    )
     function getClassForOption(option: OptionQuestion) {
       let classType = ''
+      const question = props.control.value
+      const control = props.control
       if (
-        !props.question ||
+        !question ||
         !(
-          props.question.type == QuestionType.SingleChoice ||
-          props.question.type == QuestionType.MultiChoice
+          question.type == QuestionType.SingleChoice ||
+          question.type == QuestionType.MultiChoice
         ) ||
         !option
       )
         return ''
-      if (
-        props.isShowResult &&
-        props.question.results &&
-        props.question.results.length
-      ) {
-        for (let index = 0; index < props.question.results.length; index++) {
-          const result = props.question.results[index]
+      if (control.isShowResult && question.results && question.results.length) {
+        for (let index = 0; index < question.results.length; index++) {
+          const result = question.results[index]
           if (result.content.includes(option.option_question_id)) {
             classType = 'neutral'
             break
           }
         }
       }
-      if (props.isShowAnswer) {
-        if (props.question.answers && props.question.answers.length) {
-          const isCheck = props.question.answers.find(answer =>
+      if (control.isShowAnswer) {
+        if (question.answers && question.answers.length) {
+          const isCheck = question.answers.find(answer =>
             answer.content.includes(option.option_question_id),
           )
           if (!isCheck) return classType
-          const result = props.question.results?.map(result => result.content)
+          const result = question.results?.map(result => result.content)
           if (!result) return classType
-          for (let index = 0; index < props.question.answers.length; index++) {
-            const answer = props.question.answers[index]
+          for (let index = 0; index < question.answers.length; index++) {
+            const answer = question.answers[index]
             if (result.includes(answer.content)) {
               classType = 'correct'
               return classType
@@ -82,34 +88,33 @@ export default defineComponent({
 
     return {
       QuestionMode,
+      questionTypeControl,
       QuestionType,
-      questionControl,
+      questionEditorControl,
       getClassForOption,
       singleOptionSelected,
       multiOptionSelected,
     }
   },
   created() {
+    const question = this.control.value
     if (
-      this.question &&
-      (this.question.mode == QuestionMode.Do ||
-        this.question.mode == QuestionMode.ViewOnly)
+      question &&
+      (question.mode == QuestionMode.Do ||
+        question.mode == QuestionMode.ViewOnly)
     ) {
-      this.questionControl.isHideToolbar = true
+      this.questionEditorControl.isHideToolbar = true
     }
   },
   mounted() {
-    if (
-      this.question &&
-      this.question.answers &&
-      this.question.answers.length
-    ) {
-      switch (this.question.type) {
+    const question = this.control.value
+    if (question && question.answers && question.answers.length) {
+      switch (question.type) {
         case QuestionType.SingleChoice:
-          this.singleOptionSelected = this.question.answers[0].content
+          this.singleOptionSelected = question.answers[0].content
           break
         case QuestionType.MultiChoice:
-          this.multiOptionSelected = this.question.answers.map(
+          this.multiOptionSelected = question.answers.map(
             answer => answer.content,
           )
           break

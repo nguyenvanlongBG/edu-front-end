@@ -4,7 +4,9 @@
   </div>
 
   <div class="">
-    <div class="d-flex-end p-r-8px"><EButton :control="createClassBtn" /></div>
+    <div class="d-flex-end p-r-8px">
+      <EButton :control="createClassBtn" @click="onAddClassroom" />
+    </div>
     <div class="classroom-list">
       <EClassroom
         v-for="classroom in classrooms"

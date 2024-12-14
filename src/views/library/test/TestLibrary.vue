@@ -1,22 +1,16 @@
 <script lang="ts">
-import commonFunction from '@/components/core/commons/CommonFunction'
-import PopupLibrary from '@core/library/popup-library'
 import EQuestion from '@/components/question/EQuestion.vue'
 import ETableLabel from '@/components/core/components/table-label/ETableLabel.vue'
 import EPaging from '@/components/core/components/paging/EPaging.vue'
-import { Question } from '@/models/question/question'
-import uploadFileQuestion from '@/services/file-question-service'
-import TestService from '@/services/test-service'
-import QuestionService from '@/services/question-service'
 import { ref } from 'vue'
-import { ItemTableLabel } from '@/components/core/models/table-label/item-table-label'
 import { PagingControl } from '@/components/core/models/paging/paging-control'
-import { PagingParam } from '@/components/core/models/paging/paging-param'
+import EButton from '@/components/core/components/button/EButton.vue'
+import QuestionCreatePopup from '@views/library/popup/QuestionCreatePopup.vue'
+import { TestDto } from '@/models/test/test-dto'
 import { ButtonControl } from '@/components/core/models/button/button-control'
 import { useI18n } from 'vue-i18n'
-import EButton from '@/components/core/components/button/EButton.vue'
-import { PopupControl } from '@/components/core/models/popup/popup-control'
-import QuestionCreatePopup from '@views/library/popup/QuestionCreatePopup.vue'
+import moment from 'moment'
+import commonFunction from '@/components/core/commons/CommonFunction'
 export default {
   components: {
     EQuestion,
@@ -27,101 +21,88 @@ export default {
   },
   setup() {
     const { t } = useI18n()
-    const fileInput = ref<File | null>(null)
-    const questions = ref<Question[]>([])
+    const tests = ref<TestDto[]>([
+      new TestDto({
+        test_id: commonFunction.generateID(),
+        name: 'Đề thi cuối kì 1',
+      }),
+      new TestDto({
+        test_id: commonFunction.generateID(),
+        name: 'Đề thi cuối kì 2',
+      }),
+    ])
+    const createTestBtn = ref(
+      new ButtonControl({
+        classType: 'solid',
+        label: t('i18nTest.CreateTest'),
+      }),
+    )
+    const doTestBtn = ref(
+      new ButtonControl({
+        label: t('i18nTest.Button.DoTest'),
+      }),
+    )
+    const doTestAgainBtn = ref(
+      new ButtonControl({
+        label: t('i18nTest.Button.DoTestAgain'),
+        styleClass: 'btn-do-test-again',
+      }),
+    )
+    const editTestBtn = ref(
+      new ButtonControl({
+        label: t('i18nTest.Button.EditTest'),
+        styleClass: 'btn-edit-test',
+      }),
+    )
+    const historyTestBtn = ref(
+      new ButtonControl({
+        label: t('i18nTest.Button.History'),
+        styleClass: 'btn-history-test',
+      }),
+    )
+    const tryTestBtn = ref(
+      new ButtonControl({
+        label: t('i18nTest.Button.TryTest'),
+        styleClass: 'btn-try-test',
+      }),
+    )
     const pagingControl = ref(new PagingControl())
-    const addQuestionBtn = new ButtonControl({
-      label: t('i18nQuestion.AddQuestion'),
-      classType: 'outline',
-    })
     // Object lưu trữ các refs động
-    const questionRefs = ref<{ [key: string]: HTMLElement | null }>({})
+    function formatDateTime(dateTime: Date) {
+      // Chuỗi ngày giờ ban đầu
+      const dateString = dateTime.toString()
 
-    // Hàm để gán ref động theo index
-    // const setQuestionRef = (index: string) => (el: HTMLElement | null) => {
-    //   if (el) {
-    //     questionRefs.value[index] = el
-    //   }
-    // }
-    function validateInput() {
-      return {
-        isValid: false,
-        message: 'Không hợp lệ',
-      }
+      // Parse chuỗi ngày giờ sử dụng moment
+      const date = moment(dateString)
+
+      // Format ngày giờ theo định dạng mong muốn
+      const formattedDate = date.format('DD/MM/YYYY HH:mm')
+      return formattedDate
     }
-    const handleFileChange = (event: Event) => {
-      const input = event.target as HTMLInputElement
-      if (input.files && input.files.length > 0) {
-        fileInput.value = input.files[0] // Lưu tệp vào biến `fileInput`
-      }
-    }
-    async function handleLoadData(pagingParam: PagingParam) {
-      const questionService = new QuestionService()
-      const result = await questionService.getPaging(pagingParam)
-      questions.value = commonFunction.convertToInstances<Question>(
-        result as unknown as Record<string, unknown>[],
-        Question,
-      )
-    }
-    async function testUploadFile() {
-      if (!fileInput.value) {
-        return
-      }
-      const formData = new FormData()
-      formData.append('file', fileInput.value) // Thêm tệp vào FormData
-      formData.append('testId', '12') // Thêm các trường khác nếu cần
-      const result = await uploadFileQuestion(formData)
-      questions.value = result as unknown as Question[]
-    }
-    async function getQuestion() {
-      const testService = new TestService()
-      const testId = commonFunction.generateID()
-      const result = await testService.getQuestionOfTest(testId)
-      questions.value = result as unknown as Question[]
-    }
-    function onSelectQuestionLabel(
-      itemTableLabel: ItemTableLabel,
-      index: number,
-    ) {
-      const target = questionRefs.value[itemTableLabel.value]
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      } else {
-        console.error(`Không tìm thấy phần tử với index ${index}`)
-      }
-    }
-    async function onAddQuestion() {
-      const popupAddQuestion = import(
-        '@views/library/popup/QuestionCreatePopup.vue'
-      )
-      const popupControl = new PopupControl({
-        width: '600px',
-      })
-      PopupLibrary.showPopup(popupAddQuestion, {
-        control: popupControl,
-      })
-    }
+    function onClickTest(test: TestDto) {}
+    function onDoTest(test: TestDto) {}
+    function onDoTestAgain(test: TestDto) {}
+    function onEditTest(test: TestDto) {}
+    function onTryTest(test: TestDto) {}
     return {
-      handleLoadData,
-      addQuestionBtn,
+      formatDateTime,
+      createTestBtn,
       pagingControl,
-      fileInput,
-      validateInput,
-      testUploadFile,
-      handleFileChange,
-      questions,
-      getQuestion,
-      questionRefs,
-      onSelectQuestionLabel,
-      onAddQuestion,
+      tests,
+      doTestBtn,
+      doTestAgainBtn,
+      editTestBtn,
+      historyTestBtn,
+      tryTestBtn,
+      onClickTest,
+      onDoTest,
+      onDoTestAgain,
+      onEditTest,
+      onTryTest,
     }
-  },
-  async created() {
-    const param = new PagingParam()
-    await this.handleLoadData(param)
   },
 }
 </script>
 
 <template src="./test-library.html"></template>
-<style src="./test-library.scss" lang="scss"></style>
+<style src="./test-library.scss" scoped lang="scss"></style>

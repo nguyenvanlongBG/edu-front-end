@@ -5,7 +5,6 @@ import EQuestion from '@/components/question/EQuestion.vue'
 import ETableLabel from '@/components/core/components/table-label/ETableLabel.vue'
 import EPaging from '@/components/core/components/paging/EPaging.vue'
 import { Question } from '@/models/question/question'
-import uploadFileQuestion from '@/services/file-question-service'
 import TestService from '@/services/test-service'
 import QuestionService from '@/services/question-service'
 import { ref } from 'vue'
@@ -17,6 +16,7 @@ import { useI18n } from 'vue-i18n'
 import EButton from '@/components/core/components/button/EButton.vue'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
 import QuestionCreatePopup from '@views/library/popup/QuestionCreatePopup.vue'
+import FileQuestionService from '@/services/file-question-service'
 export default {
   components: {
     EQuestion,
@@ -70,7 +70,8 @@ export default {
       const formData = new FormData()
       formData.append('file', fileInput.value) // Thêm tệp vào FormData
       formData.append('testId', '12') // Thêm các trường khác nếu cần
-      const result = await uploadFileQuestion(formData)
+      const fileQuestionService = new FileQuestionService()
+      const result = await fileQuestionService.uploadFileQuestion(formData)
       questions.value = result as unknown as Question[]
     }
     async function getQuestion() {

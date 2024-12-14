@@ -2,7 +2,8 @@
   :class="[
       'button',
       `button--${control.classType}`, // Áp dụng class tương ứng với classType
-      { 'button--loading': control.isLoading, 'button--readonly': control.readonly }
+      { 'button--loading': control.isLoading, 'button--readonly': control.readonly},
+      control.styleClass
     ]"
   :disabled="control.readonly || control.isLoading"
   :style="control.style"
