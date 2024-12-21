@@ -1,0 +1,29 @@
+<div
+  :class="[
+      'e-input p-l-4px',
+      control.styleClass,
+      control.isHorizontal ? 'd-flex': 'd-flex-column',
+    ]"
+>
+  <!-- Hiển thị label nếu có -->
+  <label v-if="control.label" class="e-input-label">
+    {{ control.label }}
+    <span v-if="control.required" class="e-input-required">*</span>
+  </label>
+  <!-- Input Field -->
+  <input
+    :class="['default-input',
+    isFocus ? 'focus-e-input' : '']"
+    :type="control.type"
+    :value="localValue"
+    :placeholder="control.placeholder"
+    @input="updateValue"
+    @blur="onBlur"
+    @focus="onFocus"
+  />
+
+  <!-- Hiển thị thông báo lỗi nếu có -->
+  <p v-if="control.messageWarning" class="e-input-error">
+    {{ control.messageWarning }}
+  </p>
+</div>

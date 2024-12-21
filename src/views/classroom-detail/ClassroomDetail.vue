@@ -1,6 +1,6 @@
 <template src="./classroom-detail.html"></template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import EButton from '@core/components/button/EButton.vue'
 import EPopup from '@core/components/popup/EPopup.vue'
 import { ButtonControl } from '@core/models/button/button-control'
@@ -9,17 +9,22 @@ import { useI18n } from 'vue-i18n'
 import EQuestion from '@/components/question/EQuestion.vue'
 import { Classroom } from '@/models/classroom/classroom'
 import { ModelState } from '@/components/core/enums/model-state'
+import { InputControl } from '@/components/core/models/input/input-control'
+import EInput from '@/components/core/components/input/EInput.vue'
+import ClassroomService from '@/services/classroom-service'
 
 export default defineComponent({
   components: {
     EPopup,
     EButton,
     EQuestion,
+    EInput,
   },
   props: {
     control: {
       type: PopupControl,
-      required: true,
+      required: false,
+      default: () => new PopupControl(),
     },
     masterData: {
       type: Classroom,
@@ -27,8 +32,22 @@ export default defineComponent({
     },
   },
   emits: ['change', 'close'],
-  setup(props, { emit }) {
+  setup(props) {
     const { t } = useI18n()
+    const masterDataLocal = ref(props.masterData)
+    const classroomService = new ClassroomService()
+    const txtClassroomName = ref(
+      new InputControl({
+        label: t('i18nClassroom.ClassroomName'),
+        placeholder: t('i18nClassroom.ClassroomName'),
+      }),
+    )
+    const txtClassroomCode = ref(
+      new InputControl({
+        label: t('i18nClassroom.CLassroomCode'),
+        placeholder: t('i18nClassroom.CLassroomCode'),
+      }),
+    )
     const cancelBtn = new ButtonControl({
       label: t('i18nButton.cancel'),
     })
@@ -38,10 +57,10 @@ export default defineComponent({
     })
 
     function getTitle() {
-      if (props.masterData) {
-        if (props.masterData.State == ModelState.INSERT) {
+      if (masterDataLocal.value) {
+        if (masterDataLocal.value.State == ModelState.INSERT) {
           return t('i18nClassroom.AddClassroom')
-        } else if (props.masterData.State == ModelState.EDIT) {
+        } else if (masterDataLocal.value.State == ModelState.EDIT) {
           return t('i18nClassroom.EditClassroom')
         }
       }
@@ -50,11 +69,23 @@ export default defineComponent({
     function onClose() {
       props.control.handleEmit('close')
     }
+    async function onSave() {
+      const resultSave = await classroomService.post(masterDataLocal.value)
+      if (resultSave) {
+        masterDataLocal.value.classroom_code = (
+          resultSave as unknown as Classroom
+        ).classroom_code
+      }
+    }
     return {
+      masterDataLocal,
       getTitle,
       cancelBtn,
       saveBtn,
       onClose,
+      onSave,
+      txtClassroomName,
+      txtClassroomCode,
     }
   },
 })

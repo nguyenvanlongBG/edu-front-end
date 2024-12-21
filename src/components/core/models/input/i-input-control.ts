@@ -7,4 +7,5 @@ export interface IInputControl extends IBaseControl {
   placeholder?: string
   styleClass?: string
   maxLength?: number
+  isHorizontal?: boolean
 }

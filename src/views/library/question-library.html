@@ -3,13 +3,12 @@
     <div class="d-flex-end">
       <EButton :control="addQuestionBtn" @click="onAddQuestion" />
     </div>
-    <div class="list-question">
+    <div style="height: 36px" v-if="isLoading">
+      <ELoading :control="loadingControl" v-model="isLoading" />
+    </div>
+    <div v-show="!isLoading" class="list-question">
       <div v-for="question in questions" :key="question.question_id">
-        <EQuestion
-          :question="question"
-          :isShowResult="true"
-          :isShowAnswer="true"
-        />
+        <EQuestion :control="getQuestionControl(question)" />
       </div>
     </div>
     <div>

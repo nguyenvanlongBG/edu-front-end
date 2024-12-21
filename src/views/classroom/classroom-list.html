@@ -1,18 +1,22 @@
-<div class="classroom-container">
+<div class="classroom-container d-flex-column">
   <div class="search-bar">
-    <EInput :control="inputControl" v-model="inputControl.value" />
+    <EInput
+      :control="searchClassControl"
+      v-model="searchClassControl.value"
+      @blur="onBlurSearchClass"
+    />
   </div>
 
-  <div class="">
+  <div class="flex-1">
     <div class="d-flex-end p-r-8px">
       <EButton :control="createClassBtn" @click="onAddClassroom" />
     </div>
-    <div class="classroom-list">
+    <div class="classroom-list flex-1">
       <EClassroom
         v-for="classroom in classrooms"
         :key="classroom.id"
         :classroom="classroom"
-        @goToClassroom="goToClassroom"
+        @click.stop="onClassroom(classroom)"
       />
     </div>
   </div>

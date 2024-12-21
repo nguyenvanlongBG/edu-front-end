@@ -16,6 +16,7 @@ export class Classroom extends BaseEntity {
   }
   classroom_id: string = ''
   name: string = ''
+  classroom_code: string = ''
   description: string = ''
   avatar: string = ''
 }

@@ -40,13 +40,12 @@ export class PopupControl extends BaseControl {
       // Gắn hàm đóng popup vào globalProperties
       app.config.globalProperties.$destroyPopup = closeFuct
       this.close = closeFuct
+
       this.handleEmit = handleEmit
     })
   }
 
   close() {}
 
-  handleEmit(eventName: string, ...args: unknown[]) {
-    console.log(eventName, args)
-  }
+  handleEmit(eventName: string, ...args: unknown[]) {}
 }

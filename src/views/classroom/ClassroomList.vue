@@ -14,8 +14,10 @@ import { useI18n } from 'vue-i18n'
 import { PagingParam } from '@/components/core/models/paging/paging-param'
 import { Classroom } from '@/models/classroom/classroom'
 import ClassroomService from '@/services/classroom-service'
-import PopupLibrary from '@core/library/popup-library'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
+import { ModelState } from '@/components/core/enums/model-state'
+import { FilterCondition } from '@/components/core/models/paging/filter-condition'
+import { FilterOperator } from '@/components/core/enums/Common'
 
 export default {
   name: 'ClassroomList',
@@ -30,10 +32,11 @@ export default {
     const classrooms = ref<Classroom[]>([])
 
     const searchQuery = ref('')
-    const inputControl = ref(
+    const searchClassControl = ref(
       new InputControl({
         placeholder: 'Tìm kiếm lớp học...',
         styleClass: 'search-input',
+        value: '12A5',
       }),
     )
     const createClassBtn = ref(
@@ -45,20 +48,17 @@ export default {
     const currentPage = ref(1)
     const itemsPerPage = ref(4)
     const pagingControl = ref(new PagingControl())
-    const filteredClassrooms = computed(() => {
-      return classrooms.value.filter(classroom =>
-        classroom.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
-      )
-    })
     const detailPopupControl = new PopupControl()
-    const goToClassroom = (id: string) => {
-      alert(`Đi tới lớp học có ID: ${id}`)
+    function onClassroom(classroom: Classroom) {
+      classroom.State = ModelState.EDIT
+      viewDetail(classroom as unknown as Record<string, unknown>)
     }
     const changePage = (page: number) => {
       currentPage.value = page
     }
     function onAddClassroom() {
       const newClassroom = new Classroom()
+      newClassroom.State = ModelState.INSERT
       viewDetail(newClassroom as unknown as Record<string, unknown>)
     }
     function getComponentDetail() {
@@ -79,27 +79,41 @@ export default {
     async function loadListData() {
       const classroomService = new ClassroomService()
       const pagingParam = buildPagingParam()
-      const data = await classroomService.getPaging(pagingParam)
+      const dataRes = await classroomService.getPaging(pagingParam)
+      classrooms.value = dataRes as unknown as Classroom[]
     }
     function buildPagingParam() {
       const pagingParam = new PagingParam({
         page: pagingControl.value.currentPage,
         take: 20,
       })
+      if (searchClassControl.value && searchClassControl.value.value) {
+        const filters = [
+          new FilterCondition({
+            Field: 'name',
+            Operator: FilterOperator.Contains,
+            Value: searchClassControl.value.value,
+          }),
+        ]
+        pagingParam.filters = filters
+      }
       return pagingParam
+    }
+    async function onBlurSearchClass() {
+      await loadListData()
     }
     return {
       detailPopupControl,
+      onClassroom,
       onAddClassroom,
+      onBlurSearchClass,
       pagingControl,
       createClassBtn,
-      inputControl,
+      searchClassControl,
       classrooms,
       searchQuery,
       currentPage,
       itemsPerPage,
-      filteredClassrooms,
-      goToClassroom,
       changePage,
       loadListData,
       buildPagingParam,

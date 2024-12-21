@@ -1,7 +1,18 @@
 <div class="e-question">
   <div class="header">
     <slot name="header-question">
-      <ECombobox :control="questionTypeControl" v-model="control.value.type" />
+      <div class="d-flex-between">
+        <div class="left-tool-bar">
+          <ECombobox
+            v-if="control.isShowQuestionType"
+            :control="questionTypeControl"
+            v-model="control.value.type"
+          />
+        </div>
+        <div class="right-tool-bar" v-if="control.isShowActionToolbar">
+          <EButton :control="btnEdit" @click="onEditQuestion" />
+        </div>
+      </div>
     </slot>
   </div>
   <div class="body">

@@ -14,6 +14,16 @@ export class QuestionControl extends BaseControl {
     }
   }
   value: Question = new Question()
-  isShowAnswer?: boolean = false
-  isShowResult?: boolean = false
+  isShowAnswer: boolean = false
+  isShowResult: boolean = false
+  isShowLevel: boolean = true
+  isShowActionToolbar: boolean = false
+  isShowToolEditor: boolean = false
+  isShowChapter: boolean = false
+  isShowQuestionType: boolean = false
+  isReadonlyResult: boolean = false
+  isReadonlyLevel: boolean = false
+  isReadonlyChapter: boolean = false
+  isReadonlyToolEditor: boolean = false
+  customAction: ((actionName: string) => void) | null = null
 }

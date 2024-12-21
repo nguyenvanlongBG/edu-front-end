@@ -17,6 +17,10 @@ import EButton from '@/components/core/components/button/EButton.vue'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
 import QuestionCreatePopup from '@views/library/popup/QuestionCreatePopup.vue'
 import FileQuestionService from '@/services/file-question-service'
+import { QuestionControl } from '@/models/question/question-control'
+import { LoadingControl } from '@/components/core/models/loading/loading-control'
+import { LoadingType } from '@/components/core/enums/Common'
+import ELoading from '@/components/core/components/loading/ELoading.vue'
 export default {
   components: {
     EQuestion,
@@ -24,12 +28,20 @@ export default {
     ETableLabel,
     EPaging,
     QuestionCreatePopup,
+    ELoading,
   },
   setup() {
     const { t } = useI18n()
     const fileInput = ref<File | null>(null)
+    const isLoading = ref(false)
+    const loadingControl = ref(
+      new LoadingControl({
+        type: LoadingType.LoadingNormal,
+      }),
+    )
     const questions = ref<Question[]>([])
     const pagingControl = ref(new PagingControl())
+    const dicQuestionControl = ref<Record<string, QuestionControl>>({})
     const addQuestionBtn = new ButtonControl({
       label: t('i18nQuestion.AddQuestion'),
       classType: 'outline',
@@ -56,12 +68,14 @@ export default {
       }
     }
     async function handleLoadData(pagingParam: PagingParam) {
+      isLoading.value = true
       const questionService = new QuestionService()
       const result = await questionService.getPaging(pagingParam)
       questions.value = commonFunction.convertToInstances<Question>(
         result as unknown as Record<string, unknown>[],
         Question,
       )
+      isLoading.value = false
     }
     async function testUploadFile() {
       if (!fileInput.value) {
@@ -91,6 +105,18 @@ export default {
         console.error(`Không tìm thấy phần tử với index ${index}`)
       }
     }
+    function getQuestionControl(question: Question) {
+      if (!question || !question.question_id) return
+      if (!(question.question_id in dicQuestionControl.value)) {
+        dicQuestionControl.value[question.question_id] = new QuestionControl({
+          value: question,
+          isShowActionToolbar: true,
+          isShowLevel: true,
+          readonly: true,
+        })
+      }
+      return dicQuestionControl.value[question.question_id]
+    }
     async function onAddQuestion() {
       const popupAddQuestion = import(
         '@views/library/popup/QuestionCreatePopup.vue'
@@ -103,13 +129,17 @@ export default {
       })
     }
     return {
+      isLoading,
+      loadingControl,
       handleLoadData,
+      dicQuestionControl,
       addQuestionBtn,
       pagingControl,
       fileInput,
       validateInput,
       testUploadFile,
       handleFileChange,
+      getQuestionControl,
       questions,
       getQuestion,
       questionRefs,
@@ -117,7 +147,8 @@ export default {
       onAddQuestion,
     }
   },
-  async created() {
+  async created() {},
+  async mounted() {
     const param = new PagingParam()
     await this.handleLoadData(param)
   },

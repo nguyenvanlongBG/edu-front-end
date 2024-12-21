@@ -1,23 +1,6 @@
-<template>
-  <div
-    :class="[
-      'e-input p-l-4px',
-      control.styleClass,
-      isFocus ? 'focus-e-input' : '',
-    ]"
-  >
-    <input
-      class="default-input"
-      :value="modelValue"
-      @input="updateValue"
-      :placeholder="control.placeholder"
-      @blur="blur"
-      @focus="focus"
-    />
-  </div>
-</template>
+<template src="./e-input.html"></template>
 <script lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 // import { useI18n } from 'vue-i18n'
 import { InputControl } from '@core/models/input/input-control'
 export default {
@@ -32,26 +15,46 @@ export default {
       required: true,
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'focus', 'blur'],
+  watch: {
+    modelValue: {
+      handler(newValue: string) {
+        console.log(newValue)
+      },
+    },
+  },
   setup(props, ctx) {
-    const value = ref('')
     // const { t } = useI18n()
+
+    watch(
+      () => props.modelValue,
+      (newData: string) => {
+        localValue.value = newData
+      },
+    )
+
     const isFocus = ref(false)
+    const localValue = ref(props.modelValue)
     function updateValue(event: Event) {
-      ctx.emit('update:modelValue', (event.target as HTMLInputElement).value)
+      const value = (event.target as HTMLInputElement).value
+      localValue.value = value
+      ctx.emit('update:modelValue', value)
     }
-    function focus() {
+    function onFocus() {
       isFocus.value = true
+      ctx.emit('focus')
     }
-    function blur() {
+    function onBlur() {
       isFocus.value = false
+      console.log(props.modelValue)
+      ctx.emit('blur')
     }
     return {
-      value,
       updateValue,
+      localValue,
       isFocus,
-      blur,
-      focus,
+      onFocus,
+      onBlur,
     }
   },
 }

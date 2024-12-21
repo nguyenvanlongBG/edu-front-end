@@ -10,7 +10,7 @@
       :placeholder="control.placeholder"
     />
     <span class="dropdown-icon" @click="onShowOptions">▼</span>
-    <div v-if="isLoading" class="loading-indicator">Loading...</div>
+    <div v-if="control.isLoading" class="loading-indicator">Loading...</div>
   </div>
   <div v-if="controlInternal.isOpenSelextBox" class="dropdown-menu">
     <div

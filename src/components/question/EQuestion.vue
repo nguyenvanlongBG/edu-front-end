@@ -9,12 +9,16 @@ import type { OptionQuestion } from '@/models/option-question/option-question'
 import ECombobox from '../core/components/combobox/ECombobox.vue'
 import { QuestionControl } from '@/models/question/question-control'
 import { ComboboxControl } from '../core/models/combobox/combobox-control'
+import EButton from '../core/components/button/EButton.vue'
+import { ButtonControl } from '../core/models/button/button-control'
+import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   name: 'EQuestion',
   components: {
     Editor,
     ECombobox,
+    EButton,
   },
   props: {
     control: {
@@ -23,19 +27,29 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const { t } = useI18n()
     const questionEditorControl = ref(new EditorControl())
     const questionTypeControl = ref(
       new ComboboxControl({
+        value: QuestionType.SingleChoice,
+        bindingText: t('i18nQuestion.SingleChoice'),
+        isOnlySelect: true,
         data: [
           {
-            display: 'Single',
+            display: t('i18nQuestion.SingleChoice'),
             value: QuestionType.SingleChoice,
           },
           {
-            display: 'Multi',
+            display: t('i18nQuestion.MultiChoice'),
             value: QuestionType.MultiChoice,
           },
         ],
+      }),
+    )
+    const btnEdit = ref(
+      new ButtonControl({
+        label: t('i18nQuestion.Edit'),
+        classType: 'outline',
       }),
     )
     function getClassForOption(option: OptionQuestion) {
@@ -83,11 +97,62 @@ export default defineComponent({
       }
       return classType
     }
+    function initControls() {
+      const question = props.control.value
+      const questionControl = props.control
+      if (questionControl && !questionControl.isShowToolEditor) {
+        questionEditorControl.value.isHideToolbar = true
+        questionEditorControl.value.readonly = true
+      }
+      questionTypeControl.value.value = question.type
+      switch (question.type) {
+        case QuestionType.SingleChoice:
+          questionTypeControl.value.bindingText = t('i18nQuestion.SingleChoice')
+          break
+        case QuestionType.MultiChoice:
+          questionTypeControl.value.bindingText = t('i18nQuestion.MultiChoice')
+          break
+      }
+
+      if (question && question.answers && question.answers.length) {
+        switch (question.type) {
+          case QuestionType.SingleChoice:
+            singleOptionSelected.value = question.answers[0].content
+            break
+          case QuestionType.MultiChoice:
+            multiOptionSelected.value = question.answers.map(
+              answer => answer.content,
+            )
+            break
+        }
+      }
+      if (props.control.isShowLevel && props.control.isReadonlyLevel) {
+        questionTypeControl.value.readonly = true
+      }
+    }
+    function onEditQuestion() {
+      const control = props.control
+      if (
+        control &&
+        control.customAction &&
+        typeof control.customAction == 'function'
+      ) {
+        control.customAction('edit')
+      } else {
+        questionEditorControl.value.isHideToolbar = false
+        questionEditorControl.value.readonly = false
+        control.isShowQuestionType = true
+        control.readonly = false
+      }
+    }
     const singleOptionSelected = ref('')
     const multiOptionSelected = ref([] as string[])
 
     return {
       QuestionMode,
+      btnEdit,
+      onEditQuestion,
+      initControls,
       questionTypeControl,
       QuestionType,
       questionEditorControl,
@@ -97,30 +162,7 @@ export default defineComponent({
     }
   },
   created() {
-    const question = this.control.value
-    if (
-      question &&
-      (question.mode == QuestionMode.Do ||
-        question.mode == QuestionMode.ViewOnly)
-    ) {
-      this.questionEditorControl.isHideToolbar = true
-    }
+    this.initControls()
   },
-  mounted() {
-    const question = this.control.value
-    if (question && question.answers && question.answers.length) {
-      switch (question.type) {
-        case QuestionType.SingleChoice:
-          this.singleOptionSelected = question.answers[0].content
-          break
-        case QuestionType.MultiChoice:
-          this.multiOptionSelected = question.answers.map(
-            answer => answer.content,
-          )
-          break
-      }
-    }
-  },
-  // Tiếp theo là phần logic xử lý
 })
 </script>

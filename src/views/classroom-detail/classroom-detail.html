@@ -3,12 +3,20 @@
     <h3>{{getTitle()}}</h3>
   </template>
   <template #body>
-    <div>Ok</div>
+    <div>
+      <EInput v-model="masterDataLocal.name" :control="txtClassroomName" />
+    </div>
+    <div>
+      <EInput
+        v-model="masterDataLocal.classroom_code"
+        :control="txtClassroomCode"
+      />
+    </div>
   </template>
   <template #footer>
     <div class="d-flex col-gap-8px">
-      <EButton :control="cancelBtn" />
-      <EButton :control="saveBtn" />
+      <EButton :control="cancelBtn" @click="onClose" />
+      <EButton :control="saveBtn" @click="onSave" />
     </div>
   </template>
 </EPopup>
