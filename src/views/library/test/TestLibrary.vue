@@ -11,6 +11,8 @@ import { ButtonControl } from '@/components/core/models/button/button-control'
 import { useI18n } from 'vue-i18n'
 import moment from 'moment'
 import commonFunction from '@/components/core/commons/CommonFunction'
+import TestService from '@/services/test-service'
+import { PagingParam } from '@/components/core/models/paging/paging-param'
 export default {
   components: {
     EQuestion,
@@ -79,6 +81,18 @@ export default {
       const formattedDate = date.format('DD/MM/YYYY HH:mm')
       return formattedDate
     }
+    async function loadData(pagingParam: PagingParam) {
+      const testService = new TestService()
+      const resultTest = await testService.getPaging(pagingParam)
+      tests.value = resultTest as unknown as TestDto[]
+    }
+    function buildPagingParam() {
+      const pagingParam = new PagingParam({
+        page: pagingControl.value.currentPage,
+        take: 20,
+      })
+      return pagingParam
+    }
     function onClickTest(test: TestDto) {}
     function onDoTest(test: TestDto) {}
     function onDoTestAgain(test: TestDto) {}
@@ -99,7 +113,13 @@ export default {
       onDoTestAgain,
       onEditTest,
       onTryTest,
+      loadData,
+      buildPagingParam,
     }
+  },
+  mounted() {
+    const pagingParam = this.buildPagingParam()
+    this.loadData(pagingParam)
   },
 }
 </script>

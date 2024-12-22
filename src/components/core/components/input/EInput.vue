@@ -17,11 +17,10 @@ export default {
   },
   emits: ['update:modelValue', 'focus', 'blur'],
   watch: {
-    modelValue: {
-      handler(newValue: string) {
-        console.log(newValue)
-      },
-    },
+    // modelValue: {
+    //   handler(newValue: string) {
+    //   },
+    // },
   },
   setup(props, ctx) {
     // const { t } = useI18n()
@@ -46,7 +45,6 @@ export default {
     }
     function onBlur() {
       isFocus.value = false
-      console.log(props.modelValue)
       ctx.emit('blur')
     }
     return {

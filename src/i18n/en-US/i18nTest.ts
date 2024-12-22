@@ -9,6 +9,7 @@ export default {
     EditTest: 'Sửa đề',
     History: 'Lịch sử',
     TryTest: 'Thi thử',
+    Save: 'Lưu lại',
   },
   TestName: 'Tên đề thi',
   DurationTest: 'Thời gian làm bài',

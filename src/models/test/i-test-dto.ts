@@ -1,10 +1,12 @@
 import type { TestMode } from '@/enums/test'
 import type { ITest } from './i-test'
+import type { Question } from '../question/question'
 
 export interface ITestDto extends ITest {
   lastExamId?: string
-  mode: TestMode
+  mode?: TestMode
   start_time?: Date
-  duration: number
+  duration?: number
   finish_time?: Date
+  questions?: Question[]
 }

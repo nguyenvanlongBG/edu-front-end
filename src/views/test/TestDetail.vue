@@ -49,6 +49,13 @@ export default {
   setup(props) {
     const { t } = useI18n()
     const masterData = ref(new TestDto(props.test))
+    masterData.value.test_id = commonFunction.generateID()
+    masterData.value.State = ModelState.INSERT
+    const saveBtn = ref(
+      new ButtonControl({
+        label: t('i18nTest.Button.Save'),
+      }),
+    )
     const isLoading = ref(false)
     const loadingControl = ref(
       new LoadingControl({
@@ -62,6 +69,7 @@ export default {
     )
     const startTimeControl = ref(new DateControl())
     const finishTimeControl = ref(new DateControl())
+    const dicQuestionControl = ref<Record<string, QuestionControl>>({})
     const durationControl = ref(
       new NumberControl({
         min: 2,
@@ -125,10 +133,17 @@ export default {
         })
       })
     }
-    const getQuestionControl = (question: Question) => {
-      return new QuestionControl({
-        value: question,
-      })
+    function getQuestionControl(question: Question) {
+      if (!question || !question.question_id) return
+      if (!(question.question_id in dicQuestionControl.value)) {
+        dicQuestionControl.value[question.question_id] = new QuestionControl({
+          value: question,
+          isShowActionToolbar: true,
+          isShowLevel: true,
+          readonly: true,
+        })
+      }
+      return dicQuestionControl.value[question.question_id]
     }
     function onImportQuestion() {
       // Kích hoạt input file ẩn
@@ -150,6 +165,7 @@ export default {
       newQuestion.question_id = commonFunction.generateID()
       newQuestion.options = [
         new OptionQuestion({
+          State: ModelState.INSERT,
           question_id: newQuestion.question_id,
           option_question_id: commonFunction.generateID(),
           object_content: [],
@@ -171,6 +187,15 @@ export default {
             data: { ...question, index: startIndex },
           }),
         )
+        if (!(question.question_id in dicQuestionControl.value)) {
+          dicQuestionControl.value[question.question_id] = new QuestionControl({
+            value: question,
+            isShowActionToolbar: true,
+            isShowLevel: true,
+            isShowToolEditor: true,
+            readonly: false,
+          })
+        }
       })
       questions.value = questions.value.concat(items)
     }
@@ -230,8 +255,17 @@ export default {
         console.error(`Không tìm thấy phần tử với index ${questionId}`)
       }
     }
+    async function onSave() {
+      masterData.value.questions = questions.value
+      if (masterData.value && masterData.value.State == ModelState.INSERT) {
+        const testService = new TestService()
+        await testService.post(masterData.value)
+      }
+    }
     return {
       masterData,
+      saveBtn,
+      dicQuestionControl,
       startTimeControl,
       finishTimeControl,
       durationControl,
@@ -259,6 +293,7 @@ export default {
       onAddQuestion,
       handleAddQuestion,
       onSelectLabel,
+      onSave,
     }
   },
   // async created() {
