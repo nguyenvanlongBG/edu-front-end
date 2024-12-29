@@ -6,7 +6,7 @@ import { Question } from '@/models/question/question'
 import TestService from '@/services/test-service'
 import FileQuestionService from '@/services/file-question-service'
 
-import { ref, nextTick } from 'vue'
+import { ref } from 'vue'
 import { TableLabelControl } from '@/components/core/models/table-label/table-label-control'
 import { ItemTableLabel } from '@/components/core/models/table-label/item-table-label'
 import EButton from '@/components/core/components/button/EButton.vue'
@@ -19,7 +19,6 @@ import { InputControl } from '@/components/core/models/input/input-control'
 import ECombobox from '@/components/core/components/combobox/ECombobox.vue'
 import { ComboboxControl } from '@/components/core/models/combobox/combobox-control'
 import { QuestionControl } from '@/models/question/question-control'
-import { OptionQuestion } from '@/models/option-question/option-question'
 import { LoadingControl } from '@/components/core/models/loading/loading-control'
 import ELoading from '@/components/core/components/loading/ELoading.vue'
 import { LoadingType } from '@/components/core/enums/Common'
@@ -27,12 +26,12 @@ import EDate from '@/components/core/components/date/date-time/EDate.vue'
 import { DateControl } from '@/components/core/models/date/date-control'
 import ENumber from '@/components/core/components/number/ENumber.vue'
 import { NumberControl } from '@/components/core/models/number/number-control'
-import { TestMode } from '@/enums/test'
+import { ExamMode } from '@/enums/exam'
 import { useRoute } from 'vue-router'
-import { RouterNameTest } from '@/components/core/enums/Router'
+import { RouterNameExam } from '@/components/core/enums/Router'
+import { ExamDto } from '@/models/exam/Dto/exam-dto'
+import ExamService from '@/services/exam-service'
 import { AnswerQuestion } from '@/models/answer-question/answer-question'
-import { ResultQuestion } from '@/models/result-question/result-question'
-import { QuestionType } from '@/enums/question'
 export default {
   components: {
     EQuestion,
@@ -45,16 +44,16 @@ export default {
     ENumber,
   },
   props: {
-    test: {
-      type: TestDto,
+    exam: {
+      type: ExamDto,
       required: false,
     },
   },
   setup(props) {
     const { t } = useI18n()
-    const testMode = ref(TestMode.None)
-    const masterData = ref(new TestDto(props.test))
-    masterData.value.test_id = commonFunction.generateID()
+    const examMode = ref(ExamMode.None)
+    const masterData = ref(new ExamDto(props.exam))
+    const test = ref(new TestDto())
     masterData.value.State = ModelState.INSERT
     const saveBtn = ref(
       new ButtonControl({
@@ -145,98 +144,45 @@ export default {
           value: question,
         })
       }
-      switch (testMode.value) {
-        case TestMode.Do:
+      switch (examMode.value) {
+        case ExamMode.Do:
           dicQuestionControl.value[question.question_id].isShowToolEditor =
             false
           dicQuestionControl.value[question.question_id].readonly = true
           break
-        case TestMode.Edit:
-          dicQuestionControl.value[question.question_id].isShowToolEditor = true
-          dicQuestionControl.value[question.question_id].isShowActionToolbar =
-            true
-          dicQuestionControl.value[question.question_id].isShowLevel = true
-          break
+        case ExamMode.History:
+          dicQuestionControl.value[question.question_id].isShowAnswer = true
+          dicQuestionControl.value[question.question_id].isShowResult = true
       }
       return dicQuestionControl.value[question.question_id]
     }
-    function onImportQuestion() {
-      // Kích hoạt input file ẩn
-      if (fileInputRef.value) {
-        fileInputRef.value.click()
-      }
-    }
     async function handleLoadData() {
-      const testService = new TestService()
-
-      // Chuẩn bị các Promise cho các cuộc gọi API
-      const testDetailPromise = testService.getById(masterData.value.test_id)
-      let questionPromise
-
-      switch (testMode.value) {
-        case TestMode.Do:
-          questionPromise = testService.getQuestionOfTest(
-            masterData.value.test_id,
+      const examService = new ExamService()
+      const tasks = []
+      switch (examMode.value) {
+        case ExamMode.Do:
+          tasks.push(examService.getTestOfExam(masterData.value.exam_id))
+          const [testDetailResult] = await Promise.all(tasks)
+          test.value = testDetailResult as unknown as TestDto
+          masterData.value.test_id = test.value.test_id
+          // Xử lý kết quả
+          questions.value = commonFunction.convertToInstances<Question>(
+            test.value.questions as unknown as Record<string, unknown>[],
+            Question,
           )
           break
-        case TestMode.Edit:
-          questionPromise = testService.getQuestionOfTestEdit(
-            masterData.value.test_id,
+        case ExamMode.History:
+          tasks.push(examService.historyExam(masterData.value.exam_id))
+          const [testHistory] = await Promise.all(tasks)
+          test.value = testHistory as unknown as TestDto
+          masterData.value.test_id = test.value.test_id
+          // Xử lý kết quả
+          questions.value = commonFunction.convertToInstances<Question>(
+            test.value.questions as unknown as Record<string, unknown>[],
+            Question,
           )
           break
       }
-
-      // Chờ cả hai Promise hoàn thành
-      const [testDetailResult, questionsResult] = await Promise.all([
-        testDetailPromise,
-        questionPromise,
-      ])
-      masterData.value = testDetailResult as unknown as TestDto
-      // Xử lý kết quả
-      questions.value = commonFunction.convertToInstances<Question>(
-        questionsResult as unknown as Record<string, unknown>[],
-        Question,
-      )
-    }
-    function onAddQuestion() {
-      const newQuestion = new Question()
-      newQuestion.State = ModelState.INSERT
-      newQuestion.question_id = commonFunction.generateID()
-      newQuestion.options = [
-        new OptionQuestion({
-          State: ModelState.INSERT,
-          question_id: newQuestion.question_id,
-          option_question_id: commonFunction.generateID(),
-          object_content: [],
-        }),
-      ]
-      handleAddQuestion([newQuestion])
-      nextTick(() => {
-        scrollToQuestion(newQuestion.question_id)
-      })
-    }
-    function handleAddQuestion(items: Question[]) {
-      if (!items || !items.length) return
-      let startIndex = questions.value.length
-      items.forEach(question => {
-        startIndex += 1
-        tableLabel.value.data.push(
-          new ItemTableLabel({
-            value: question.question_id,
-            data: { ...question, index: startIndex },
-          }),
-        )
-        if (!(question.question_id in dicQuestionControl.value)) {
-          dicQuestionControl.value[question.question_id] = new QuestionControl({
-            value: question,
-            isShowActionToolbar: true,
-            isShowLevel: true,
-            isShowToolEditor: true,
-            readonly: false,
-          })
-        }
-      })
-      questions.value = questions.value.concat(items)
     }
     // Object lưu trữ các refs động
     const questionRefs = ref<{ [key: string]: HTMLElement | null }>({})
@@ -245,31 +191,6 @@ export default {
     const setQuestionRef = (index: string) => (el: HTMLElement | null) => {
       if (el) {
         questionRefs.value[index] = el
-      }
-    }
-    async function handleFileChange(event: Event) {
-      try {
-        changeLoading(true)
-        const input = event.target as HTMLInputElement
-        if (input && input.files && input.files.length) {
-          const file = input.files[0]
-          const formData = new FormData()
-          formData.append('file', file) // Thêm tệp vào FormData
-          formData.append('testId', '12') // Thêm các trường khác nếu cần
-          const fileQuestionService = new FileQuestionService()
-          const result = await fileQuestionService.uploadFileQuestion(formData)
-          const newQuestions = commonFunction.convertToInstances<Question>(
-            result as unknown as Array<Record<string, unknown>>,
-            Question,
-          )
-          if (!newQuestions || !newQuestions.length) return
-          newQuestions.forEach(question => (question.State = ModelState.INSERT))
-          handleAddQuestion(newQuestions)
-        }
-      } catch (error: unknown) {
-        console.log(error)
-      } finally {
-        changeLoading(false)
       }
     }
     function changeLoading(loadingStatus: boolean = false) {
@@ -295,90 +216,66 @@ export default {
       }
     }
     async function onSave() {
-      masterData.value.questions = questions.value
-      if (masterData.value && masterData.value.State == ModelState.INSERT) {
-        const testService = new TestService()
-        await testService.post(masterData.value)
+      const answers = questions.value
+        ?.filter(q => q.answer)
+        .map(question => question.answer)
+
+      masterData.value.answers = answers as AnswerQuestion[]
+      const examService = new ExamService()
+      switch (examMode.value) {
+        case ExamMode.Do:
+          await examService.doExam(masterData.value)
+          break
+        case ExamMode.Mark:
+          break
       }
     }
+
     function initData() {
       const route = useRoute()
-      masterData.value.test_id = route.params.test_id as string
+      masterData.value.exam_id = route.params.exam_id as string
       switch (route.name) {
-        case RouterNameTest.Add:
-          testMode.value = TestMode.Add
+        case RouterNameExam.Do:
+          examMode.value = ExamMode.Do
           break
-        case RouterNameTest.Edit:
-          testMode.value = TestMode.Edit
+        case RouterNameExam.Mark:
+          examMode.value = ExamMode.Mark
           break
-        case RouterNameTest.Do:
-          testMode.value = TestMode.Do
-          break
-        case RouterNameTest.History:
-          testMode.value = TestMode.History
+        case RouterNameExam.History:
+          examMode.value = ExamMode.History
           break
         default:
-          testMode.value = TestMode.None
+          examMode.value = ExamMode.None
       }
     }
     function initControl() {
-      switch (testMode.value) {
-        case TestMode.Add:
-          inputControl.value.readonly = false
-          startTimeControl.value.readonly = false
-          durationControl.value.readonly = false
+      inputControl.value.readonly = true
+      startTimeControl.value.readonly = true
+      durationControl.value.readonly = true
+      switch (examMode.value) {
+        case ExamMode.History:
           break
-        case TestMode.Edit:
-          inputControl.value.readonly = false
-          startTimeControl.value.readonly = false
-          durationControl.value.readonly = false
-          break
-        case TestMode.Do:
-          inputControl.value.readonly = true
-          startTimeControl.value.readonly = true
-          durationControl.value.readonly = true
-          break
-        case TestMode.History:
-          inputControl.value.readonly = true
-          startTimeControl.value.readonly = true
-          durationControl.value.readonly = true
-          break
-        default:
-          testMode.value = TestMode.None
       }
     }
     function onChangeAnswer(question: Question, answer: string) {
-      if (testMode.value == TestMode.Do) {
+      if (examMode.value == ExamMode.Do) {
         if (!question.answer) {
           question.answer = new AnswerQuestion({
+            exam_id: masterData.value.exam_id,
+            answer_id: commonFunction.generateID(),
             question_id: question.question_id,
+            State: ModelState.INSERT,
           })
+        } else if (question.answer.State == ModelState.VIEW) {
+          question.answer.State = ModelState.EDIT
         }
         question.answer.content = answer
-      } else if (testMode.value == TestMode.Edit) {
-        if (!question.results || !question.results?.length) {
-          question.results = [] as ResultQuestion[]
-          const result = new ResultQuestion({
-            result_question_id: commonFunction.generateID(),
-            question_id: question.question_id,
-          })
-          question.results.push(result)
-        }
-        switch (question.type) {
-          case QuestionType.SingleChoice:
-            const resultTmpSi = question.results[0]
-            resultTmpSi.content = answer
-            break
-          case QuestionType.MultiChoice:
-            const resultTmpMu = question.results[0]
-            resultTmpMu.content = answer
-            break
-        }
       }
     }
     return {
-      testMode,
-      TestMode,
+      examMode,
+      test,
+      ExamMode,
       masterData,
       saveBtn,
       dicQuestionControl,
@@ -404,10 +301,6 @@ export default {
       getQuestion,
       questionRefs,
       onSelectQuestionLabel,
-      handleFileChange,
-      onImportQuestion,
-      onAddQuestion,
-      handleAddQuestion,
       onSelectLabel,
       onSave,
       initData,
@@ -425,5 +318,5 @@ export default {
 }
 </script>
 
-<template src="./test-detail.html"></template>
-<style src="./test-detail.scss" lang="scss"></style>
+<template src="./exam-detail.html"></template>
+<style src="./exam-detail.scss" lang="scss"></style>

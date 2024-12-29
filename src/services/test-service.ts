@@ -10,4 +10,10 @@ export default class TestService extends BaseService {
       method: 'GET',
     })
   }
+  async getQuestionOfTestEdit(testId: string) {
+    return await request({
+      url: `Test/${testId}/edit`,
+      method: 'GET',
+    })
+  }
 }

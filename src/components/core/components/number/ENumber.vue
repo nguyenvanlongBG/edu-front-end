@@ -21,7 +21,10 @@ export default defineComponent({
     const innerValue = ref(props.modelValue)
 
     const validate = () => {
-      if (!props.control.validateCustom(innerValue.value)) {
+      if (
+        typeof props.control.validateCustom == 'function' &&
+        !props.control.validateCustom(innerValue.value)
+      ) {
         emit('update:modelValue', null) // Reset value nếu không hợp lệ
       }
     }

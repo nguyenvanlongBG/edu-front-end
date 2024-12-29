@@ -1,3 +1,4 @@
+import { RouterNameExam, RouterNameTest } from '@/components/core/enums/Router'
 import type { RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
@@ -26,7 +27,7 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: '',
-            name: 'create-test',
+            name: RouterNameTest.Add,
             component: () => import('@views/test/TestDetail.vue'),
           },
           {
@@ -36,18 +37,60 @@ const routes: RouteRecordRaw[] = [
           },
           {
             path: ':test_id',
-            name: 'view-test',
+            name: RouterNameTest.View,
             component: () => import('@views/test/TestDetail.vue'),
           },
           {
             path: ':test_id/edit',
-            name: 'edit-test',
+            name: RouterNameTest.Edit,
+            component: () => import('@views/test/TestDetail.vue'),
+          },
+          {
+            path: ':test_id/do',
+            name: RouterNameTest.Do,
             component: () => import('@views/test/TestDetail.vue'),
           },
           {
             path: ':test_id/history',
-            name: 'history-test',
+            name: RouterNameTest.History,
             component: () => import('@views/test/TestDetail.vue'),
+          },
+        ],
+      },
+      {
+        path: '/exam',
+        name: 'exam',
+        children: [
+          {
+            path: ':exam_id',
+            name: RouterNameExam.View,
+            component: () => import('@views/exam/ExamDetail.vue'),
+          },
+          {
+            path: ':exam_id/do',
+            name: RouterNameExam.Do,
+            component: () => import('@views/exam/ExamDetail.vue'),
+          },
+          {
+            path: ':exam_id/mark',
+            name: RouterNameExam.Mark,
+            component: () => import('@views/exam/ExamDetail.vue'),
+          },
+          {
+            path: ':exam_id/history',
+            name: RouterNameExam.History,
+            component: () => import('@views/exam/ExamDetail.vue'),
+          },
+        ],
+      },
+      {
+        path: '/report',
+        name: 'report',
+        children: [
+          {
+            path: '',
+            name: 'report-test',
+            component: () => import('@views/report/report-test/ReportTest.vue'),
           },
         ],
       },

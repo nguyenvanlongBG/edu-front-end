@@ -1,7 +1,9 @@
 import type { IBaseEntity } from '../base/i-base-entity'
 
 export interface IAnswerQuestion extends IBaseEntity {
-  question_id: string
-  content: string
+  exam_id: string
+  answer_id: string
+  question_id?: string
+  content?: string
   point?: number
 }

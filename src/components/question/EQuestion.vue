@@ -26,9 +26,11 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
+  emits: ['change-answer'],
+  setup(props, ctx) {
     const { t } = useI18n()
     const questionEditorControl = ref(new EditorControl())
+    const noteEditorControl = ref(new EditorControl())
     const questionTypeControl = ref(
       new ComboboxControl({
         value: QuestionType.SingleChoice,
@@ -52,8 +54,13 @@ export default defineComponent({
         classType: 'outline',
       }),
     )
+    const btnNote = ref(
+      new ButtonControl({
+        label: t('i18nQuestion.Note'),
+        classType: 'outline',
+      }),
+    )
     function getClassForOption(option: OptionQuestion) {
-      let classType = ''
       const question = props.control.value
       const control = props.control
       if (
@@ -65,37 +72,33 @@ export default defineComponent({
         !option
       )
         return ''
-      if (control.isShowResult && question.results && question.results.length) {
-        for (let index = 0; index < question.results.length; index++) {
-          const result = question.results[index]
-          if (result.content.includes(option.option_question_id)) {
-            classType = 'neutral'
-            break
-          }
-        }
-      }
-      if (control.isShowAnswer) {
-        if (question.answers && question.answers.length) {
-          const isCheck = question.answers.find(answer =>
-            answer.content.includes(option.option_question_id),
-          )
-          if (!isCheck) return classType
-          const result = question.results?.map(result => result.content)
-          if (!result) return classType
-          for (let index = 0; index < question.answers.length; index++) {
-            const answer = question.answers[index]
-            if (result.includes(answer.content)) {
-              classType = 'correct'
-              return classType
-            } else {
-              classType = 'incorrect'
-              return classType
+      if (control.isShowAnswer && control.isShowResult) {
+        switch (question.type) {
+          case QuestionType.SingleChoice:
+            if (
+              question.results &&
+              question.results.length &&
+              question.answer
+            ) {
+              if (
+                question.results[0].result_question_id ==
+                question.answer.content
+              )
+                return 'correct'
+              return 'incorrect'
             }
-          }
-          return classType
+            break
+          case QuestionType.MultiChoice:
+            if (
+              question.results &&
+              question.results.length &&
+              question.answer
+            ) {
+              return 'incorrect'
+            }
+            return 'correct'
         }
       }
-      return classType
     }
     function initControls() {
       const question = props.control.value
@@ -114,13 +117,23 @@ export default defineComponent({
           break
       }
 
-      if (question && question.answers && question.answers.length) {
+      if (question && question.answer && question.answer.content) {
         switch (question.type) {
           case QuestionType.SingleChoice:
-            singleOptionSelected.value = question.answers[0].content
+            singleOptionSelected.value = question.answer.content
             break
           case QuestionType.MultiChoice:
-            multiOptionSelected.value = question.answers.map(
+            multiOptionSelected.value = question.answer.content.split(',')
+            break
+        }
+      }
+      if (question && question.results && question.results.length) {
+        switch (question.type) {
+          case QuestionType.SingleChoice:
+            singleOptionSelected.value = question.results[0].content
+            break
+          case QuestionType.MultiChoice:
+            multiOptionSelected.value = question.results.map(
               answer => answer.content,
             )
             break
@@ -145,13 +158,38 @@ export default defineComponent({
         control.readonly = false
       }
     }
+    function onNoteQuestion() {
+      const control = props.control
+      if (control) {
+        control.isShowNote = true
+      }
+    }
     const singleOptionSelected = ref('')
     const multiOptionSelected = ref([] as string[])
-
+    function onChangeChoice() {
+      const question = props.control.value
+      if (question) {
+        switch (question.type) {
+          case QuestionType.SingleChoice:
+            ctx.emit('change-answer', question, singleOptionSelected.value)
+            break
+          case QuestionType.MultiChoice:
+            ctx.emit(
+              'change-answer',
+              question,
+              multiOptionSelected.value.join(','),
+            )
+            break
+        }
+      }
+    }
     return {
       QuestionMode,
+      noteEditorControl,
       btnEdit,
+      btnNote,
       onEditQuestion,
+      onNoteQuestion,
       initControls,
       questionTypeControl,
       QuestionType,
@@ -159,9 +197,11 @@ export default defineComponent({
       getClassForOption,
       singleOptionSelected,
       multiOptionSelected,
+      onChangeChoice,
     }
   },
-  created() {
+  created() {},
+  mounted() {
     this.initControls()
   },
 })

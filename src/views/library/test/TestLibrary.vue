@@ -13,6 +13,10 @@ import moment from 'moment'
 import commonFunction from '@/components/core/commons/CommonFunction'
 import TestService from '@/services/test-service'
 import { PagingParam } from '@/components/core/models/paging/paging-param'
+import router from '@/router'
+import { RouterNameExam, RouterNameTest } from '@/components/core/enums/Router'
+import ExamService from '@/services/exam-service'
+import type { Exam } from '@/models/exam/exam'
 export default {
   components: {
     EQuestion,
@@ -94,9 +98,36 @@ export default {
       return pagingParam
     }
     function onClickTest(test: TestDto) {}
-    function onDoTest(test: TestDto) {}
-    function onDoTestAgain(test: TestDto) {}
-    function onEditTest(test: TestDto) {}
+    function onDoTest(test: TestDto) {
+      router.push({
+        name: RouterNameTest.Do,
+        params: {
+          test_id: test.test_id,
+        },
+      })
+    }
+    async function onDoTestAgain(test: TestDto) {
+      const examService = new ExamService()
+      const newExam = (await examService.doNewExam(
+        test.test_id,
+      )) as unknown as Exam
+      if (newExam) {
+        router.push({
+          name: RouterNameExam.Do,
+          params: {
+            exam_id: newExam.exam_id,
+          },
+        })
+      }
+    }
+    function onEditTest(test: TestDto) {
+      router.push({
+        name: RouterNameTest.Edit,
+        params: {
+          test_id: test.test_id,
+        },
+      })
+    }
     function onTryTest(test: TestDto) {}
     return {
       formatDateTime,

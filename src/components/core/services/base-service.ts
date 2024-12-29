@@ -12,25 +12,35 @@ export class BaseService {
       data: pagingParam,
     })
   }
+  async getById(id: string) {
+    const controller = this.getController()
+    return await request({
+      url: `${controller + ('/' + id)}`,
+      method: 'GET',
+    })
+  }
   async get(url: string = '') {
     const controller = this.getController()
     return await request({
-      url: `${controller + (url ? url + '/' : '')}`,
+      url: `${controller + (url ? '/' + url : '')}`,
       method: 'GET',
     })
   }
   async post(data: unknown, url: string = '') {
     const controller = this.getController()
     return await request({
-      url: `${controller + (url ? url + '/' : '')}`,
+      url: `${controller + (url ? '/' + url : '')}`,
       method: 'POST',
       data: data,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
   }
   async put(data: unknown, url: string = '') {
     const controller = this.getController()
     return await request({
-      url: `${controller + (url ? url + '/' : '')}`,
+      url: `${controller + (url ? '/' + url : '')}`,
       method: 'PUT',
       data: data,
     })
@@ -38,7 +48,7 @@ export class BaseService {
   async delete(data: unknown, url: string = '') {
     const controller = this.getController()
     return await request({
-      url: `${controller + (url ? url + '/' : '')}`,
+      url: `${controller + (url ? '/' + url : '')}`,
       method: 'DELETE',
       data: data,
     })

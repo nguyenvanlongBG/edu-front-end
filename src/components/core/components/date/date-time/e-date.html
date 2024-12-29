@@ -6,6 +6,7 @@
     type="date"
     :min="control.minDate"
     :max="control.maxDate"
+    :readOnly="control.readonly"
     v-model="innerValue"
     @blur="validate"
     @input="onInput"

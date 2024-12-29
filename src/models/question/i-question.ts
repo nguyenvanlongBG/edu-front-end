@@ -12,5 +12,5 @@ export interface IQuestion extends IBaseEntity {
   results?: ResultQuestion[]
   type: QuestionType
   mode?: QuestionMode
-  answers?: AnswerQuestion[]
+  answer?: AnswerQuestion
 }

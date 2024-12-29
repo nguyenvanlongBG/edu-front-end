@@ -5,4 +5,5 @@ export default {
   Edit: 'Sửa',
   SingleChoice: 'Một đáp án',
   MultiChoice: 'Nhiều đáp án',
+  Note: 'Ghi chú',
 }

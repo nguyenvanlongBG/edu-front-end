@@ -25,5 +25,5 @@ export class Question extends BaseEntity {
   options?: OptionQuestion[] = []
   results?: ResultQuestion[] = []
   mode?: QuestionMode = QuestionMode.ViewCanEdit
-  answers?: AnswerQuestion[]
+  answer?: AnswerQuestion
 }

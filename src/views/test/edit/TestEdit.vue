@@ -9,6 +9,8 @@ import FileQuestionService from '@/services/file-question-service'
 import { ref, nextTick } from 'vue'
 import { TableLabelControl } from '@/components/core/models/table-label/table-label-control'
 import { ItemTableLabel } from '@/components/core/models/table-label/item-table-label'
+import QuestionService from '@/services/question-service'
+import { PagingParam } from '@/components/core/models/paging/paging-param'
 import EButton from '@/components/core/components/button/EButton.vue'
 import { ButtonControl } from '@/components/core/models/button/button-control'
 import { useI18n } from 'vue-i18n'
@@ -27,12 +29,6 @@ import EDate from '@/components/core/components/date/date-time/EDate.vue'
 import { DateControl } from '@/components/core/models/date/date-control'
 import ENumber from '@/components/core/components/number/ENumber.vue'
 import { NumberControl } from '@/components/core/models/number/number-control'
-import { TestMode } from '@/enums/test'
-import { useRoute } from 'vue-router'
-import { RouterNameTest } from '@/components/core/enums/Router'
-import { AnswerQuestion } from '@/models/answer-question/answer-question'
-import { ResultQuestion } from '@/models/result-question/result-question'
-import { QuestionType } from '@/enums/question'
 export default {
   components: {
     EQuestion,
@@ -49,10 +45,13 @@ export default {
       type: TestDto,
       required: false,
     },
+    mode: {
+      type: String,
+      required: false,
+    },
   },
   setup(props) {
     const { t } = useI18n()
-    const testMode = ref(TestMode.None)
     const masterData = ref(new TestDto(props.test))
     masterData.value.test_id = commonFunction.generateID()
     masterData.value.State = ModelState.INSERT
@@ -143,20 +142,10 @@ export default {
       if (!(question.question_id in dicQuestionControl.value)) {
         dicQuestionControl.value[question.question_id] = new QuestionControl({
           value: question,
+          isShowActionToolbar: true,
+          isShowLevel: true,
+          readonly: true,
         })
-      }
-      switch (testMode.value) {
-        case TestMode.Do:
-          dicQuestionControl.value[question.question_id].isShowToolEditor =
-            false
-          dicQuestionControl.value[question.question_id].readonly = true
-          break
-        case TestMode.Edit:
-          dicQuestionControl.value[question.question_id].isShowToolEditor = true
-          dicQuestionControl.value[question.question_id].isShowActionToolbar =
-            true
-          dicQuestionControl.value[question.question_id].isShowLevel = true
-          break
       }
       return dicQuestionControl.value[question.question_id]
     }
@@ -166,35 +155,11 @@ export default {
         fileInputRef.value.click()
       }
     }
-    async function handleLoadData() {
-      const testService = new TestService()
-
-      // Chuẩn bị các Promise cho các cuộc gọi API
-      const testDetailPromise = testService.getById(masterData.value.test_id)
-      let questionPromise
-
-      switch (testMode.value) {
-        case TestMode.Do:
-          questionPromise = testService.getQuestionOfTest(
-            masterData.value.test_id,
-          )
-          break
-        case TestMode.Edit:
-          questionPromise = testService.getQuestionOfTestEdit(
-            masterData.value.test_id,
-          )
-          break
-      }
-
-      // Chờ cả hai Promise hoàn thành
-      const [testDetailResult, questionsResult] = await Promise.all([
-        testDetailPromise,
-        questionPromise,
-      ])
-      masterData.value = testDetailResult as unknown as TestDto
-      // Xử lý kết quả
+    async function handleLoadData(pagingParam: PagingParam) {
+      const questionService = new QuestionService()
+      const result = await questionService.getPaging(pagingParam)
       questions.value = commonFunction.convertToInstances<Question>(
-        questionsResult as unknown as Record<string, unknown>[],
+        result as unknown as Record<string, unknown>[],
         Question,
       )
     }
@@ -301,84 +266,7 @@ export default {
         await testService.post(masterData.value)
       }
     }
-    function initData() {
-      const route = useRoute()
-      masterData.value.test_id = route.params.test_id as string
-      switch (route.name) {
-        case RouterNameTest.Add:
-          testMode.value = TestMode.Add
-          break
-        case RouterNameTest.Edit:
-          testMode.value = TestMode.Edit
-          break
-        case RouterNameTest.Do:
-          testMode.value = TestMode.Do
-          break
-        case RouterNameTest.History:
-          testMode.value = TestMode.History
-          break
-        default:
-          testMode.value = TestMode.None
-      }
-    }
-    function initControl() {
-      switch (testMode.value) {
-        case TestMode.Add:
-          inputControl.value.readonly = false
-          startTimeControl.value.readonly = false
-          durationControl.value.readonly = false
-          break
-        case TestMode.Edit:
-          inputControl.value.readonly = false
-          startTimeControl.value.readonly = false
-          durationControl.value.readonly = false
-          break
-        case TestMode.Do:
-          inputControl.value.readonly = true
-          startTimeControl.value.readonly = true
-          durationControl.value.readonly = true
-          break
-        case TestMode.History:
-          inputControl.value.readonly = true
-          startTimeControl.value.readonly = true
-          durationControl.value.readonly = true
-          break
-        default:
-          testMode.value = TestMode.None
-      }
-    }
-    function onChangeAnswer(question: Question, answer: string) {
-      if (testMode.value == TestMode.Do) {
-        if (!question.answer) {
-          question.answer = new AnswerQuestion({
-            question_id: question.question_id,
-          })
-        }
-        question.answer.content = answer
-      } else if (testMode.value == TestMode.Edit) {
-        if (!question.results || !question.results?.length) {
-          question.results = [] as ResultQuestion[]
-          const result = new ResultQuestion({
-            result_question_id: commonFunction.generateID(),
-            question_id: question.question_id,
-          })
-          question.results.push(result)
-        }
-        switch (question.type) {
-          case QuestionType.SingleChoice:
-            const resultTmpSi = question.results[0]
-            resultTmpSi.content = answer
-            break
-          case QuestionType.MultiChoice:
-            const resultTmpMu = question.results[0]
-            resultTmpMu.content = answer
-            break
-        }
-      }
-    }
     return {
-      testMode,
-      TestMode,
       masterData,
       saveBtn,
       dicQuestionControl,
@@ -410,18 +298,12 @@ export default {
       handleAddQuestion,
       onSelectLabel,
       onSave,
-      initData,
-      initControl,
-      onChangeAnswer,
     }
   },
-  created() {
-    this.initData()
-    this.initControl()
-  },
-  mounted() {
-    this.handleLoadData()
-  },
+  // async created() {
+  //   const param = new PagingParam()
+  //   await this.handleLoadData(param)
+  // },
 }
 </script>
 

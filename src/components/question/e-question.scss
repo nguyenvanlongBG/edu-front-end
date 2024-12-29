@@ -1,9 +1,4 @@
 .e-question {
-  .body {
-    display: flex;
-    flex-direction: column;
-    row-gap: 8px;
-  }
   .list-option {
     list-style-type: none;
     padding-left: 0px;
@@ -14,8 +9,10 @@
   }
   .correct {
     border: 2px solid green; /* Viền xanh nếu đáp án đúng */
+    accent-color: green;
   }
   .incorrect {
+    accent-color: red;
     border: 2px solid red; /* Viền đỏ nếu đáp án sai */
   }
   .neutral {

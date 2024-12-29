@@ -4,7 +4,7 @@
       <div class="list-question flex-1 p-x-8px">
         <div
           class="d-flex-vcenter d-flex-end col-gap-8px"
-          v-if="testMode== TestMode.Edit"
+          v-if="examMode != ExamMode.Do"
         >
           <EButton :control="addQuestionBtn" @click="onAddQuestion" />
           <div class="ic-import cursor-pointer" @click="onImportQuestion"></div>
@@ -25,15 +25,18 @@
             :key="question.question_id"
             :ref="setQuestionRef(question.question_id)"
           >
-            <EQuestion :control="getQuestionControl(question)" />
+            <EQuestion
+              :control="getQuestionControl(question)"
+              @change-answer="onChangeAnswer"
+            />
           </div>
         </div>
       </div>
       <div class="test-info">
         <div class="d-flex-column row-gap-8px">
-          <EInput :control="inputControl" v-model="masterData.name" />
-          <EDate :control="startTimeControl" v-model="masterData.start_time" />
-          <ENumber :control="durationControl" v-model="masterData.duration" />
+          <EInput :control="inputControl" v-model="test.name" />
+          <EDate :control="startTimeControl" v-model="test.start_time" />
+          <ENumber :control="durationControl" v-model="test.duration" />
           <EButton :control="saveBtn" @click="onSave" />
         </div>
         <div class="table-label-question p-x-8px p-t-8px">

@@ -8,4 +8,5 @@ export enum QuestionMode {
   ViewCanEdit = 2, // Xem
   Edit = 3,
   Do = 4,
+  History = 5,
 }
