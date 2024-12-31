@@ -9,6 +9,8 @@ export default {
     EditTest: 'Sửa đề',
     History: 'Lịch sử',
     TryTest: 'Thi thử',
+    MarkTest: 'Chấm điểm',
+    ReportTest: 'Báo cáo',
     Save: 'Lưu lại',
   },
   TestName: 'Tên đề thi',

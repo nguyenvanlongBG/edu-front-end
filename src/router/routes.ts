@@ -55,6 +55,16 @@ const routes: RouteRecordRaw[] = [
             name: RouterNameTest.History,
             component: () => import('@views/test/TestDetail.vue'),
           },
+          {
+            path: ':test_id/mark',
+            name: RouterNameTest.Mark,
+            component: () => import('@views/test/TestDetail.vue'),
+          },
+          {
+            path: 'mark',
+            name: RouterNameTest.MarkList,
+            component: () => import('@views/test/mark/MarkListTest.vue'),
+          },
         ],
       },
       {

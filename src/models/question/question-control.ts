@@ -20,11 +20,13 @@ export class QuestionControl extends BaseControl {
   isShowActionToolbar: boolean = false
   isShowActionNote: boolean = true
   isShowNote: boolean = false
+  isShowPoint: boolean = false
   isShowToolEditor: boolean = false
   isShowChapter: boolean = false
   isShowQuestionType: boolean = false
   isReadonlyResult: boolean = false
   isReadonlyLevel: boolean = false
+  isReadonlyPoint: boolean = false
   isReadonlyChapter: boolean = false
   isReadonlyToolEditor: boolean = false
   customAction: ((actionName: string) => void) | null = null

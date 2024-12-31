@@ -4,7 +4,7 @@
       <div class="list-question flex-1 p-x-8px">
         <div
           class="d-flex-vcenter d-flex-end col-gap-8px"
-          v-if="testMode== TestMode.Edit"
+          v-if="testMode== TestMode.Edit || testMode== TestMode.Add"
         >
           <EButton :control="addQuestionBtn" @click="onAddQuestion" />
           <div class="ic-import cursor-pointer" @click="onImportQuestion"></div>

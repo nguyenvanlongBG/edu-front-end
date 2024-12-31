@@ -30,7 +30,6 @@ import { NumberControl } from '@/components/core/models/number/number-control'
 import { TestMode } from '@/enums/test'
 import { useRoute } from 'vue-router'
 import { RouterNameTest } from '@/components/core/enums/Router'
-import { AnswerQuestion } from '@/models/answer-question/answer-question'
 import { ResultQuestion } from '@/models/result-question/result-question'
 import { QuestionType } from '@/enums/question'
 export default {
@@ -54,8 +53,6 @@ export default {
     const { t } = useI18n()
     const testMode = ref(TestMode.None)
     const masterData = ref(new TestDto(props.test))
-    masterData.value.test_id = commonFunction.generateID()
-    masterData.value.State = ModelState.INSERT
     const saveBtn = ref(
       new ButtonControl({
         label: t('i18nTest.Button.Save'),
@@ -170,33 +167,29 @@ export default {
       const testService = new TestService()
 
       // Chuẩn bị các Promise cho các cuộc gọi API
-      const testDetailPromise = testService.getById(masterData.value.test_id)
-      let questionPromise
+      const tasks = []
 
       switch (testMode.value) {
-        case TestMode.Do:
-          questionPromise = testService.getQuestionOfTest(
-            masterData.value.test_id,
-          )
+        case TestMode.Add:
+          masterData.value = new TestDto()
+          masterData.value.State = ModelState.INSERT
+          masterData.value.test_id = commonFunction.generateID()
+          questions.value = []
           break
         case TestMode.Edit:
-          questionPromise = testService.getQuestionOfTestEdit(
-            masterData.value.test_id,
+          tasks.push(testService.getById(masterData.value.test_id))
+          tasks.push(
+            testService.getQuestionOfTestEdit(masterData.value.test_id),
+          )
+          const [testDetailResult, questionsResult] = await Promise.all(tasks)
+          masterData.value = testDetailResult as unknown as TestDto
+          // Xử lý kết quả
+          questions.value = commonFunction.convertToInstances<Question>(
+            questionsResult as unknown as Record<string, unknown>[],
+            Question,
           )
           break
       }
-
-      // Chờ cả hai Promise hoàn thành
-      const [testDetailResult, questionsResult] = await Promise.all([
-        testDetailPromise,
-        questionPromise,
-      ])
-      masterData.value = testDetailResult as unknown as TestDto
-      // Xử lý kết quả
-      questions.value = commonFunction.convertToInstances<Question>(
-        questionsResult as unknown as Record<string, unknown>[],
-        Question,
-      )
     }
     function onAddQuestion() {
       const newQuestion = new Question()
@@ -348,14 +341,7 @@ export default {
       }
     }
     function onChangeAnswer(question: Question, answer: string) {
-      if (testMode.value == TestMode.Do) {
-        if (!question.answer) {
-          question.answer = new AnswerQuestion({
-            question_id: question.question_id,
-          })
-        }
-        question.answer.content = answer
-      } else if (testMode.value == TestMode.Edit) {
+      if (testMode.value == TestMode.Edit) {
         if (!question.results || !question.results?.length) {
           question.results = [] as ResultQuestion[]
           const result = new ResultQuestion({

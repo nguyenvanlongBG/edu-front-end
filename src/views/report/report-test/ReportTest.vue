@@ -10,7 +10,7 @@ export default {
   setup() {
     const series = ref([
       {
-        name: 'Bài thi',
+        name: 'SL',
         data: [] as number[],
       },
     ])
@@ -41,7 +41,7 @@ export default {
 
       xaxis: {
         categories: [] as string[],
-        position: 'top',
+        position: 'bottom',
         axisBorder: {
           show: false,
         },

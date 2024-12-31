@@ -1,4 +1,6 @@
 <script lang="ts">
+import { Test } from '@/models/test/test'
+
 export default {
   name: 'ExamCard',
   props: {

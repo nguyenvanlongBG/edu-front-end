@@ -54,6 +54,16 @@ export default {
         styleClass: 'btn-do-test-again',
       }),
     )
+    const markTestBtn = ref(
+      new ButtonControl({
+        label: t('i18nTest.Button.MarkTest'),
+      }),
+    )
+    const reportTestBtn = ref(
+      new ButtonControl({
+        label: t('i18nTest.Button.ReportTest'),
+      }),
+    )
     const editTestBtn = ref(
       new ButtonControl({
         label: t('i18nTest.Button.EditTest'),
@@ -139,6 +149,8 @@ export default {
       editTestBtn,
       historyTestBtn,
       tryTestBtn,
+      markTestBtn,
+      reportTestBtn,
       onClickTest,
       onDoTest,
       onDoTestAgain,

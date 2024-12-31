@@ -1,0 +1,19 @@
+<div>
+  <table class="tables">
+    <thead>
+      <tr>
+        <th v-for="column in control.columns">{{column.name}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template v-for="item in control.data">
+        <tr>
+          <td v-for="column in dataColumn()">
+            {{ column.customDisplay(item) }}
+          </td>
+          <td v-if="actionColumn()">{{ }}</td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+</div>

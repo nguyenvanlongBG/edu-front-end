@@ -47,5 +47,8 @@ export class PopupControl extends BaseControl {
 
   close() {}
 
-  handleEmit(eventName: string, ...args: unknown[]) {}
+  handleEmit(_eventName: string, ..._args: unknown[]) {
+    if (_eventName && _args) {
+    }
+  }
 }

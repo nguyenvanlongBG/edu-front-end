@@ -37,6 +37,11 @@
               @click.stop="onHistoryTest(test)"
             />
             <EButton :control="tryTestBtn" @click.stop="onTryTest(test)" />
+            <EButton :control="markTestBtn" @click.stop="onMarkTest(test)" />
+            <EButton
+              :control="reportTestBtn"
+              @click.stop="onReportTest(test)"
+            />
           </div>
         </div>
       </div>
