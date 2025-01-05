@@ -10,6 +10,7 @@ class PopupLibrary {
       app.use(i18n)
       // Mount the popup component to a new div
       const container = document.createElement('div')
+      container.style.zIndex = '1000'
       document.body.appendChild(container)
       app.mount(container)
       app.config.globalProperties.$destroyPopup = () => {

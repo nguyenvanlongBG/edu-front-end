@@ -7,6 +7,8 @@ import { ActionEditor } from '@core/enums/Common'
 import commonFunction from '@core/commons/CommonFunction'
 import { EditorControl } from '@core/models/editor/editor-control'
 import PopupMathEditor from './popup/PopupMathEditor.vue'
+import { PopupControl } from '../../models/popup/popup-control'
+import poupLibrary from '../../library/popup-library'
 window.katex = katex
 export default defineComponent({
   name: 'e-editor',
@@ -21,13 +23,10 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ['update:modelValue'],
   created() {
-    const insertData = [
-      ...this.modelValue,
-      {
-        insert: '\n',
-      },
-    ]
+    const insertData = this.modelValue
+
     this.texto = new Delta(insertData)
   },
   mounted() {
@@ -40,42 +39,99 @@ export default defineComponent({
       if (!formulaElements || !formulaElements.length) return
       formulaElements.forEach(element => {
         element.addEventListener('click', () => {
-          //const dataValue = element.getAttribute('data-value')
-          //const formula = dataValue ?? ''
-          this.actionEditor = ActionEditor.EDIT
-          // this.$q
-          //   .dialog({
-          //     component: DialogMathEditor,
-          //     componentProps: {
-          //       formulaProp: formula,
-          //     },
-          //   })
-          //   .onOk((formula: string) => {
-          //     this.transferMainEditor(formula);
-          //   });
+          const dataValue = element.getAttribute('data-value')
+          if (dataValue) {
+            this.showEditMath(dataValue as string, ActionEditor.EDIT)
+          }
         })
       })
     }
   },
-  setup() {
+  setup(props, { emit }) {
     const myQuillEditor = ref<InstanceType<typeof QuillEditor> | null>(null)
     const editContainerRef = ref<HTMLElement | null>(null)
     const actionEditor = ref(ActionEditor.INSERT)
-    const formula = ref(
-      '{\\left(1+x\\right)}^{n}=1+\\frac{nx}{1!}+\\frac{n\\left(n-1\\right){x}^{2}}{2!}+\\dots',
-    )
+    function showEditMath(
+      formulaStr: string = '',
+      actionEditor: ActionEditor = ActionEditor.EDIT,
+    ) {
+      const popupControl = new PopupControl()
+      popupControl.handleEmit = (eventName: string, data: string) => {
+        if (eventName == 'emitFormula') {
+          transferMainEditor(data, actionEditor)
+        }
+      }
+      const component = import('./popup/PopupMathEditor.vue')
+      poupLibrary.showPopup(component, {
+        control: popupControl,
+        formulaValue: formulaStr,
+      })
+    }
     const idToolbar = 'toolbar-' + commonFunction.generateID()
     const editorOptions = ref({
       modules: {
         toolbar: {
           container: '#' + idToolbar,
           handlers: {
-            formula: () => {},
+            formula: () => {
+              showEditMath('', ActionEditor.INSERT)
+            },
           },
         },
       },
     })
     const texto = ref()
+    function transferMainEditor(
+      formula: string,
+      actionEditor: ActionEditor = ActionEditor.EDIT,
+    ) {
+      if (!myQuillEditor.value) return
+      const quillInstance = myQuillEditor.value.getQuill()
+      quillInstance.focus()
+      const cursorPosition = quillInstance.getSelection()
+      const position =
+        cursorPosition && cursorPosition.index ? cursorPosition.index : 0
+      if (actionEditor == ActionEditor.INSERT) {
+        quillInstance.insertEmbed(position, 'formula', formula)
+      } else {
+        const delta = quillInstance.getContents()
+        if (position) {
+          delta.ops.splice(position - 1, 1)
+        } else {
+          delta.ops.splice(0, 1)
+        }
+        quillInstance.setContents(delta)
+        if (position) {
+          quillInstance.insertEmbed(position - 1, 'formula', formula)
+        } else {
+          quillInstance.insertEmbed(0, 'formula', formula)
+        }
+      }
+      if (
+        !editContainerRef.value ||
+        !editContainerRef.value.querySelectorAll('.ql-formula')
+      )
+        return
+      const formulaElements =
+        editContainerRef.value.querySelectorAll('.ql-formula')
+      formulaElements.forEach(element => {
+        element.addEventListener('click', () => {
+          const dataValue = element.getAttribute('data-value')
+          if (dataValue) {
+            showEditMath(dataValue as string, ActionEditor.EDIT)
+          }
+        })
+      })
+    }
+    function handleInput(e: Event) {
+      formula.value = (e.target as HTMLInputElement).value
+    }
+    function onUpdate(content: Delta) {
+      emit('update:modelValue', content)
+    }
+    const formula = ref(
+      '{\\left(1+x\\right)}^{n}=1+\\frac{nx}{1!}+\\frac{n\\left(n-1\\right){x}^{2}}{2!}+\\dots',
+    )
     const macros = {
       smallfrac: {
         args: 2,
@@ -92,77 +148,19 @@ export default defineComponent({
         captureSelection: false,
       },
     }
-    const isShowMathEditor = ref<boolean>(false)
-    function transferMainEditor(formula: string) {
-      if (!myQuillEditor.value) return
-      const quillInstance = myQuillEditor.value.getQuill()
-      quillInstance.focus()
-      const cursorPosition = quillInstance.getSelection()
-      const position =
-        cursorPosition && cursorPosition.index ? cursorPosition.index : 0
-      if (actionEditor.value == ActionEditor.INSERT) {
-        quillInstance.insertEmbed(position, 'formula', formula)
-      } else {
-        const delta = quillInstance.getContents()
-        if (position) {
-          delta.ops.splice(position - 1, 1)
-        } else {
-          delta.ops.splice(0, 1)
-        }
-        quillInstance.setContents(delta)
-        if (position) {
-          quillInstance.insertEmbed(position - 1, 'formula', formula)
-        } else {
-          quillInstance.insertEmbed(0, 'formula', formula)
-        }
-      }
-      console.log(quillInstance.getContents())
-      if (
-        !editContainerRef.value ||
-        !editContainerRef.value.querySelectorAll('.ql-formula')
-      )
-        return
-      const formulaElements =
-        editContainerRef.value.querySelectorAll('.ql-formula')
-      actionEditor.value = ActionEditor.INSERT
-      formulaElements.forEach(element => {
-        element.addEventListener('click', () => {
-          actionEditor.value = ActionEditor.EDIT
-          //const dataValue = element.getAttribute('data-value')
-          // const formula = dataValue ?? ''
-          // console.log(cursorPosition)
-          // isShowMathEditor.value = true
-          // $q.dialog({
-          //   component: DialogMathEditor,
-          //   componentProps: {
-          //     formulaProp: formula,
-          //   },
-          // }).onOk((formula: string) => {
-          //   me.transferMainEditor(formula);
-          // });
-        })
-      })
-    }
-    function handleInput(e: Event) {
-      formula.value = (e.target as HTMLInputElement).value
-      console.log(formula)
-    }
-    function showMathEditor() {
-      isShowMathEditor.value = true
-    }
     return {
       macros,
       formula,
-      showMathEditor,
-      isShowMathEditor,
       idToolbar,
       editorOptions,
       texto,
       myQuillEditor,
+      onUpdate,
       transferMainEditor,
       editContainerRef,
       actionEditor,
       handleInput,
+      showEditMath,
     }
   },
 })

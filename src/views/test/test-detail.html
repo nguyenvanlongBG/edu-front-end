@@ -7,14 +7,7 @@
           v-if="testMode== TestMode.Edit || testMode== TestMode.Add"
         >
           <EButton :control="addQuestionBtn" @click="onAddQuestion" />
-          <div class="ic-import cursor-pointer" @click="onImportQuestion"></div>
-          <input
-            type="file"
-            ref="fileInputRef"
-            style="display: none"
-            @change="handleFileChange"
-            accept=".doc, .docx"
-          />
+          <EButton :control="autoGenQuestionBtn" @click="onAutoGenQuestion" />
         </div>
         <div style="height: 36px" v-if="isLoading">
           <ELoading :control="loadingControl" v-model="isLoading" />

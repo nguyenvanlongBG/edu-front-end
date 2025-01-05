@@ -1,42 +1,6 @@
 <template>
   <div class="the-header">
-    <ul class="list-item-menu-shortcut">
-      <li class="item-shortcut">
-        <img
-          class="size-img-28px"
-          src="../../assets/pictures/forum-header.png"
-          alt=""
-        />
-      </li>
-      <li class="item-shortcut">
-        <img
-          class="size-img-28px"
-          src="../../assets/pictures/exam-header.png"
-          alt=""
-        />
-      </li>
-      <li class="item-shortcut">
-        <img
-          class="size-img-28px"
-          src="../../assets/pictures/classroom-header.png"
-          alt=""
-        />
-      </li>
-      <li class="item-shortcut">
-        <img
-          class="size-img-28px"
-          src="../../assets/pictures/study-header.png"
-          alt=""
-        />
-      </li>
-      <li class="item-shortcut">
-        <img
-          class="size-img-28px"
-          src="../../assets/pictures/study-group-header.png"
-          alt=""
-        />
-      </li>
-    </ul>
+    <ul class="list-item-menu-shortcut"></ul>
     <div class="user-toolbar">
       <div class="item-user-toolbar">
         <div name="notifications" size="32px"></div>

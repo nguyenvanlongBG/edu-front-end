@@ -1,0 +1,20 @@
+<div class="e-tab">
+  <div class="tabs-container">
+    <div class="tabs">
+      <div class="tab-links">
+        <button
+          v-for="tab in control.tabs"
+          :key="tab.id"
+          :class="['tab-link', tab.id === control.value ? 'active': '' ]"
+          @click="selectTab(tab.id)"
+        >
+          {{ tab.name }}
+        </button>
+      </div>
+
+      <div class="tab-content">
+        <slot name="tab-content">OK</slot>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<EPopup :control="control" @close="onClose">
+  <template #header>
+    <h3>Tạo câu hỏi tự động</h3>
+  </template>
+  <template #body>
+    <div>
+      <div style="height: 36px" v-if="isLoading">
+        <ELoading :control="loadingControl" v-model="isLoading" />
+      </div>
+      <div style="min-height: 500px" class="d-flex-column row-gap-8px">
+        <ENumber
+          :control="numberQuestionControl"
+          v-model="numberQuestionControl.value"
+        />
+        <div class="d-flex-column row-gap-8px">
+          <div
+            v-for="settingChapterControl in chapterControls"
+            class="d-flex-vcenter col-gap-8px"
+          >
+            <div>Chương</div>
+            <ECombobox
+              :control="settingChapterControl.chapter"
+              v-model="settingChapterControl.chapter.value"
+            />
+            <div class="d-flex-vcenter">
+              <div style="width: 100px; height: 36px">Nhận biết</div>
+              <ENumber
+                :control="settingChapterControl.numberQuestionRecognition"
+                v-model="settingChapterControl.numberQuestionRecognition.value"
+              />
+            </div>
+            <div class="d-flex-vcenter">
+              <div style="width: 100px; height: 36px">Thông hiểu</div>
+              <ENumber
+                :control="settingChapterControl.numberQuestionComprehension"
+                v-model="settingChapterControl.numberQuestionComprehension.value"
+              />
+            </div>
+            <div class="d-flex-vcenter">
+              <div style="width: 100px; height: 36px">Vận dụng</div>
+              <ENumber
+                :control="settingChapterControl.numberQuestionApplication"
+                v-model="settingChapterControl.numberQuestionApplication.value"
+              />
+            </div>
+            <div class="d-flex-vcenter">
+              <div style="width: 150px; height: 36px">Vận dụng cao</div>
+              <ENumber
+                :control="settingChapterControl.numberQuestionAdvancedApplication"
+                v-model="settingChapterControl.numberQuestionAdvancedApplication.value"
+              />
+            </div>
+          </div>
+          <div style="width: 80px">
+            <EButton
+              :control="addChapterConfigBtn"
+              @click="onAddConfigChapter"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+  <template #footer>
+    <div class="d-flex col-gap-8px">
+      <EButton :control="cancelBtn" @click="onClose" />
+      <EButton :control="saveBtn" @click="onSave" />
+    </div>
+  </template>
+</EPopup>

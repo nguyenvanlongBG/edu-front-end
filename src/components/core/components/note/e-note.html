@@ -1,0 +1,6 @@
+<div class="note-page">
+  <h1>Ghi chú</h1>
+  <slot name="content">
+    <editor :control="editorControl" v-model="innerValue" />
+  </slot>
+</div>

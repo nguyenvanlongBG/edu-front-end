@@ -20,7 +20,7 @@
       <button class="ql-link"></button>
       <button class="ql-image"></button>
       <button class="ql-video"></button>
-      <button class="ql-formula" @click="showMathEditor"></button>
+      <button class="ql-formula"></button>
     </div>
     <div>
       <QuillEditor
@@ -28,13 +28,8 @@
         ref="myQuillEditor"
         v-model:content="texto"
         :options="editorOptions"
+        @update:content="onUpdate"
       />
     </div>
   </div>
-  <!-- <PopupMathEditor
-    v-model:isShow="isShowMathEditor"
-    :formulaValue="formula"
-    @emitFormula="transferMainEditor"
-  >
-  </PopupMathEditor> -->
 </template>

@@ -1,34 +1,26 @@
-<template>
-  <div>
-    <math-field
-      :macros="macros"
-      ref="mathLive"
-      virtual-keyboard-mode="manual"
-      v-model:value="formula"
-      @input="handleInput"
-    ></math-field>
-  </div>
-</template>
+<template src="./popup-math-editor.html"></template>
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue'
+import { ButtonControl } from '@/components/core/models/button/button-control'
+import { PopupControl } from '@/components/core/models/popup/popup-control'
+import { defineComponent, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import EPopup from '@core/components/popup/EPopup.vue'
+import EButton from '@core/components/button/EButton.vue'
 export default defineComponent({
   name: 'PopupMathEditor',
-  emits: ['updateFormula', 'emitFormula', 'update:isShow'],
-  components: {},
+  emits: ['updateFormula', 'emitFormula'],
+  components: {
+    EButton,
+    EPopup,
+  },
   props: {
-    isShow: {
-      type: Boolean,
+    control: {
+      type: PopupControl,
       required: true,
-      default: false,
     },
     formulaValue: {
       type: String,
       required: true,
-      default: '',
-    },
-    title: {
-      type: String,
-      required: false,
       default: '',
     },
   },
@@ -37,14 +29,7 @@ export default defineComponent({
     this.formula = this.formulaValue
   },
   setup(props, ctx) {
-    const showDialog = computed({
-      get() {
-        return props.isShow
-      },
-      set(newValue) {
-        ctx.emit('update:isShow', newValue)
-      },
-    })
+    const { t } = useI18n()
     const macros = {
       smallfrac: {
         args: 2,
@@ -64,26 +49,29 @@ export default defineComponent({
     const formula = ref(
       '{\\left(1+x\\right)}^{n}=1+\\frac{nx}{1!}+\\frac{n\\left(n-1\\right){x}^{2}}{2!}+\\dots',
     )
-    function handleInput(e) {
-      formula.value = e.target.value
-      console.log(formula)
+    const cancelBtn = new ButtonControl({
+      label: t('i18nButton.cancel'),
+    })
+    const saveBtn = new ButtonControl({
+      label: t('i18nButton.save'),
+      classType: 'solid',
+    })
+    function handleInput(e: Event) {
+      formula.value = (e.target as HTMLInputElement).value
+      props.control.handleEmit('updateFormula', formula.value)
       ctx.emit('updateFormula', formula.value)
     }
     function emitMath() {
+      props.control.handleEmit('emitFormula', formula.value)
       ctx.emit('emitFormula', formula.value)
     }
-    watch(
-      () => props.isShow,
-      newValue => {
-        showDialog.value = newValue
-      },
-    )
     return {
       macros,
       formula,
+      cancelBtn,
+      saveBtn,
       handleInput,
       emitMath,
-      showDialog,
     }
   },
 })

@@ -1,5 +1,6 @@
 import request from '@components/core/utils/origin-request'
 import type { PagingParam } from '../models/paging/paging-param'
+import type { FilterCondition } from '../models/paging/filter-condition'
 export class BaseService {
   getController(): string {
     throw 'Chưa khai báo controller'
@@ -11,6 +12,9 @@ export class BaseService {
       method: 'POST',
       data: pagingParam,
     })
+  }
+  async filter(filters: FilterCondition[]) {
+    return await this.post(filters, 'filter')
   }
   async getById(id: string) {
     const controller = this.getController()

@@ -6,7 +6,7 @@ import { Question } from '@/models/question/question'
 import TestService from '@/services/test-service'
 import FileQuestionService from '@/services/file-question-service'
 
-import { ref, nextTick } from 'vue'
+import { nextTick, ref } from 'vue'
 import { TableLabelControl } from '@/components/core/models/table-label/table-label-control'
 import { ItemTableLabel } from '@/components/core/models/table-label/item-table-label'
 import EButton from '@/components/core/components/button/EButton.vue'
@@ -19,7 +19,6 @@ import { InputControl } from '@/components/core/models/input/input-control'
 import ECombobox from '@/components/core/components/combobox/ECombobox.vue'
 import { ComboboxControl } from '@/components/core/models/combobox/combobox-control'
 import { QuestionControl } from '@/models/question/question-control'
-import { OptionQuestion } from '@/models/option-question/option-question'
 import { LoadingControl } from '@/components/core/models/loading/loading-control'
 import ELoading from '@/components/core/components/loading/ELoading.vue'
 import { LoadingType } from '@/components/core/enums/Common'
@@ -32,6 +31,7 @@ import { useRoute } from 'vue-router'
 import { RouterNameTest } from '@/components/core/enums/Router'
 import { ResultQuestion } from '@/models/result-question/result-question'
 import { QuestionType } from '@/enums/question'
+import { PopupControl } from '@/components/core/models/popup/popup-control'
 export default {
   components: {
     EQuestion,
@@ -100,12 +100,19 @@ export default {
     )
     const addQuestionBtn = ref(
       new ButtonControl({
-        label: t('i18nQuestion.CreateQuestion'),
+        label: t('i18nQuestion.AddQuestion'),
+      }),
+    )
+    const autoGenQuestionBtn = ref(
+      new ButtonControl({
+        label: t('i18nQuestion.AutoGenQuestion'),
       }),
     )
     const tableLabel = ref<TableLabelControl>(new TableLabelControl())
     tableLabel.value.displayValue = 'index'
     const questions = ref<Question[]>([])
+    let questionsOrigin = [] as Question[]
+
     function validateInput() {
       return {
         isValid: false,
@@ -157,12 +164,6 @@ export default {
       }
       return dicQuestionControl.value[question.question_id]
     }
-    function onImportQuestion() {
-      // Kích hoạt input file ẩn
-      if (fileInputRef.value) {
-        fileInputRef.value.click()
-      }
-    }
     async function handleLoadData() {
       const testService = new TestService()
 
@@ -183,8 +184,13 @@ export default {
           )
           const [testDetailResult, questionsResult] = await Promise.all(tasks)
           masterData.value = testDetailResult as unknown as TestDto
+          masterData.value.State = ModelState.EDIT
           // Xử lý kết quả
           questions.value = commonFunction.convertToInstances<Question>(
+            questionsResult as unknown as Record<string, unknown>[],
+            Question,
+          )
+          questionsOrigin = commonFunction.convertToInstances<Question>(
             questionsResult as unknown as Record<string, unknown>[],
             Question,
           )
@@ -192,21 +198,36 @@ export default {
       }
     }
     function onAddQuestion() {
-      const newQuestion = new Question()
-      newQuestion.State = ModelState.INSERT
-      newQuestion.question_id = commonFunction.generateID()
-      newQuestion.options = [
-        new OptionQuestion({
-          State: ModelState.INSERT,
-          question_id: newQuestion.question_id,
-          option_question_id: commonFunction.generateID(),
-          object_content: [],
-        }),
-      ]
-      handleAddQuestion([newQuestion])
-      nextTick(() => {
-        scrollToQuestion(newQuestion.question_id)
+      const popupControl = new PopupControl({
+        width: '1200px',
       })
+      const component = import(
+        '@views/test/popup-add-question/PopupAddQuestion.vue'
+      )
+      const methodHandle = (event: string, data: unknown) => {
+        if (event == 'close') {
+          popupControl.close()
+        } else if (event == 'ok') {
+          const questions = data as Question[]
+          if (questions?.length) {
+            handleAddQuestion(questions)
+            popupControl.close()
+            const lastQuestion = questions[questions.length - 1]
+            if (lastQuestion) {
+              nextTick(() => {
+                scrollToQuestion(lastQuestion.question_id)
+              })
+            }
+          }
+        }
+      }
+      popupControl.show(
+        component,
+        {
+          control: popupControl,
+        },
+        methodHandle,
+      )
     }
     function handleAddQuestion(items: Question[]) {
       if (!items || !items.length) return
@@ -220,6 +241,7 @@ export default {
           }),
         )
         if (!(question.question_id in dicQuestionControl.value)) {
+          question.State = ModelState.INSERT
           dicQuestionControl.value[question.question_id] = new QuestionControl({
             value: question,
             isShowActionToolbar: true,
@@ -231,6 +253,38 @@ export default {
       })
       questions.value = questions.value.concat(items)
     }
+    function onAutoGenQuestion() {
+      const popupControl = new PopupControl({
+        width: '1200px',
+      })
+      const component = import(
+        '@views/test/popup-auto-gen-question/PopupAutoGenQuestion.vue'
+      )
+      const methodHandle = (event: string, data: unknown) => {
+        if (event == 'close') {
+          popupControl.close()
+        } else if (event == 'ok') {
+          const questions = data as Question[]
+          if (questions?.length) {
+            handleAddQuestion(questions)
+            popupControl.close()
+            const lastQuestion = questions[questions.length - 1]
+            if (lastQuestion) {
+              nextTick(() => {
+                scrollToQuestion(lastQuestion.question_id)
+              })
+            }
+          }
+        }
+      }
+      popupControl.show(
+        component,
+        {
+          control: popupControl,
+        },
+        methodHandle,
+      )
+    }
     // Object lưu trữ các refs động
     const questionRefs = ref<{ [key: string]: HTMLElement | null }>({})
 
@@ -238,31 +292,6 @@ export default {
     const setQuestionRef = (index: string) => (el: HTMLElement | null) => {
       if (el) {
         questionRefs.value[index] = el
-      }
-    }
-    async function handleFileChange(event: Event) {
-      try {
-        changeLoading(true)
-        const input = event.target as HTMLInputElement
-        if (input && input.files && input.files.length) {
-          const file = input.files[0]
-          const formData = new FormData()
-          formData.append('file', file) // Thêm tệp vào FormData
-          formData.append('testId', '12') // Thêm các trường khác nếu cần
-          const fileQuestionService = new FileQuestionService()
-          const result = await fileQuestionService.uploadFileQuestion(formData)
-          const newQuestions = commonFunction.convertToInstances<Question>(
-            result as unknown as Array<Record<string, unknown>>,
-            Question,
-          )
-          if (!newQuestions || !newQuestions.length) return
-          newQuestions.forEach(question => (question.State = ModelState.INSERT))
-          handleAddQuestion(newQuestions)
-        }
-      } catch (error: unknown) {
-        console.log(error)
-      } finally {
-        changeLoading(false)
       }
     }
     function changeLoading(loadingStatus: boolean = false) {
@@ -289,9 +318,29 @@ export default {
     }
     async function onSave() {
       masterData.value.questions = questions.value
+      const test = new TestDto(masterData.value)
+      const testService = new TestService()
+      let questionsHandle = questions.value.filter(
+        q => q.State == ModelState.INSERT || q.State == ModelState.EDIT,
+      )
+      const questionOriginIds = new Set(
+        (questions.value ?? []).map(question => question.question_id),
+      )
+      const questionsDelete = questionsOrigin.filter(
+        q => !questionOriginIds.has(q.question_id),
+      )
+      if (questionsDelete?.length) {
+        questionsDelete.forEach(q => (q.State = ModelState.DELETE))
+        questionsHandle = questionsHandle.concat(questionsDelete)
+      }
+      test.questions = questionsHandle
       if (masterData.value && masterData.value.State == ModelState.INSERT) {
-        const testService = new TestService()
-        await testService.post(masterData.value)
+        await testService.post(test)
+      } else if (
+        masterData.value &&
+        masterData.value.State == ModelState.EDIT
+      ) {
+        await testService.put(test)
       }
     }
     function initData() {
@@ -303,12 +352,6 @@ export default {
           break
         case RouterNameTest.Edit:
           testMode.value = TestMode.Edit
-          break
-        case RouterNameTest.Do:
-          testMode.value = TestMode.Do
-          break
-        case RouterNameTest.History:
-          testMode.value = TestMode.History
           break
         default:
           testMode.value = TestMode.None
@@ -379,6 +422,8 @@ export default {
       inputControl,
       fileInputRef,
       addQuestionBtn,
+      autoGenQuestionBtn,
+      onAutoGenQuestion,
       tableLabel,
       handleLoadData,
       fileInput,
@@ -387,11 +432,10 @@ export default {
       setQuestionRef,
       scrollToQuestion,
       questions,
+      questionsOrigin,
       getQuestion,
       questionRefs,
       onSelectQuestionLabel,
-      handleFileChange,
-      onImportQuestion,
       onAddQuestion,
       handleAddQuestion,
       onSelectLabel,

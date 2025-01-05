@@ -27,27 +27,9 @@
           </li>
           <li class="item-menu">
             <div class="block-img-menu-item">
-              <img src="../../assets/pictures/study.png" alt="" />
-            </div>
-            <span class="title-menu-item">Ôn tập</span>
-          </li>
-          <li class="item-menu">
-            <div class="block-img-menu-item">
               <img src="../../assets/pictures/classroom.png" alt="" />
             </div>
             <span class="title-menu-item">Lớp học</span>
-          </li>
-          <li class="item-menu" @click="navigateToPage(6, null)">
-            <div class="block-img-menu-item">
-              <img src="../../assets/pictures/study-group.png" alt="" />
-            </div>
-            <span class="title-menu-item">Học nhóm</span>
-          </li>
-          <li class="item-menu">
-            <div class="block-img-menu-item">
-              <img src="../../assets/pictures/online-course.png" alt="" />
-            </div>
-            <span class="title-menu-item">Khóa học</span>
           </li>
           <li class="item-menu">
             <div class="block-img-menu-item">
@@ -55,38 +37,9 @@
             </div>
             <span class="title-menu-item">Báo cáo</span>
           </li>
-          <li class="item-menu">
-            <div class="block-img-menu-item">
-              <img src="../../assets/pictures/event.png" alt="" />
-            </div>
-            <span class="title-menu-item">Sự kiện</span>
-          </li>
-          <li class="item-menu">
-            <div class="block-img-menu-item">
-              <img src="../../assets/pictures/glory.png" alt="" />
-            </div>
-            <span class="title-menu-item">Vinh danh</span>
-          </li>
-          <li class="item-menu">
-            <div class="block-img-menu-item">
-              <img src="../../assets/pictures/emotional.png" alt="" />
-            </div>
-            <span class="title-menu-item">Dòng trạng thái</span>
-          </li>
-          <li class="item-menu">
-            <div class="block-img-menu-item">
-              <img src="../../assets/pictures/introduce.png" alt="" />
-            </div>
-            <span class="title-menu-item">Giới thiệu</span>
-          </li>
         </ul>
-        <div class="item-menu">
-          <div class="block-img-menu-item"></div>
-          <span calss="title-menu-item">Ẩn bớt</span>
-        </div>
       </div>
       <div class="line"></div>
-      <div>Khối lối tắt</div>
     </div>
     <GroupMenu v-if="pageFocus == Menu.GROUP"> </GroupMenu>
   </div>

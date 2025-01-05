@@ -18,7 +18,7 @@ export class QuestionControl extends BaseControl {
   isShowResult: boolean = false
   isShowLevel: boolean = true
   isShowActionToolbar: boolean = false
-  isShowActionNote: boolean = true
+  isShowActionNote: boolean = false
   isShowNote: boolean = false
   isShowPoint: boolean = false
   isShowToolEditor: boolean = false

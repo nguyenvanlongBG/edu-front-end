@@ -107,7 +107,14 @@ export default {
       })
       return pagingParam
     }
-    function onClickTest(test: TestDto) {}
+    function onMarkTest(test: TestDto) {
+      router.push({
+        name: RouterNameTest.Mark,
+        params: {
+          test_id: test.test_id,
+        },
+      })
+    }
     function onDoTest(test: TestDto) {
       router.push({
         name: RouterNameTest.Do,
@@ -139,6 +146,14 @@ export default {
       })
     }
     function onTryTest(test: TestDto) {}
+    function onHistoryTest(test: TestDto) {
+      router.push({
+        name: RouterNameTest.History,
+        params: {
+          test_id: test.test_id,
+        },
+      })
+    }
     return {
       formatDateTime,
       createTestBtn,
@@ -151,10 +166,11 @@ export default {
       tryTestBtn,
       markTestBtn,
       reportTestBtn,
-      onClickTest,
+      onMarkTest,
       onDoTest,
       onDoTestAgain,
       onEditTest,
+      onHistoryTest,
       onTryTest,
       loadData,
       buildPagingParam,

@@ -1,0 +1,10 @@
+<div>
+  <ETab :control="tabControl" @change="onChangeExam">
+    <template #tab-content>
+      <div style="height: 36px" v-if="isLoading">
+        <ELoading :control="loadingControl" v-model="isLoading" />
+      </div>
+      <ExamDetail :exam="masterData" v-else />
+    </template>
+  </ETab>
+</div>

@@ -1,0 +1,39 @@
+<EPopup :control="control" @close="onClose">
+  <template #header>
+    <h3>Thêm câu hỏi</h3>
+  </template>
+  <template #body>
+    <div>
+      <div class="d-flex-end col-gap-8px">
+        <EButton :control="addQuestionBtn" @click="onAddQuestion" />
+        <div class="ic-import cursor-pointer" @click="onImportQuestion"></div>
+        <input
+          type="file"
+          ref="fileInputRef"
+          style="display: none"
+          @change="handleFileChange"
+          accept=".doc, .docx"
+        />
+        <EButton :control="choiceLibraryBtn" @click="onChoiceQuestionLibrary" />
+      </div>
+      <div style="height: 36px" v-if="isLoading">
+        <ELoading :control="loadingControl" v-model="isLoading" />
+      </div>
+      <div v-show="!isLoading">
+        <div
+          v-for="question in questions"
+          :key="question.question_id"
+          :ref="setQuestionRef(question.question_id)"
+        >
+          <EQuestion :control="getQuestionControl(question)" />
+        </div>
+      </div>
+    </div>
+  </template>
+  <template #footer>
+    <div class="d-flex col-gap-8px">
+      <EButton :control="cancelBtn" @click="onClose" />
+      <EButton :control="saveBtn" @click="onSave" />
+    </div>
+  </template>
+</EPopup>

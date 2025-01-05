@@ -27,11 +27,11 @@ import { DateControl } from '@/components/core/models/date/date-control'
 import ENumber from '@/components/core/components/number/ENumber.vue'
 import { NumberControl } from '@/components/core/models/number/number-control'
 import { ExamMode } from '@/enums/exam'
-import { useRoute } from 'vue-router'
-import { RouterNameExam } from '@/components/core/enums/Router'
 import { ExamDto } from '@/models/exam/Dto/exam-dto'
 import ExamService from '@/services/exam-service'
 import { AnswerQuestion } from '@/models/answer-question/answer-question'
+import ECheckbox from '@/components/core/components/checkbox/ECheckbox.vue'
+import { CheckboxControl } from '@/components/core/models/checkbox/checkbox-control'
 export default {
   components: {
     EQuestion,
@@ -42,19 +42,19 @@ export default {
     ELoading,
     EDate,
     ENumber,
+    ECheckbox,
   },
   props: {
     exam: {
-      type: ExamDto,
+      type: Object, // Sử dụng Object nếu ExamDto là một class hoặc constructor
       required: false,
+      default: () => new ExamDto(),
     },
   },
   setup(props) {
     const { t } = useI18n()
-    const examMode = ref(ExamMode.None)
     const masterData = ref(new ExamDto(props.exam))
     const test = ref(new TestDto())
-    masterData.value.State = ModelState.INSERT
     const saveBtn = ref(
       new ButtonControl({
         label: t('i18nTest.Button.Save'),
@@ -66,6 +66,8 @@ export default {
         type: LoadingType.LoadingNormal,
       }),
     )
+    const questionAttention = ref([])
+    const checkboxControl = ref(new CheckboxControl())
     const inputControl = ref(
       new InputControl({
         placeholder: t('i18nTest.TestName'),
@@ -144,7 +146,7 @@ export default {
           value: question,
         })
       }
-      switch (examMode.value) {
+      switch (masterData.value.mode) {
         case ExamMode.Do:
           dicQuestionControl.value[question.question_id].isShowToolEditor =
             false
@@ -153,13 +155,27 @@ export default {
         case ExamMode.History:
           dicQuestionControl.value[question.question_id].isShowAnswer = true
           dicQuestionControl.value[question.question_id].isShowResult = true
+          dicQuestionControl.value[question.question_id].isShowPoint = true
+          dicQuestionControl.value[question.question_id].isReadonlyPoint = true
+        case ExamMode.Mark:
+          dicQuestionControl.value[question.question_id].isShowAnswer = true
+          dicQuestionControl.value[question.question_id].isShowResult = true
+          dicQuestionControl.value[question.question_id].isShowPoint = true
+          dicQuestionControl.value[question.question_id].isReadonlyPoint = false
       }
       return dicQuestionControl.value[question.question_id]
+    }
+    function getCheckboxControl(question: Question) {
+      if (!question || !question.question_id) return
+      return new CheckboxControl({
+        value: question.question_id,
+        label: 'Cần chữa',
+      })
     }
     async function handleLoadData() {
       const examService = new ExamService()
       const tasks = []
-      switch (examMode.value) {
+      switch (masterData.value.mode) {
         case ExamMode.Do:
           tasks.push(examService.getTestOfExam(masterData.value.exam_id))
           const [testDetailResult] = await Promise.all(tasks)
@@ -175,6 +191,17 @@ export default {
           tasks.push(examService.historyExam(masterData.value.exam_id))
           const [testHistory] = await Promise.all(tasks)
           test.value = testHistory as unknown as TestDto
+          masterData.value.test_id = test.value.test_id
+          // Xử lý kết quả
+          questions.value = commonFunction.convertToInstances<Question>(
+            test.value.questions as unknown as Record<string, unknown>[],
+            Question,
+          )
+          break
+        case ExamMode.Mark:
+          tasks.push(examService.historyExam(masterData.value.exam_id))
+          const [testMark] = await Promise.all(tasks)
+          test.value = testMark as unknown as TestDto
           masterData.value.test_id = test.value.test_id
           // Xử lý kết quả
           questions.value = commonFunction.convertToInstances<Question>(
@@ -222,7 +249,7 @@ export default {
 
       masterData.value.answers = answers as AnswerQuestion[]
       const examService = new ExamService()
-      switch (examMode.value) {
+      switch (masterData.value.mode) {
         case ExamMode.Do:
           await examService.doExam(masterData.value)
           break
@@ -231,34 +258,14 @@ export default {
       }
     }
 
-    function initData() {
-      const route = useRoute()
-      masterData.value.exam_id = route.params.exam_id as string
-      switch (route.name) {
-        case RouterNameExam.Do:
-          examMode.value = ExamMode.Do
-          break
-        case RouterNameExam.Mark:
-          examMode.value = ExamMode.Mark
-          break
-        case RouterNameExam.History:
-          examMode.value = ExamMode.History
-          break
-        default:
-          examMode.value = ExamMode.None
-      }
-    }
+    function initData() {}
     function initControl() {
       inputControl.value.readonly = true
       startTimeControl.value.readonly = true
       durationControl.value.readonly = true
-      switch (examMode.value) {
-        case ExamMode.History:
-          break
-      }
     }
     function onChangeAnswer(question: Question, answer: string) {
-      if (examMode.value == ExamMode.Do) {
+      if (masterData.value.mode == ExamMode.Do) {
         if (!question.answer) {
           question.answer = new AnswerQuestion({
             exam_id: masterData.value.exam_id,
@@ -273,9 +280,10 @@ export default {
       }
     }
     return {
-      examMode,
       test,
       ExamMode,
+      questionAttention,
+      checkboxControl,
       masterData,
       saveBtn,
       dicQuestionControl,
@@ -286,6 +294,7 @@ export default {
       isLoading,
       changeLoading,
       getQuestionControl,
+      getCheckboxControl,
       comboboxControl,
       inputControl,
       fileInputRef,

@@ -12,13 +12,19 @@ import { ComboboxControl } from '../core/models/combobox/combobox-control'
 import EButton from '../core/components/button/EButton.vue'
 import { ButtonControl } from '../core/models/button/button-control'
 import { useI18n } from 'vue-i18n'
+import { NoteControl } from '../core/models/note/note-control'
+import ENote from '../core/components/note/ENote.vue'
+import ENumber from '../core/components/number/ENumber.vue'
+import { NumberControl } from '../core/models/number/number-control'
 
 export default defineComponent({
   name: 'EQuestion',
   components: {
     Editor,
     ECombobox,
+    ENumber,
     EButton,
+    ENote,
   },
   props: {
     control: {
@@ -30,7 +36,7 @@ export default defineComponent({
   setup(props, ctx) {
     const { t } = useI18n()
     const questionEditorControl = ref(new EditorControl())
-    const noteEditorControl = ref(new EditorControl())
+    const noteEditorControl = ref(new NoteControl())
     const questionTypeControl = ref(
       new ComboboxControl({
         value: QuestionType.SingleChoice,
@@ -48,6 +54,7 @@ export default defineComponent({
         ],
       }),
     )
+    const pointControl = ref(new NumberControl())
     const btnEdit = ref(
       new ButtonControl({
         label: t('i18nQuestion.Edit'),
@@ -142,6 +149,9 @@ export default defineComponent({
       if (props.control.isShowLevel && props.control.isReadonlyLevel) {
         questionTypeControl.value.readonly = true
       }
+      if (props.control.isShowPoint && props.control.isReadonlyPoint) {
+        pointControl.value.readonly = true
+      }
     }
     function onEditQuestion() {
       const control = props.control
@@ -186,6 +196,7 @@ export default defineComponent({
     return {
       QuestionMode,
       noteEditorControl,
+      pointControl,
       btnEdit,
       btnNote,
       onEditQuestion,

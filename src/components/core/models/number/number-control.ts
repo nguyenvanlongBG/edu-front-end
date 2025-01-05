@@ -16,7 +16,7 @@ export class NumberControl extends BaseControl {
   value: number | null = null // Giá trị ban đầu
   required: boolean = false
   placeholder: string = ''
-  min?: number // Giá trị nhỏ nhất
+  min: number = 0 // Giá trị nhỏ nhất
   max?: number // Giá trị lớn nhất
   step: number = 1 // Bước tăng giảm
   styleClass: string = ''

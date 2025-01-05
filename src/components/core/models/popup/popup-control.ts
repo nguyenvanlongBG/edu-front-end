@@ -18,7 +18,7 @@ export class PopupControl extends BaseControl {
   show(
     promiseComponent: Promise<ComponentOptions>,
     props: Record<string, unknown>,
-    handleEmit: (event: string, ...args: unknown[]) => void, // Callback để xử lý sự kiện emit
+    handleEmit: (event: string, ...args: unknown[]) => void = () => {}, // Callback để xử lý sự kiện emit
   ) {
     promiseComponent.then(componentResult => {
       const app = createApp(componentResult.default, props)

@@ -3,11 +3,18 @@
     <slot name="header-question">
       <div class="d-flex-between">
         <div class="left-tool-bar">
-          <ECombobox
-            v-if="control.isShowQuestionType"
-            :control="questionTypeControl"
-            v-model="control.value.type"
-          />
+          <slot name="left-tool-bar">
+            <ECombobox
+              v-if="control.isShowQuestionType"
+              :control="questionTypeControl"
+              v-model="control.value.type"
+            />
+            <ENumber
+              v-if="control.isShowPoint"
+              :control="pointControl"
+              v-model="control.value.point"
+            />
+          </slot>
         </div>
         <div class="right-tool-bar">
           <EButton
@@ -24,8 +31,8 @@
       </div>
     </slot>
   </div>
-  <div class="body d-flex-column">
-    <div class="question d-flex-column row-gap-8px">
+  <div class="body d-flex">
+    <div class="question d-flex-column row-gap-8px flex-1">
       <div class="question-content">
         <editor
           :control="questionEditorControl"
@@ -77,12 +84,10 @@
         </div>
       </div>
     </div>
-    <div v-if="control.isShowNote">
-      Ghi chú
-      <editor
-        :control="noteEditorControl"
-        v-model="control.value.object_content"
-      />
-    </div>
+    <ENote
+      v-if="control.isShowNote"
+      :control="noteEditorControl"
+      v-model="control.value.object_content"
+    />
   </div>
 </div>

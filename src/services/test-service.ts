@@ -16,4 +16,7 @@ export default class TestService extends BaseService {
       method: 'GET',
     })
   }
+  async examsUserHistory(testId: string) {
+    return await this.get(testId + '/history')
+  }
 }

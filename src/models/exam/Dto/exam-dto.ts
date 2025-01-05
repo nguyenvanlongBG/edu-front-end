@@ -1,8 +1,8 @@
 import commonFunction from '@/components/core/commons/CommonFunction'
-import { TestMode } from '@/enums/test'
 import { Exam } from '../exam'
 import type { IExamDto } from './i-exam-dto'
 import type { AnswerQuestion } from '@/models/answer-question/answer-question'
+import { ExamMode } from '@/enums/exam'
 
 export class ExamDto extends Exam {
   constructor(exam?: IExamDto) {
@@ -15,5 +15,5 @@ export class ExamDto extends Exam {
     }
   }
   answers: AnswerQuestion[] = []
-  mode: TestMode = TestMode.None // Nếu mode View thì cần dùng
+  mode: ExamMode = ExamMode.None // Nếu mode View thì cần dùng
 }

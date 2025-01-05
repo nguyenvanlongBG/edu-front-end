@@ -1,4 +1,6 @@
 import { RouterNameExam, RouterNameTest } from '@/components/core/enums/Router'
+import { ExamMode } from '@/enums/exam'
+import { ExamDto } from '@/models/exam/Dto/exam-dto'
 import type { RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
@@ -51,19 +53,14 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@views/test/TestDetail.vue'),
           },
           {
-            path: ':test_id/history',
-            name: RouterNameTest.History,
-            component: () => import('@views/test/TestDetail.vue'),
-          },
-          {
             path: ':test_id/mark',
             name: RouterNameTest.Mark,
-            component: () => import('@views/test/TestDetail.vue'),
+            component: () => import('@views/test/mark/MarkListTest.vue'),
           },
           {
-            path: 'mark',
-            name: RouterNameTest.MarkList,
-            component: () => import('@views/test/mark/MarkListTest.vue'),
+            path: ':test_id/history',
+            name: RouterNameTest.History,
+            component: () => import('@views/exam/history/HistoryExams.vue'),
           },
         ],
       },
@@ -75,21 +72,45 @@ const routes: RouteRecordRaw[] = [
             path: ':exam_id',
             name: RouterNameExam.View,
             component: () => import('@views/exam/ExamDetail.vue'),
+            props: route => ({
+              exam: new ExamDto({
+                exam_id: route.params.exam_id as string,
+                mode: ExamMode.Do,
+              }),
+            }),
           },
           {
             path: ':exam_id/do',
             name: RouterNameExam.Do,
             component: () => import('@views/exam/ExamDetail.vue'),
+            props: route => ({
+              exam: new ExamDto({
+                exam_id: route.params.exam_id as string,
+                mode: ExamMode.Do,
+              }),
+            }),
           },
           {
             path: ':exam_id/mark',
             name: RouterNameExam.Mark,
             component: () => import('@views/exam/ExamDetail.vue'),
+            props: route => ({
+              exam: new ExamDto({
+                exam_id: route.params.exam_id as string,
+                mode: ExamMode.Mark,
+              }),
+            }),
           },
           {
             path: ':exam_id/history',
             name: RouterNameExam.History,
             component: () => import('@views/exam/ExamDetail.vue'),
+            props: route => ({
+              exam: new ExamDto({
+                exam_id: route.params.exam_id as string,
+                mode: ExamMode.History,
+              }),
+            }),
           },
         ],
       },

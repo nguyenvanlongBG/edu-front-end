@@ -1,17 +1,19 @@
 <div :class="['e-number', control.styleClass]">
-  <label v-if="control.label" class="number-label">{{ control.label }}</label>
-  <input
-    type="number"
-    :min="control.min"
-    :max="control.max"
-    :step="control.step"
-    v-model.number="innerValue"
-    :placeholder="control.placeholder"
-    :readOnly="control.readonly"
-    @blur="validate"
-    @input="onInput"
-    class="number-input"
-  />
+  <div class="d-flex-vcenter col-gap-8px">
+    <label v-if="control.label" class="number-label">{{ control.label }}</label>
+    <input
+      type="number"
+      :min="control.min"
+      :max="control.max"
+      :step="control.step"
+      v-model.number="innerValue"
+      :placeholder="control.placeholder"
+      :readOnly="control.readonly"
+      @blur="validate"
+      @input="onInput"
+      class="number-input"
+    />
+  </div>
   <p v-if="control.messageWarning" class="warning-message">
     {{ control.messageWarning }}
   </p>
