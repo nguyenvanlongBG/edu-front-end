@@ -18,7 +18,10 @@
             :key="question.question_id"
             :ref="setQuestionRef(question.question_id)"
           >
-            <EQuestion :control="getQuestionControl(question)" />
+            <EQuestion
+              :control="getQuestionControl(question)"
+              @change-answer="onChangeAnswer"
+            />
           </div>
         </div>
       </div>

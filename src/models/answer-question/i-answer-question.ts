@@ -5,5 +5,6 @@ export interface IAnswerQuestion extends IBaseEntity {
   answer_id: string
   question_id?: string
   content?: string
+  object_content?: object[]
   point?: number
 }

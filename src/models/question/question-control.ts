@@ -2,6 +2,7 @@ import commonFunction from '@/components/core/commons/CommonFunction'
 import type { IQuestionControl } from './i-question-control'
 import { BaseControl } from '@/components/core/models/base/base-control'
 import { Question } from './question'
+import type { ButtonControl } from '@/components/core/models/button/button-control'
 
 export class QuestionControl extends BaseControl {
   constructor(control?: IQuestionControl) {
@@ -18,7 +19,6 @@ export class QuestionControl extends BaseControl {
   isShowResult: boolean = false
   isShowLevel: boolean = true
   isShowActionToolbar: boolean = false
-  isShowActionNote: boolean = false
   isShowNote: boolean = false
   isShowPoint: boolean = false
   isShowToolEditor: boolean = false
@@ -29,5 +29,6 @@ export class QuestionControl extends BaseControl {
   isReadonlyPoint: boolean = false
   isReadonlyChapter: boolean = false
   isReadonlyToolEditor: boolean = false
-  customAction: ((actionName: string) => void) | null = null
+  btnActions: Array<ButtonControl> = []
+  customAction: ((actionName: string, data: Question) => void) | null = null
 }

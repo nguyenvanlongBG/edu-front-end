@@ -58,6 +58,12 @@ class CommonFunction {
         : match
     })
   }
+  convertToString(data: unknown) {
+    return JSON.stringify(data)
+  }
+  convertToData<T>(data: string) {
+    return JSON.parse(data) as T
+  }
 }
 const commonFunction = new CommonFunction()
 export default commonFunction

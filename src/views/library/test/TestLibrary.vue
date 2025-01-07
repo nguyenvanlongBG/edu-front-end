@@ -154,6 +154,12 @@ export default {
         },
       })
     }
+    function onCreateTest() {
+      router.push({
+        name: RouterNameTest.Add,
+        params: {},
+      })
+    }
     return {
       formatDateTime,
       createTestBtn,
@@ -174,6 +180,7 @@ export default {
       onTryTest,
       loadData,
       buildPagingParam,
+      onCreateTest,
     }
   },
   mounted() {

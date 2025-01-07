@@ -12,6 +12,6 @@ export class OptionQuestion extends BaseEntity {
   }
   option_question_id: string = ''
   content: string = ''
-  object_content: object[] = []
+  object_content: object[] | object = []
   question_id: string = ''
 }

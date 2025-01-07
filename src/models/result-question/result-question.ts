@@ -13,4 +13,5 @@ export class ResultQuestion extends BaseEntity {
   result_question_id: string = ''
   question_id: string = ''
   content: string = ''
+  object_content: object[] | object = []
 }

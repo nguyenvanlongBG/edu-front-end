@@ -11,11 +11,13 @@ import { ComboboxControl } from '@/components/core/models/combobox/combobox-cont
 import { LoadingControl } from '@/components/core/models/loading/loading-control'
 import { NumberControl } from '@/components/core/models/number/number-control'
 import { PagingControl } from '@/components/core/models/paging/paging-control'
-import { PagingParam } from '@/components/core/models/paging/paging-param'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
 import EQuestion from '@/components/question/EQuestion.vue'
 import type { Chapter } from '@/models/chapter/chapter'
+import { ChapterGenQuestionConfig } from '@/models/test/auto-gen-test-param.ts/chapter-gen-question-config'
+import { ParamAutoGenTest } from '@/models/test/auto-gen-test-param.ts/param-auto-gen-test'
 import ChapterService from '@/services/chapter-service'
+import TestService from '@/services/test-service'
 import { level } from '@/stores/level'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -35,7 +37,6 @@ export default {
     EPaging,
     ENumber,
     ECombobox,
-    EButton,
   },
   props: {
     control: {
@@ -63,21 +64,31 @@ export default {
       classType: 'solid',
     })
     const chapterControls = ref<Array<SettingChapterControl>>([])
-    const numberQuestionControl = ref(
-      new NumberControl({
-        label: 'Số câu hỏi',
-        value: 50,
-      }),
-    )
     const pagingControl = ref(new PagingControl())
     const chapters = ref([] as Chapter[])
     function changeLoading(loadingStatus: boolean = false) {
       isLoading.value = loadingStatus
     }
-    function onSave() {
+    async function onSave() {
       const control = props.control
       if (control && typeof control.handleEmit == 'function') {
-        control.handleEmit('ok', questions.value)
+        const paramAutoGenTest = new ParamAutoGenTest({
+          chapters: chapterControls.value.map(control => {
+            return new ChapterGenQuestionConfig({
+              chapter_id: control.chapter.value as string,
+              Recognition: control.numberQuestionRecognition.value ?? 0,
+              Comprehension: control.numberQuestionComprehension.value ?? 0,
+              Application: control.numberQuestionApplication.value ?? 0,
+              AdvancedApplication:
+                control.numberQuestionAdvancedApplication.value ?? 0,
+            })
+          }),
+        })
+        const testService = new TestService()
+        const questions = await testService.autoGenQuestion(
+          paramAutoGenTest as unknown as Record<string, unknown>,
+        )
+        control.handleEmit('ok', questions)
       }
     }
     function onAddConfigChapter() {
@@ -113,7 +124,6 @@ export default {
       cancelBtn,
       saveBtn,
       addChapterConfigBtn,
-      numberQuestionControl,
       pagingControl,
       chapterControls,
       chapters,

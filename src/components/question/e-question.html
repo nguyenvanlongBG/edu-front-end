@@ -16,17 +16,14 @@
             />
           </slot>
         </div>
-        <div class="right-tool-bar">
-          <EButton
-            :control="btnEdit"
-            v-if="control.isShowActionToolbar"
-            @click="onEditQuestion"
-          />
-          <EButton
-            :control="btnNote"
-            v-if="control.isShowActionNote"
-            @click="onNoteQuestion"
-          />
+        <div class="right-tool-bar" v-if="control.isShowActionToolbar">
+          <slot name="action-toolbar">
+            <EButton
+              v-for="button in control.btnActions"
+              :control="button"
+              @click="onActionQuestion(button)"
+            />
+          </slot>
         </div>
       </div>
     </slot>
@@ -79,7 +76,8 @@
         <div v-if="control.value.type === QuestionType.FillResult">
           <editor
             :control="questionEditorControl"
-            v-model="control.value.object_content"
+            v-model="fillResult"
+            @update:modelValue="onUpdateFillResult"
           />
         </div>
       </div>

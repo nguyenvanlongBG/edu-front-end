@@ -8,10 +8,6 @@
         <ELoading :control="loadingControl" v-model="isLoading" />
       </div>
       <div style="min-height: 500px" class="d-flex-column row-gap-8px">
-        <ENumber
-          :control="numberQuestionControl"
-          v-model="numberQuestionControl.value"
-        />
         <div class="d-flex-column row-gap-8px">
           <div
             v-for="settingChapterControl in chapterControls"

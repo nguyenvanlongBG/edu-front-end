@@ -21,6 +21,8 @@ import { QuestionControl } from '@/models/question/question-control'
 import { LoadingControl } from '@/components/core/models/loading/loading-control'
 import { LoadingType } from '@/components/core/enums/Common'
 import ELoading from '@/components/core/components/loading/ELoading.vue'
+import { nextTick } from 'vue'
+import { ModelState } from '@/components/core/enums/model-state'
 export default {
   components: {
     EQuestion,
@@ -98,11 +100,14 @@ export default {
       itemTableLabel: ItemTableLabel,
       index: number,
     ) {
-      const target = questionRefs.value[itemTableLabel.value]
+      scrollToQuestion(itemTableLabel.value)
+    }
+    function scrollToQuestion(questionId: string) {
+      const target = questionRefs.value[questionId]
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' })
       } else {
-        console.error(`Không tìm thấy phần tử với index ${index}`)
+        console.error(`Không tìm thấy phần tử với index ${questionId}`)
       }
     }
     function getQuestionControl(question: Question) {
@@ -117,6 +122,20 @@ export default {
       }
       return dicQuestionControl.value[question.question_id]
     }
+    async function handleAddQuestion(items: Question[]) {
+      if (!items || !items.length) return
+      items.forEach(item => {
+        item.content = commonFunction.convertToString(item.object_content)
+        item.options?.forEach(
+          o => (o.content = commonFunction.convertToString(o.object_content)),
+        )
+        item.results?.forEach(
+          o => (o.content = commonFunction.convertToString(o.object_content)),
+        )
+      })
+      const questionService = new QuestionService()
+      await questionService.insertQuestionLibrary(items)
+    }
     async function onAddQuestion() {
       const popupAddQuestion = import(
         '@views/library/popup/QuestionCreatePopup.vue'
@@ -124,9 +143,32 @@ export default {
       const popupControl = new PopupControl({
         width: '600px',
       })
-      PopupLibrary.showPopup(popupAddQuestion, {
-        control: popupControl,
-      })
+      const methodHandle = async (event: string, data: unknown) => {
+        if (event == 'close') {
+          popupControl.close()
+        } else if (event == 'ok') {
+          const questions = data as Question[]
+          if (questions?.length) {
+            await handleAddQuestion(questions)
+            popupControl.close()
+            const param = new PagingParam()
+            await handleLoadData(param)
+            const lastQuestion = questions[questions.length - 1]
+            if (lastQuestion) {
+              nextTick(() => {
+                scrollToQuestion(lastQuestion.question_id)
+              })
+            }
+          }
+        }
+      }
+      popupControl.show(
+        popupAddQuestion,
+        {
+          control: popupControl,
+        },
+        methodHandle,
+      )
     }
     return {
       isLoading,
@@ -145,6 +187,7 @@ export default {
       questionRefs,
       onSelectQuestionLabel,
       onAddQuestion,
+      scrollToQuestion,
     }
   },
   async created() {},

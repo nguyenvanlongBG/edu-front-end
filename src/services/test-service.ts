@@ -10,6 +10,15 @@ export default class TestService extends BaseService {
       method: 'GET',
     })
   }
+  async autoGenQuestion(param: Record<string, unknown>) {
+    return await this.post(param, 'auto-gen')
+  }
+  async getInfoDoTest(testId: string) {
+    return await request({
+      url: `Test/${testId}/do`,
+      method: 'GET',
+    })
+  }
   async getQuestionOfTestEdit(testId: string) {
     return await request({
       url: `Test/${testId}/edit`,

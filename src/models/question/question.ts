@@ -20,7 +20,7 @@ export class Question extends BaseEntity {
   }
   question_id: string = ''
   content: string = ''
-  object_content: object[] = []
+  object_content: object[] | object = []
   type: QuestionType = QuestionType.SingleChoice
   options?: OptionQuestion[] = []
   results?: ResultQuestion[] = []

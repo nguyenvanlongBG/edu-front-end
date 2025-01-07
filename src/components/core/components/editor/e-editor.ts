@@ -19,15 +19,32 @@ export default defineComponent({
       required: true,
     },
     modelValue: {
-      type: Array<object>, // Kiểu dữ liệu của modelValue
+      type: [Array<object>, Object], // Kiểu dữ liệu của modelValue
       required: true,
     },
   },
   emits: ['update:modelValue'],
+
+  watch: {
+    modelValue(newValue: Array<object> | object) {
+      if (newValue) {
+        if (!Array.isArray(newValue)) {
+          this.texto = new Delta(
+            ('ops' in newValue ? newValue.ops : []) as Array<object>,
+          )
+        } else {
+          this.texto = new Delta(newValue)
+        }
+      }
+    },
+  },
   created() {
     const insertData = this.modelValue
-
-    this.texto = new Delta(insertData)
+    if (!Array.isArray(insertData)) {
+      this.texto = new Delta(insertData.ops)
+    } else {
+      this.texto = new Delta(insertData)
+    }
   },
   mounted() {
     if (

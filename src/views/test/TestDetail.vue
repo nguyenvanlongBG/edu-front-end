@@ -32,6 +32,9 @@ import { RouterNameTest } from '@/components/core/enums/Router'
 import { ResultQuestion } from '@/models/result-question/result-question'
 import { QuestionType } from '@/enums/question'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
+import { AnswerQuestion } from '@/models/answer-question/answer-question'
+import ExamService from '@/services/exam-service'
+import { ExamDto } from '@/models/exam/Dto/exam-dto'
 export default {
   components: {
     EQuestion,
@@ -108,6 +111,13 @@ export default {
         label: t('i18nQuestion.AutoGenQuestion'),
       }),
     )
+    const btnActionsQuestion = ref([
+      new ButtonControl({
+        label: t('i18nQuestion.Edit'),
+        name: 'edit',
+        classType: 'outline',
+      }),
+    ])
     const tableLabel = ref<TableLabelControl>(new TableLabelControl())
     tableLabel.value.displayValue = 'index'
     const questions = ref<Question[]>([])
@@ -154,15 +164,53 @@ export default {
           dicQuestionControl.value[question.question_id].isShowToolEditor =
             false
           dicQuestionControl.value[question.question_id].readonly = true
+          dicQuestionControl.value[question.question_id].isReadonlyToolEditor =
+            true
           break
         case TestMode.Edit:
-          dicQuestionControl.value[question.question_id].isShowToolEditor = true
+          dicQuestionControl.value[question.question_id].isShowToolEditor =
+            false
+          dicQuestionControl.value[question.question_id].isReadonlyToolEditor =
+            true
           dicQuestionControl.value[question.question_id].isShowActionToolbar =
             true
-          dicQuestionControl.value[question.question_id].isShowLevel = true
+          dicQuestionControl.value[question.question_id].isShowLevel = false
+          dicQuestionControl.value[question.question_id].btnActions =
+            btnActionsQuestion.value
+          dicQuestionControl.value[question.question_id].customAction =
+            handleActionQuestion
           break
       }
       return dicQuestionControl.value[question.question_id]
+    }
+    function handleActionQuestion(eventName: string, question: Question) {
+      if (eventName && question) {
+        const questionControl = dicQuestionControl.value[question.question_id]
+        if (questionControl) {
+          if (eventName == 'edit') {
+            questionControl.isShowToolEditor = true
+            questionControl.isReadonlyToolEditor = false
+            questionControl.isShowQuestionType = true
+            questionControl.readonly = false
+            question.State =
+              question.State == ModelState.INSERT
+                ? ModelState.INSERT
+                : ModelState.EDIT
+            question.options?.forEach(o =>
+              o.State == ModelState.INSERT || o.State == ModelState.DELETE
+                ? o.State
+                : question.State,
+            )
+            question.results?.forEach(r =>
+              r.State == ModelState.INSERT || r.State == ModelState.DELETE
+                ? r.State
+                : question.State,
+            )
+          } else if (eventName == 'note') {
+            questionControl.isShowNote = true
+          }
+        }
+      }
     }
     async function handleLoadData() {
       const testService = new TestService()
@@ -192,6 +240,27 @@ export default {
           )
           questionsOrigin = commonFunction.convertToInstances<Question>(
             questionsResult as unknown as Record<string, unknown>[],
+            Question,
+          )
+          break
+        case TestMode.Do:
+          tasks.push(testService.getInfoDoTest(masterData.value.test_id))
+
+          const [testDetailDoResult] = await Promise.all(tasks)
+          if ('test' in testDetailDoResult) {
+            masterData.value = testDetailDoResult?.test as unknown as TestDto
+            masterData.value.State = ModelState.VIEW
+            if ('exam_id' in testDetailDoResult) {
+              masterData.value.exam_id = testDetailDoResult.exam_id as string
+            }
+          }
+          // Xử lý kết quả
+          questions.value = commonFunction.convertToInstances<Question>(
+            masterData.value.questions as unknown as Record<string, unknown>[],
+            Question,
+          )
+          questionsOrigin = commonFunction.convertToInstances<Question>(
+            masterData.value.questions as unknown as Record<string, unknown>[],
             Question,
           )
           break
@@ -242,6 +311,7 @@ export default {
         )
         if (!(question.question_id in dicQuestionControl.value)) {
           question.State = ModelState.INSERT
+          question?.options?.forEach(o => (o.State = ModelState.INSERT))
           dicQuestionControl.value[question.question_id] = new QuestionControl({
             value: question,
             isShowActionToolbar: true,
@@ -266,6 +336,17 @@ export default {
         } else if (event == 'ok') {
           const questions = data as Question[]
           if (questions?.length) {
+            questions.forEach(q => {
+              q.question_id = commonFunction.generateID()
+              q.options?.forEach(o => {
+                o.question_id = q.question_id
+                o.option_question_id = commonFunction.generateID()
+              })
+              q.results?.forEach(o => {
+                o.question_id = q.question_id
+                o.result_question_id = commonFunction.generateID()
+              })
+            })
             handleAddQuestion(questions)
             popupControl.close()
             const lastQuestion = questions[questions.length - 1]
@@ -318,40 +399,106 @@ export default {
     }
     async function onSave() {
       masterData.value.questions = questions.value
-      const test = new TestDto(masterData.value)
-      const testService = new TestService()
-      let questionsHandle = questions.value.filter(
-        q => q.State == ModelState.INSERT || q.State == ModelState.EDIT,
-      )
-      const questionOriginIds = new Set(
-        (questions.value ?? []).map(question => question.question_id),
-      )
-      const questionsDelete = questionsOrigin.filter(
-        q => !questionOriginIds.has(q.question_id),
-      )
-      if (questionsDelete?.length) {
-        questionsDelete.forEach(q => (q.State = ModelState.DELETE))
-        questionsHandle = questionsHandle.concat(questionsDelete)
-      }
-      test.questions = questionsHandle
-      if (masterData.value && masterData.value.State == ModelState.INSERT) {
-        await testService.post(test)
-      } else if (
-        masterData.value &&
-        masterData.value.State == ModelState.EDIT
-      ) {
-        await testService.put(test)
+      switch (testMode.value) {
+        case TestMode.Edit:
+          const test = new TestDto(masterData.value)
+          const testService = new TestService()
+          let questionsHandle = questions.value.filter(
+            q => q.State == ModelState.INSERT || q.State == ModelState.EDIT,
+          )
+          const questionOriginIds = new Set(
+            (questions.value ?? []).map(question => question.question_id),
+          )
+          const questionsDelete = questionsOrigin.filter(
+            q => !questionOriginIds.has(q.question_id),
+          )
+          if (questionsDelete?.length) {
+            questionsDelete.forEach(q => (q.State = ModelState.DELETE))
+            questionsHandle = questionsHandle.concat(questionsDelete)
+          }
+          questionsHandle.forEach(q => {
+            q.content =
+              typeof q.object_content == 'object' &&
+              !Array.isArray(q.object_content)
+                ? commonFunction.convertToString(
+                    'ops' in q.object_content ? q.object_content.ops : [],
+                  )
+                : commonFunction.convertToString(q.object_content)
+            q.options?.forEach(
+              o =>
+                (o.content =
+                  typeof o.object_content == 'object' &&
+                  !Array.isArray(o.object_content)
+                    ? commonFunction.convertToString(
+                        'ops' in o.object_content ? o.object_content.ops : [],
+                      )
+                    : commonFunction.convertToString(o.object_content)),
+            )
+          })
+          test.questions = questionsHandle
+          if (masterData.value && masterData.value.State == ModelState.INSERT) {
+            await testService.post(test)
+          } else if (
+            masterData.value &&
+            masterData.value.State == ModelState.EDIT
+          ) {
+            await testService.put(test)
+          }
+          break
+        case TestMode.Do:
+          const examService = new ExamService()
+          const answers = questions.value
+            ?.filter(q => q.answer)
+            .map(question => question.answer)
+          const exam = new ExamDto({
+            exam_id: masterData.value.exam_id,
+            test_id: masterData.value.test_id,
+            answers: (answers ?? []) as AnswerQuestion[],
+          })
+          await examService.doExam(exam)
+          break
+        case TestMode.Add:
+          const testAdd = new TestDto(masterData.value)
+          const testServiceAdd = new TestService()
+          const questionsHandleAdd = questions.value
+          questionsHandleAdd.forEach(q => {
+            q.State = ModelState.INSERT
+            q.content =
+              typeof q.object_content == 'object' &&
+              !Array.isArray(q.object_content)
+                ? commonFunction.convertToString(
+                    'ops' in q.object_content ? q.object_content.ops : [],
+                  )
+                : commonFunction.convertToString(q.object_content)
+            q.options?.forEach(
+              o =>
+                (o.content =
+                  typeof o.object_content == 'object' &&
+                  !Array.isArray(o.object_content)
+                    ? commonFunction.convertToString(
+                        'ops' in o.object_content ? o.object_content.ops : [],
+                      )
+                    : commonFunction.convertToString(o.object_content)),
+            )
+          })
+          testAdd.questions = questionsHandleAdd
+          await testServiceAdd.post(testAdd)
       }
     }
     function initData() {
       const route = useRoute()
-      masterData.value.test_id = route.params.test_id as string
       switch (route.name) {
         case RouterNameTest.Add:
+          masterData.value.test_id = commonFunction.generateID()
           testMode.value = TestMode.Add
           break
         case RouterNameTest.Edit:
+          masterData.value.test_id = route.params.test_id as string
           testMode.value = TestMode.Edit
+          break
+        case RouterNameTest.Do:
+          masterData.value.test_id = route.params.test_id as string
+          testMode.value = TestMode.Do
           break
         default:
           testMode.value = TestMode.None
@@ -390,18 +537,68 @@ export default {
           const result = new ResultQuestion({
             result_question_id: commonFunction.generateID(),
             question_id: question.question_id,
+            State: ModelState.INSERT,
           })
           question.results.push(result)
         }
         switch (question.type) {
           case QuestionType.SingleChoice:
             const resultTmpSi = question.results[0]
-            resultTmpSi.content = answer
+            resultTmpSi.content = answer as string
+            resultTmpSi.State =
+              resultTmpSi.State == ModelState.INSERT
+                ? resultTmpSi.State
+                : ModelState.EDIT
             break
           case QuestionType.MultiChoice:
             const resultTmpMu = question.results[0]
-            resultTmpMu.content = answer
+            resultTmpMu.content = answer as string
+            resultTmpMu.State =
+              resultTmpMu.State == ModelState.INSERT
+                ? resultTmpMu.State
+                : ModelState.EDIT
+          case QuestionType.FillResult:
+            const resultFill = question.results[0]
+            const objectContent = commonFunction.convertToData<object>(answer)
+            resultFill.content =
+              'ops' in objectContent
+                ? commonFunction.convertToString(objectContent.ops)
+                : '[]'
+            resultFill.State =
+              resultFill.State == ModelState.INSERT
+                ? resultFill.State
+                : ModelState.EDIT
             break
+        }
+      } else if (testMode.value == TestMode.Do) {
+        let newContent = ''
+        switch (question.type) {
+          case QuestionType.MultiChoice:
+          case QuestionType.SingleChoice:
+            newContent = answer
+            break
+          case QuestionType.FillResult:
+            const objectContent = commonFunction.convertToData<object>(answer)
+            newContent =
+              'ops' in objectContent
+                ? commonFunction.convertToString(objectContent.ops)
+                : '[]'
+            break
+        }
+        if (!question.answer) {
+          question.answer = new AnswerQuestion({
+            answer_id: commonFunction.generateID(),
+            exam_id: masterData.value.exam_id,
+            question_id: question.question_id,
+            content: newContent,
+            State: ModelState.INSERT,
+          })
+        } else {
+          question.answer.content = newContent
+          question.answer.State =
+            question.answer.State != ModelState.INSERT
+              ? ModelState.EDIT
+              : ModelState.INSERT
         }
       }
     }
@@ -410,6 +607,7 @@ export default {
       TestMode,
       masterData,
       saveBtn,
+      btnActionsQuestion,
       dicQuestionControl,
       startTimeControl,
       finishTimeControl,

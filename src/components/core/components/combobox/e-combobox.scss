@@ -38,7 +38,7 @@
   border: 2px solid #0056b3;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   border-radius: 8px; /* Làm tròn các góc dưới */
-  z-index: 5; /* Đảm bảo dropdown nằm dưới input nhưng trên các phần tử khác */
+  z-index: 100; /* Đảm bảo dropdown nằm dưới input nhưng trên các phần tử khác */
 }
 
 /* Mục lựa chọn trong menu */

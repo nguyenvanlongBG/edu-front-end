@@ -3,7 +3,7 @@ import type { ITest } from './i-test'
 import type { Question } from '../question/question'
 
 export interface ITestDto extends ITest {
-  lastExamId?: string
+  exam_id?: string
   mode?: TestMode
   start_time?: Date
   duration?: number

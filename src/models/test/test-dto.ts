@@ -14,7 +14,7 @@ export class TestDto extends Test {
       )
     }
   }
-  lastExamId: string = ''
+  exam_id: string = ''
   mode: TestMode = TestMode.None // Nếu mode View thì cần dùng
   questions: Question[] = []
 }

@@ -7,5 +7,6 @@ export default {
   Edit: 'Sửa',
   SingleChoice: 'Một đáp án',
   MultiChoice: 'Nhiều đáp án',
+  FillResult: 'Điền đáp án',
   Note: 'Ghi chú',
 }

@@ -13,6 +13,7 @@ export class ButtonControl extends BaseControl {
       control as Record<string, unknown>,
     )
   }
+  name: string = ''
   iconLeft?: string
   iconRight?: string
   styleClass: string = ''

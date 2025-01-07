@@ -14,5 +14,6 @@ export class AnswerQuestion extends BaseEntity {
   answer_id: string = ''
   question_id: string = ''
   content: string = ''
+  object_content: object[] = []
   point?: number = 0
 }
