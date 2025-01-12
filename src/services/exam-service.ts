@@ -10,6 +10,9 @@ export default class ExamService extends BaseService {
   async doExam(exam: ExamDto) {
     return await this.put(exam, 'do')
   }
+  async submitExam(exam: ExamDto) {
+    return await this.put(exam, 'submit')
+  }
   async getTestOfExam(examId: string) {
     return await this.post(examId, 'test-of-exam')
   }

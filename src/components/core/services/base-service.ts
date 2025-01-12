@@ -13,6 +13,14 @@ export class BaseService {
       data: pagingParam,
     })
   }
+  async getSummary(pagingParam: PagingParam) {
+    const controller = this.getController()
+    return await request({
+      url: `${controller}/summary`,
+      method: 'POST',
+      data: pagingParam,
+    })
+  }
   async filter(filters: FilterCondition[]) {
     return await this.post(filters, 'filter')
   }

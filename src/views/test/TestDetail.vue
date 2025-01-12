@@ -256,6 +256,7 @@ export default {
           if ('test' in testDetailDoResult) {
             masterData.value = testDetailDoResult?.test as unknown as TestDto
             masterData.value.State = ModelState.VIEW
+            handleSetTimeoutSubmit(masterData.value)
             if ('exam_id' in testDetailDoResult) {
               masterData.value.exam_id = testDetailDoResult.exam_id as string
             }
@@ -272,6 +273,36 @@ export default {
           )
           questionHelper.mapObjectContentQuestions(questionsOrigin)
           break
+      }
+    }
+    async function handleSetTimeoutSubmit(test: TestDto) {
+      if (test) {
+        const startTimeExam = new Date()
+        const endTime = new Date(
+          startTimeExam.getTime() + test.duration * 60 * 1000,
+        )
+        const timeRemaining = endTime.getTime() - Date.now()
+        const examService = new ExamService()
+        if (timeRemaining > 0) {
+          setTimeout(async () => {
+            const answers = questions.value
+              ?.filter(q => q.answer)
+              .map(question => question.answer)
+            const exam = new ExamDto({
+              exam_id: masterData.value.exam_id,
+              test_id: masterData.value.test_id,
+              answers: (answers ?? []) as AnswerQuestion[],
+            })
+            await examService.submitExam(exam)
+          }, timeRemaining)
+        } else {
+          const examSubmit = new ExamDto({
+            exam_id: masterData.value.exam_id,
+            test_id: masterData.value.test_id,
+            answers: [] as AnswerQuestion[],
+          })
+          await examService.submitExam(examSubmit)
+        }
       }
     }
     function onAddQuestion() {
@@ -620,6 +651,7 @@ export default {
       onAutoGenQuestion,
       tableLabel,
       handleLoadData,
+      handleSetTimeoutSubmit,
       fileInput,
       validateInput,
       testUploadFile,

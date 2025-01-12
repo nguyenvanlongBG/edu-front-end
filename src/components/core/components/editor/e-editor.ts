@@ -37,6 +37,9 @@ export default defineComponent({
         }
       }
     },
+    'control.readOnly'(newValue: boolean) {
+      this.editorOptions.readOnly = newValue
+    },
   },
   created() {
     const insertData = this.modelValue
@@ -86,6 +89,7 @@ export default defineComponent({
     }
     const idToolbar = 'toolbar-' + commonFunction.generateID()
     const editorOptions = ref({
+      readOnly: props.control.readonly,
       modules: {
         toolbar: {
           container: '#' + idToolbar,

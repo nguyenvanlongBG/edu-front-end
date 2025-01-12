@@ -18,6 +18,13 @@ import { PopupControl } from '@/components/core/models/popup/popup-control'
 import { ModelState } from '@/components/core/enums/model-state'
 import { FilterCondition } from '@/components/core/models/paging/filter-condition'
 import { FilterOperator } from '@/components/core/enums/Common'
+import EnrollmentClassService from '@/services/enrollment-class-service'
+import { EnrollmentClass } from '@/models/enrollment-class/enrollment-class'
+import commonFunction from '@/components/core/commons/CommonFunction'
+import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
+import { User } from '@/models/user/user'
+import { LocalStorageKey } from '@/constants/local-storage-key'
+import { EnrollmentStatus } from '@/enums/classroom'
 
 export default {
   name: 'ClassroomList',
@@ -36,7 +43,7 @@ export default {
       new InputControl({
         placeholder: 'Tìm kiếm lớp học...',
         styleClass: 'search-input',
-        value: '12A5',
+        value: '',
       }),
     )
     const createClassBtn = ref(
@@ -72,6 +79,26 @@ export default {
           detailPopupControl.close() // Đóng popup nếu cần
         }
       })
+    }
+    async function onEdit(classroom: Classroom) {
+      classroom.State = ModelState.EDIT
+      const classTmp = new Classroom(classroom)
+      viewDetail(classTmp as unknown as Record<string, unknown>)
+    }
+    async function onLeave(classroom: Classroom) {}
+    async function onEnroll(classroom: Classroom) {
+      const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
+      const enrollServicec = new EnrollmentClassService()
+      if (user) {
+        const newEnroll = new EnrollmentClass({
+          enrollmen_class_id: commonFunction.generateID(),
+          user_id: user.user_id,
+          classroom_id: classroom.classroom_id,
+          status: EnrollmentStatus.PENDING,
+        })
+        await enrollServicec.post(newEnroll)
+        await loadListData()
+      }
     }
     function buildPropsDetail(record: Record<string, unknown>) {
       return { masterData: record, control: detailPopupControl }
@@ -120,6 +147,9 @@ export default {
       getComponentDetail,
       buildPropsDetail,
       viewDetail,
+      onEnroll,
+      onEdit,
+      onLeave,
     }
   },
   mounted() {

@@ -11,13 +11,17 @@
         class="menu-action-classroom"
         @click.stop
       >
-        <li>
-          <div class="action-classroom">{{$t("i18nClassroom.ShareClass")}}</div>
+        <li @click="onEnroll">
+          <div class="action-classroom">
+            {{$t("i18nClassroom.EnrollClass")}}
+          </div>
         </li>
-        <li>
-          <div class="action-classroom">{{$t("i18nClassroom.LeaveClass")}}</div>
+        <li v-if="isShowEdit()" @click="onEdit">
+          <div class="action-classroom">
+            {{$t("i18nClassroom.EditClassroom")}}
+          </div>
         </li>
-        <li>
+        <li @click="onLeave">
           <div class="action-classroom">{{$t("i18nClassroom.LeaveClass")}}</div>
         </li>
       </ul>

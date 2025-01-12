@@ -1,0 +1,57 @@
+<div class="classroom-container">
+  <!-- Danh sách bài viết -->
+  <div class="content-section">
+    <h2>Danh sách bài viết</h2>
+    <ul class="post-list">
+      <li>Bài viết 1</li>
+      <li>Bài viết 2</li>
+      <li>Bài viết 3</li>
+      <li>Bài viết 4</li>
+    </ul>
+  </div>
+
+  <!-- Danh sách học sinh -->
+  <div class="student-section">
+    <h2>Danh sách học sinh</h2>
+    <div class="student-container d-flex-column row-gap-8px">
+      <div>
+        <div class="student-summary" @click="onToggleUser">
+          <p>{{enrollSuccess?.length}} học sinh tham gia</p>
+          <!-- Icon thay đổi theo trạng thái -->
+          <span id="toggle-icon" class="toggle-icon">
+            {{ isShowListStudent ? '▲' : '▼' }}
+          </span>
+        </div>
+        <div id="student-list" class="student-list" v-show="isShowListStudent">
+          <ul>
+            <li
+              v-for="enroll in enrollSuccess"
+              :key="enroll.enrollmen_class_id"
+            >
+              {{enroll.user_id}}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div v-if="isShowBoxRequest">
+        <div class="student-summary" @click="onToggleRequest">
+          <p>{{enrollPending?.length}} Yêu cầu chờ duyệt</p>
+          <!-- Icon thay đổi theo trạng thái -->
+          <span id="toggle-icon" class="toggle-icon">
+            {{ isShowListStudent ? '▲' : '▼' }}
+          </span>
+        </div>
+        <div id="student-list" class="student-list" v-show="isShowListRequest">
+          <ul>
+            <li
+              v-for="enroll in enrollPending"
+              :key="enroll.enrollmen_class_id"
+            >
+              {{enroll.name}}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

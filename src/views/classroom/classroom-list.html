@@ -1,4 +1,7 @@
 <div class="classroom-container d-flex-column">
+  <div class="d-flex-end p-r-8px">
+    <EButton :control="createClassBtn" @click="onAddClassroom" />
+  </div>
   <div class="search-bar">
     <EInput
       :control="searchClassControl"
@@ -8,15 +11,15 @@
   </div>
 
   <div class="flex-1">
-    <div class="d-flex-end p-r-8px">
-      <EButton :control="createClassBtn" @click="onAddClassroom" />
-    </div>
     <div class="classroom-list flex-1">
       <EClassroom
         v-for="classroom in classrooms"
         :key="classroom.id"
         :classroom="classroom"
         @click.stop="onClassroom(classroom)"
+        @edit="onEdit"
+        @leave="onLeave"
+        @enroll="onEnroll"
       />
     </div>
   </div>

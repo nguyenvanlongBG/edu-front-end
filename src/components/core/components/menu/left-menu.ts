@@ -1,7 +1,7 @@
 import { defineComponent, ref } from 'vue'
 import { Menu } from '@core/enums/Menu'
 import GroupMenu from './GroupMenu.vue'
-import router from '@/router/index'
+import router from '@/router'
 export default defineComponent({
   name: 'left-menu',
   components: {
@@ -9,19 +9,9 @@ export default defineComponent({
   },
   setup() {
     const pageFocus = ref(1)
-    const routerNames = [
-      'forum',
-      'forum',
-      'groups',
-      'groups',
-      'groups',
-      'groups',
-      'groups',
-    ]
-    function navigateToPage(indexItemMenu = 0, params = null) {
-      pageFocus.value = indexItemMenu
-      console.log(params, routerNames, indexItemMenu)
-      router.push({ name: routerNames[indexItemMenu] })
+
+    function navigateToPage(routerName: string) {
+      router.push({ name: routerName })
     }
     return { navigateToPage, pageFocus, Menu }
   },

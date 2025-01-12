@@ -1,0 +1,97 @@
+/* Layout chính */
+.classroom-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  gap: 16px;
+}
+
+.content-section {
+  flex: 9;
+  background-color: #f9f9f9;
+  padding: 16px;
+  border-right: 1px solid #ccc;
+}
+
+.student-section {
+  flex: 3;
+  background-color: #fff;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.post-list {
+  list-style: none;
+  padding: 0;
+}
+
+.post-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.student-container {
+  margin-top: 16px;
+}
+
+/* Dòng tóm tắt */
+.student-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.student-summary:hover {
+  background-color: #f0f0f0;
+}
+
+/* Icon xổ xuống/xổ lên */
+.toggle-icon {
+  font-size: 18px;
+  color: #97a3b1;
+  transition: transform 0.3s ease;
+}
+
+.toggle-icon.up {
+  transform: rotate(180deg);
+}
+
+/* Danh sách học sinh */
+.student-list {
+  margin-top: 16px;
+  overflow: auto;
+  transition:
+    max-height 0.5s ease,
+    padding 0.5s ease;
+  background-color: #f1f1f1;
+  border-radius: 4px;
+  padding: 0 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.student-list ul {
+  list-style: none;
+  padding: 16px 0;
+  margin: 0;
+}
+
+.student-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.student-list li:last-child {
+  border-bottom: none;
+}
+
+/* Hiển thị danh sách */
+.student-list.open {
+  max-height: 300px; /* Giới hạn chiều cao tối đa */
+  padding: 16px;
+}

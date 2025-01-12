@@ -7,31 +7,31 @@
     <div v-if="pageFocus == Menu.FORUM">
       <div class="main-menu-block">
         <ul class="main-menu">
-          <li class="item-menu" @click="navigateToPage(1, null)">
+          <li class="item-menu" @click="navigateToPage('post')">
             <div class="block-img-menu-item">
               <img src="../../assets/pictures/forum.png" alt="" />
             </div>
             <span class="title-menu-item">Diễn đàn</span>
           </li>
-          <li class="item-menu">
+          <li class="item-menu" @click="navigateToPage('test-library')">
             <div class="block-img-menu-item">
               <img src="../../assets/pictures/library.png" alt="" />
             </div>
             <span class="title-menu-item">Thư viện</span>
           </li>
-          <li class="item-menu">
+          <li class="item-menu" @click="navigateToPage('test-library')">
             <div class="block-img-menu-item">
               <img src="../../assets/pictures/exam.png" alt="" />
             </div>
             <span class="title-menu-item">Kỳ thi</span>
           </li>
-          <li class="item-menu">
+          <li class="item-menu" @click="navigateToPage('classroom')">
             <div class="block-img-menu-item">
               <img src="../../assets/pictures/classroom.png" alt="" />
             </div>
             <span class="title-menu-item">Lớp học</span>
           </li>
-          <li class="item-menu">
+          <li class="item-menu" @click="navigateToPage('report-test')">
             <div class="block-img-menu-item">
               <img src="../../assets/pictures/analysis.png" alt="" />
             </div>

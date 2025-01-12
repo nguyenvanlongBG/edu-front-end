@@ -1,0 +1,19 @@
+<EPopup :control="control" @close="onClose">
+  <template #header>
+    <h3>{{getTitle()}}</h3>
+  </template>
+  <template #body>
+    <div style="height: 400px">
+      <editor
+        :control="editorControl"
+        v-model="masterDataLocal.object_content"
+      />
+    </div>
+  </template>
+  <template #footer>
+    <div class="d-flex col-gap-8px">
+      <EButton :control="cancelBtn" @click="onClose" />
+      <EButton :control="saveBtn" @click="onSave" />
+    </div>
+  </template>
+</EPopup>

@@ -1,0 +1,29 @@
+<div class="p-8px d-flex-column row-gap-8px">
+  <div class="d-flex-end">
+    <EButton :control="addPostBtn" @click="onAddPost" />
+  </div>
+  <div>
+    <div v-for="post in posts" class="p-8px">
+      <div class="d-flex-end" v-if="isShowAction(post)">
+        <div class="box-action-classroom">
+          <i
+            class="fa-solid fa-ellipsis icon-tool-classroom"
+            @click.stop="toggleAction(post)"
+            >...</i
+          >
+          <ul class="menu-action-classroom" v-if="dicStatus[post.post_id]">
+            <li>
+              <div class="action-classroom" @click.stop="onEditPost(post)">
+                Sửa bài viết
+              </div>
+            </li>
+            <li>
+              <div class="action-classroom">Xóa bài viết</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <editor :control="editorControl" v-model="post.object_content" />
+    </div>
+  </div>
+</div>

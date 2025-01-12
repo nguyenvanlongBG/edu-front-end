@@ -20,9 +20,9 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@views/authen/RegisterComponent.vue'),
       },
       {
-        path: '/home-view',
-        name: 'homeview',
-        component: () => import('@views/HomeView.vue'),
+        path: '/forum',
+        name: 'forum',
+        component: () => import('@views/forum/ForumView.vue'),
       },
       {
         path: '/test',
@@ -152,6 +152,12 @@ const routes: RouteRecordRaw[] = [
             name: 'list',
             component: () => import('@views/classroom/ClassroomList.vue'),
           },
+          {
+            path: ':classroom_id',
+            name: 'classroom-detail',
+            component: () =>
+              import('@views/classroom-study/ClassroomStudy.vue'),
+          },
         ],
       },
       {
@@ -160,24 +166,13 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: '',
-            name: 'question',
+            name: 'question-library',
             component: () => import('@views/library/QuestionLibrary.vue'),
           },
           {
             path: 'test',
             name: 'test-library',
             component: () => import('@views/library/test/TestLibrary.vue'),
-          },
-        ],
-      },
-      {
-        path: '/forum',
-        name: 'forum',
-        children: [
-          {
-            path: '',
-            name: 'question2',
-            component: () => import('@views/library/QuestionLibrary.vue'),
           },
         ],
       },

@@ -12,6 +12,9 @@ import { ModelState } from '@/components/core/enums/model-state'
 import { InputControl } from '@/components/core/models/input/input-control'
 import EInput from '@/components/core/components/input/EInput.vue'
 import ClassroomService from '@/services/classroom-service'
+import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
+import { LocalStorageKey } from '@/constants/local-storage-key'
+import type { User } from '@/models/user/user'
 
 export default defineComponent({
   components: {
@@ -70,11 +73,15 @@ export default defineComponent({
       props.control.handleEmit('close')
     }
     async function onSave() {
-      const resultSave = await classroomService.post(masterDataLocal.value)
-      if (resultSave) {
-        masterDataLocal.value.classroom_code = (
-          resultSave as unknown as Classroom
-        ).classroom_code
+      const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
+      if (user && user.user_id) {
+        masterDataLocal.value.user_id = user.user_id
+        const resultSave = await classroomService.post(masterDataLocal.value)
+        if (resultSave) {
+          masterDataLocal.value.classroom_code = (
+            resultSave as unknown as Classroom
+          ).classroom_code
+        }
       }
     }
     return {

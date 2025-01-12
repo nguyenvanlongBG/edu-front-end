@@ -1,0 +1,40 @@
+.box-action-classroom {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: flex-end;
+  cursor: pointer;
+}
+
+.menu-action-classroom {
+  position: absolute;
+  padding-left: 0px;
+  width: 150px;
+  top: 40px;
+  right: 0px;
+  border: 2px solid #033e63;
+  background-color: #e6eff5;
+  border-radius: 5px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.menu-action-classroom li {
+  display: block;
+  list-style: none;
+  background-color: #025c94;
+  text-align: center;
+  color: white;
+  padding: 8px 12px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.menu-action-classroom li:hover {
+  background-color: #033e63;
+}
+
+.icon-tool-classroom {
+  font-size: 25px;
+  margin-right: 5px;
+}
