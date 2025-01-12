@@ -1,5 +1,17 @@
 <div>
-  <div>Filter</div>
+  <div class="d-flex col-gap-8px">
+    <EMultiCombobox
+      :control="testCbb"
+      :modelValue="testIds"
+      @update:modelValue="onUpdateTestIds"
+    />
+    <EMultiCombobox
+      v-if="isShowRoleTeacher"
+      :control="classCbb"
+      :modelValue="classIds"
+      @update:modelValue="onUpdateClassIds"
+    />
+  </div>
   <div>
     <apexchart
       type="bar"

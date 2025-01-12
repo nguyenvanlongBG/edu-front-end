@@ -1,5 +1,5 @@
 <div id="appl">
-  <div id="chart" class="d-flex-column row-gap-8px" v-if="isShowChartSummary">
+  <div id="chart" class="d-flex-column row-gap-8px" v-if="isShowRoleTeacher">
     <div class="p-l-24px title-report-test text-bold">Biểu đồ phổ điểm</div>
     <apexchart
       type="bar"
@@ -9,11 +9,17 @@
     ></apexchart>
   </div>
   <div class="d-flex-column row-gap-8px p-8px">
-    <div>
+    <div class="d-flex col-gap-8px">
       <EMultiCombobox
         :control="testCbb"
         :modelValue="testIds"
         @update:modelValue="onUpdateTestIds"
+      />
+      <EMultiCombobox
+        v-if="isShowRoleTeacher"
+        :control="classCbb"
+        :modelValue="classIds"
+        @update:modelValue="onUpdateClassIds"
       />
     </div>
     <div>

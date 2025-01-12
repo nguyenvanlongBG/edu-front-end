@@ -138,7 +138,8 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'level',
             name: 'report-level',
-            component: () => import('@views/report/report-test/ReportTest.vue'),
+            component: () =>
+              import('@views/report/report-level/ReportLevel.vue'),
           },
         ],
       },

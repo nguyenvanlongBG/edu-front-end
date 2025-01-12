@@ -9,4 +9,7 @@ export default class ExamService extends BaseService {
   async reportChapter(data: Record<string, unknown>) {
     return await this.post(data, 'chapter')
   }
+  async reportLevel(data: Record<string, unknown>) {
+    return await this.post(data, 'level')
+  }
 }

@@ -5,24 +5,29 @@ import TestService from '@/services/test-service'
 import { ref } from 'vue'
 import ApexCharts from 'vue3-apexcharts'
 import ReportService from '@/services/report-service'
+import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
+import type { User } from '@/models/user/user'
+import { LocalStorageKey } from '@/constants/local-storage-key'
+import { Role } from '@/enums/role'
+import EMultiCombobox from '@/components/core/components/e-multi-combobox/EMultiCombobox.vue'
 
 export default {
   components: {
     apexchart: ApexCharts,
+    EMultiCombobox,
   },
   setup() {
-    const testIds = ref([] as string[])
     const series = ref([
       {
-        name: 'correct',
+        name: 'Đúng',
         data: [] as number[],
       },
       {
-        name: 'incorrect',
+        name: 'Sai',
         data: [] as number[],
       },
       {
-        name: 'unattempted',
+        name: 'Chưa làm',
         data: [] as number[],
       },
     ])
@@ -57,6 +62,7 @@ export default {
         offsetY: 50,
       },
     })
+    const testIds = ref([] as string[])
     const testCbb = ref(
       new MultiComboboxControl({
         displayField: 'name',
@@ -64,6 +70,15 @@ export default {
         data: [],
       }),
     )
+    const classIds = ref([] as string[])
+    const classCbb = ref(
+      new MultiComboboxControl({
+        displayField: 'name',
+        valueField: 'class_id',
+        data: [],
+      }),
+    )
+    const isShowRoleTeacher = ref(true)
     async function handleLoadData() {
       await getTestOfUser()
       await handleLoadReport()
@@ -102,9 +117,9 @@ export default {
         incorrectData.push(incorrect)
         unattemptedData.push(unattempted)
       })
-      const correctSeri = series.value.find(s => s.name == 'correct')
-      const incorrectSeri = series.value.find(s => s.name == 'incorrect')
-      const unattemptedSeri = series.value.find(s => s.name == 'unattempted')
+      const correctSeri = series.value.find(s => s.name == 'Đúng')
+      const incorrectSeri = series.value.find(s => s.name == 'Sai')
+      const unattemptedSeri = series.value.find(s => s.name == 'Chưa làm')
       if (correctSeri) {
         correctData.forEach(c => correctSeri.data.push(c))
       }
@@ -127,8 +142,20 @@ export default {
       }
       return reportParam
     }
+    function initData() {
+      const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
+      if (user) {
+        isShowRoleTeacher.value =
+          user.role_id == Role.Admin || user.role_id == Role.Teacher
+      }
+    }
     return {
+      initData,
       testIds,
+      testCbb,
+      classCbb,
+      classIds,
+      isShowRoleTeacher,
       series,
       buildReportParam,
       chartOptions,
@@ -137,6 +164,9 @@ export default {
       handleLoadChart,
       getTestOfUser,
     }
+  },
+  created() {
+    this.initData()
   },
   async mounted() {
     await this.handleLoadData()

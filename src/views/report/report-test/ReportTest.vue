@@ -8,11 +8,12 @@ import { ColumnControl } from '@/components/core/models/table/column/column-cont
 import { Role } from '@/enums/role'
 import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
 import { LocalStorageKey } from '@/constants/local-storage-key'
-import type { User } from '@/models/user/user'
+import { User } from '@/models/user/user'
 import EMultiCombobox from '@/components/core/components/e-multi-combobox/EMultiCombobox.vue'
 import { MultiComboboxControl } from '@/components/core/models/multi-combobox/multi-combobox-control'
 import { ReportParam } from '@/models/report/report-param'
 import TestService from '@/services/test-service'
+import ClassroomService from '@/services/classroom-service'
 
 export default {
   components: {
@@ -50,6 +51,14 @@ export default {
       new MultiComboboxControl({
         displayField: 'name',
         valueField: 'test_id',
+        data: [],
+      }),
+    )
+    const classIds = ref([] as string[])
+    const classCbb = ref(
+      new MultiComboboxControl({
+        displayField: 'name',
+        valueField: 'class_id',
         data: [],
       }),
     )
@@ -133,29 +142,32 @@ export default {
         },
       },
     })
-    const isShowChartSummary = ref(true)
+    const isShowRoleTeacher = ref(true)
     async function handleLoadData() {
       await getTestOfUser()
+      const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
+      if (
+        user &&
+        (user.role_id == Role.Admin || user?.role_id == Role.Teacher)
+      ) {
+        await getClassroomOfTeacher()
+      }
       await handleLoadReport()
-      // Chuyển đổi dữ liệu cho biểu đồ
-      // const scores = Object.keys(result) // Chuyển đổi khóa từ string sang number
-      // const counts = Object.values(result) // Lấy các giá trị (số lượng bài thi cho mỗi điểm)
-      // series.value[0].data = counts
-      // scores.forEach(score => {
-      //   chartOptions.value.xaxis.categories.push(score)
-      // })
     }
     function buildReportParam() {
       const reportParam = new ReportParam()
       if (testIds.value && testIds.value.length) {
         reportParam.testIds = testIds.value
       }
+      if (classIds.value && classIds.value.length) {
+        reportParam.classIds = classIds.value
+      }
       return reportParam
     }
     function initData() {
       const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
       if (user) {
-        isShowChartSummary.value =
+        isShowRoleTeacher.value =
           user.role_id == Role.Admin || user.role_id == Role.Teacher
       }
     }
@@ -163,6 +175,13 @@ export default {
       const testService = new TestService()
       const tests = await testService.getAllTestOfUser()
       testCbb.value.data = tests as unknown as Array<Record<string, unknown>>
+    }
+    async function getClassroomOfTeacher() {
+      const classroomService = new ClassroomService()
+      const classrooms = await classroomService.getAllClassOfUser()
+      classCbb.value.data = classrooms as unknown as Array<
+        Record<string, unknown>
+      >
     }
     async function handleLoadReport() {
       const reportService = new ReportService()
@@ -229,12 +248,22 @@ export default {
         await handleLoadReport() // Gọi vào hàm load dữ liệu với danh sách test ID
       }, 500)
     }
+    async function onUpdateClassIds(ids: string[]) {
+      testIds.value = ids
+      setTimeout(async () => {
+        await handleLoadReport() // Gọi vào hàm load dữ liệu với danh sách test ID
+      }, 500)
+    }
     return {
-      testCbb,
       onUpdateTestIds,
+      onUpdateClassIds,
       handleLoadReport,
+      getClassroomOfTeacher,
+      testCbb,
       testIds,
-      isShowChartSummary,
+      classCbb,
+      classIds,
+      isShowRoleTeacher,
       handleDataSummary,
       buildReportParam,
       chartOptions,
