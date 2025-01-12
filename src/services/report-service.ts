@@ -3,7 +3,10 @@ export default class ExamService extends BaseService {
   getController(): string {
     return 'Report'
   }
-  async reportTest() {
-    return await this.get('test')
+  async reportTest(data: Record<string, unknown>) {
+    return await this.post(data, 'test')
+  }
+  async reportChapter(data: Record<string, unknown>) {
+    return await this.post(data, 'chapter')
   }
 }

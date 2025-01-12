@@ -1,11 +1,14 @@
 import axios from 'axios'
-import { getAccessToken, removeAccessToken } from './cookies'
 import router from '../../../router'
+import localStorageLibrary from '../commons/LocalStorageLibrary'
+import { LocalStorageKey } from '@/constants/local-storage-key'
 
 const HEADER_ACCEPT = 'application/json'
+const HEADER_CONTENT_TYPE = 'application/json'
 const WITH_CREDENTIALS = false
 const REQUEST_HEADER = {
   Accept: HEADER_ACCEPT,
+  'Content-Type': HEADER_CONTENT_TYPE,
 }
 const service = axios.create({
   baseURL: 'http://localhost:5000/api',
@@ -14,7 +17,9 @@ const service = axios.create({
 })
 service.interceptors.request.use(
   config => {
-    const token = getAccessToken()
+    const token = localStorageLibrary.getValueByKey<string>(
+      LocalStorageKey.AccessToken,
+    )
     if (config.data instanceof FormData) {
       config.headers['Content-Type'] = 'multipart/form-data'
     } else if (typeof config.data === 'object') {
@@ -37,7 +42,6 @@ service.interceptors.response.use(
   },
   error => {
     if (error.response.status == 401) {
-      removeAccessToken()
       router.push({ name: 'login' })
     }
     if (error.response.status === 500) {

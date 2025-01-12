@@ -32,6 +32,8 @@ import ExamService from '@/services/exam-service'
 import { AnswerQuestion } from '@/models/answer-question/answer-question'
 import ECheckbox from '@/components/core/components/checkbox/ECheckbox.vue'
 import { CheckboxControl } from '@/components/core/models/checkbox/checkbox-control'
+import questionHelper from '@/helper/question/question-helper'
+
 export default {
   components: {
     EQuestion,
@@ -186,6 +188,7 @@ export default {
             test.value.questions as unknown as Record<string, unknown>[],
             Question,
           )
+          questionHelper.mapObjectContentQuestions(questions.value)
           break
         case ExamMode.History:
           tasks.push(examService.historyExam(masterData.value.exam_id))
@@ -197,6 +200,7 @@ export default {
             test.value.questions as unknown as Record<string, unknown>[],
             Question,
           )
+          questionHelper.mapObjectContentQuestions(questions.value)
           break
         case ExamMode.Mark:
           tasks.push(examService.historyExam(masterData.value.exam_id))
@@ -208,6 +212,7 @@ export default {
             test.value.questions as unknown as Record<string, unknown>[],
             Question,
           )
+          questionHelper.mapObjectContentQuestions(questions.value)
           break
       }
     }

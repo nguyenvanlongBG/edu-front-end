@@ -10,3 +10,9 @@ export enum QuestionMode {
   Do = 4,
   History = 5,
 }
+export enum QuestionLevel {
+  Recognition = 1, // Nhận biết
+  Comprehension = 2, // Thông hiểu
+  Application = 3, // Vận dụng
+  AdvancedApplication = 4, // Vận dụng cao
+}

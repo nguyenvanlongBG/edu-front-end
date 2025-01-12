@@ -10,6 +10,18 @@ export default class TestService extends BaseService {
       method: 'GET',
     })
   }
+  async getExamMark(testId: string) {
+    return await request({
+      url: `Test/${testId}/exam-mark`,
+      method: 'GET',
+    })
+  }
+  async markAllExam(testId: string) {
+    return await request({
+      url: `Test/${testId}/mark`,
+      method: 'GET',
+    })
+  }
   async autoGenQuestion(param: Record<string, unknown>) {
     return await this.post(param, 'auto-gen')
   }
@@ -27,5 +39,8 @@ export default class TestService extends BaseService {
   }
   async examsUserHistory(testId: string) {
     return await this.get(testId + '/history')
+  }
+  async getAllTestOfUser() {
+    return await this.get('test-of-user')
   }
 }

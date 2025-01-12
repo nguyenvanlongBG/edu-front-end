@@ -1,17 +1,29 @@
 <div>
   <table class="tables">
     <thead>
-      <tr>
-        <th v-for="column in control.columns">{{column.name}}</th>
+      <tr class="d-flex">
+        <th v-for="column in control.columns" :style="getColumnStyle(column)">
+          {{column.name}}
+        </th>
       </tr>
     </thead>
     <tbody>
       <template v-for="item in control.data">
-        <tr>
-          <td v-for="column in dataColumn()">
+        <tr class="d-flex">
+          <td v-for="column in dataColumn" :style="getColumnStyle(column)">
             {{ column.customDisplay(item) }}
           </td>
-          <td v-if="actionColumn()">{{ }}</td>
+          <td
+            v-if="actionColumn && actionColumn.toolbarItems?.length"
+            :style="getColumnStyle(actionColumn)"
+          >
+            <div>
+              <EButton
+                :control="item"
+                v-for="item in actionColumn.toolbarItems"
+              ></EButton>
+            </div>
+          </td>
         </tr>
       </template>
     </tbody>

@@ -6,4 +6,7 @@ export default class QuestionService extends BaseService {
   async insertQuestionLibrary(data: unknown) {
     return await this.post(data, 'library')
   }
+  async getPagingQuestionLibrary(data: unknown) {
+    return await this.post(data, 'library/paging')
+  }
 }

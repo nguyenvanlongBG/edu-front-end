@@ -15,4 +15,5 @@ export class Test extends BaseEntity {
   start_time?: Date = new Date()
   duration: number = 90
   finish_time?: Date = new Date()
+  user_id: string = ''
 }

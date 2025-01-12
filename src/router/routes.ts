@@ -1,6 +1,7 @@
 import { RouterNameExam, RouterNameTest } from '@/components/core/enums/Router'
 import { ExamMode } from '@/enums/exam'
 import { ExamDto } from '@/models/exam/Dto/exam-dto'
+import { TestDto } from '@/models/test/test-dto'
 import type { RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
@@ -56,6 +57,11 @@ const routes: RouteRecordRaw[] = [
             path: ':test_id/mark',
             name: RouterNameTest.Mark,
             component: () => import('@views/test/mark/MarkListTest.vue'),
+            props: route => ({
+              test: new TestDto({
+                test_id: route.params.test_id as string,
+              }),
+            }),
           },
           {
             path: ':test_id/history',
@@ -119,8 +125,19 @@ const routes: RouteRecordRaw[] = [
         name: 'report',
         children: [
           {
-            path: '',
+            path: 'test',
             name: 'report-test',
+            component: () => import('@views/report/report-test/ReportTest.vue'),
+          },
+          {
+            path: 'chapter',
+            name: 'report-chapter',
+            component: () =>
+              import('@views/report/report-chapter/ReportChapter.vue'),
+          },
+          {
+            path: 'level',
+            name: 'report-level',
             component: () => import('@views/report/report-test/ReportTest.vue'),
           },
         ],
@@ -149,6 +166,17 @@ const routes: RouteRecordRaw[] = [
             path: 'test',
             name: 'test-library',
             component: () => import('@views/library/test/TestLibrary.vue'),
+          },
+        ],
+      },
+      {
+        path: '/forum',
+        name: 'forum',
+        children: [
+          {
+            path: '',
+            name: 'question2',
+            component: () => import('@views/library/QuestionLibrary.vue'),
           },
         ],
       },

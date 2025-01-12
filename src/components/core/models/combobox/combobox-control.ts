@@ -15,6 +15,7 @@ export class ComboboxControl extends BaseControl {
   }
   data: Array<Record<string, unknown>> = []
   displayField: string = 'display'
+  width: string = '200px'
   valueField: string = 'value'
   value: unknown = null
   bindingText?: string = ''

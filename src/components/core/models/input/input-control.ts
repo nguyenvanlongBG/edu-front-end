@@ -18,6 +18,7 @@ export class InputControl extends BaseControl {
   placeholder: string = ''
   styleClass: string = ''
   maxLength: number = 255
+  isHorizontal: boolean = true
   validateCustom(value: string) {
     const { t } = useI18n()
     if (this.required && !value) {

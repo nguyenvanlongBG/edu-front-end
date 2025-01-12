@@ -15,6 +15,9 @@ export class ColumnControl extends BaseControl {
   name: string = ''
   type: ColumnType = ColumnType.TextBox
   valueKey: string = ''
+  width: string = ''
+  flex: number = 1
+  toolbarItems: Array<BaseControl> = []
   customDisplay: (_: Record<string, unknown>) => unknown = (
     record: Record<string, unknown>,
   ) => {

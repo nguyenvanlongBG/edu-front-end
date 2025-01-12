@@ -2,19 +2,26 @@
   <div class="header">
     <slot name="header-question">
       <div class="d-flex-between">
-        <div class="left-tool-bar">
-          <slot name="left-tool-bar">
-            <ECombobox
-              v-if="control.isShowQuestionType"
-              :control="questionTypeControl"
-              v-model="control.value.type"
-            />
-            <ENumber
-              v-if="control.isShowPoint"
-              :control="pointControl"
-              v-model="control.value.point"
-            />
-          </slot>
+        <div class="left-tool-bar d-flex-vcenter col-gap-8px">
+          <slot name="left-default-toolbar"></slot>
+          <ECombobox
+            v-if="control.isShowQuestionType"
+            :control="questionTypeControl"
+            v-model="control.value.type"
+            :bindingText="questionTypeControl.bindingText"
+          />
+          <ECombobox
+            v-if="control.isShowLevel"
+            :control="questionLevelControl"
+            v-model="control.value.level"
+            :bindingText="questionLevelControl.bindingText"
+          />
+          <ENumber
+            v-if="control.isShowPoint"
+            :control="pointControl"
+            v-model="control.value.point"
+          />
+          <slot name="right-default-tool-bar"></slot>
         </div>
         <div class="right-tool-bar" v-if="control.isShowActionToolbar">
           <slot name="action-toolbar">

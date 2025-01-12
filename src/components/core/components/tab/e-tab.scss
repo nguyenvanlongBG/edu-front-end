@@ -7,6 +7,7 @@
   padding: 5px; /* Thêm đệm xung quanh để tránh sát mép */
   box-sizing: border-box;
   width: 100%;
+  overflow-y: auto;
   height: 100%; /* Đảm bảo chiếm đầy chiều cao */
 }
 
@@ -17,7 +18,7 @@
   background-color: white;
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  overflow: hidden; /* Ẩn các phần thừa */
+  overflow-y: auto; /* Ẩn các phần thừa */
   position: relative;
 }
 
@@ -65,6 +66,7 @@
 
 .tab-content {
   animation: fadeInUp 0.5s ease;
+  max-height: calc(100% - 40px);
   overflow-y: auto; /* Cho phép cuộn nếu nội dung dài */
 }
 

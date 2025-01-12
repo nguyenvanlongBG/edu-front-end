@@ -4,12 +4,15 @@ import EButton from '@/components/core/components/button/EButton.vue'
 import EPaging from '@/components/core/components/paging/EPaging.vue'
 import EPopup from '@/components/core/components/popup/EPopup.vue'
 import { LoadingType } from '@/components/core/enums/Common'
+import { ModelState } from '@/components/core/enums/model-state'
 import { ButtonControl } from '@/components/core/models/button/button-control'
 import { LoadingControl } from '@/components/core/models/loading/loading-control'
 import { PagingControl } from '@/components/core/models/paging/paging-control'
 import { PagingParam } from '@/components/core/models/paging/paging-param'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
 import EQuestion from '@/components/question/EQuestion.vue'
+import { QuestionType } from '@/enums/question'
+import questionHelper from '@/helper/question/question-helper'
 import { Question } from '@/models/question/question'
 import { QuestionControl } from '@/models/question/question-control'
 import QuestionService from '@/services/question-service'
@@ -74,11 +77,26 @@ export default {
     async function handleLoadData(pagingParam: PagingParam) {
       isLoading.value = true
       const questionService = new QuestionService()
-      const result = await questionService.getPaging(pagingParam)
+      const result = await questionService.getPagingQuestionLibrary(pagingParam)
       questions.value = commonFunction.convertToInstances<Question>(
         result as unknown as Record<string, unknown>[],
         Question,
       )
+      questions.value.forEach(question => {
+        question.State = ModelState.INSERT
+        question.question_id = commonFunction.generateID()
+        question.options?.forEach(option => {
+          option.State = ModelState.INSERT
+          option.option_question_id = commonFunction.generateID()
+          option.question_id = question.question_id
+        })
+        question.results?.forEach(result => {
+          result.result_question_id = commonFunction.generateID()
+          result.question_id = question.question_id
+          result.State = ModelState.INSERT
+        })
+      })
+      questionHelper.mapObjectContentQuestions(questions.value)
       isLoading.value = false
     }
     function onSave() {

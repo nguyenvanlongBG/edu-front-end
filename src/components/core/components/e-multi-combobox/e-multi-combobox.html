@@ -1,0 +1,65 @@
+<div class="MultiSelect">
+  <!-- Control Container -->
+  <div
+    class="MultiSelect-control"
+    :class="{ 's-focused': isFocused }"
+    ref="controlRef"
+    @mousedown.prevent="onControlClick"
+  >
+    <!-- Placeholder -->
+    <span class="MultiSelect-placeholder" v-show="showPlaceholder">
+      {{ control.placeholder || 'Select options...' }}
+    </span>
+
+    <!-- Selected Items -->
+    <div
+      v-for="(item, index) in selectedItems"
+      :key="index"
+      class="MultiSelectItem"
+      :class="{ 's-selected': selectedItemIndex === index }"
+      @mousedown.prevent="onClickItemSelected(item)"
+    >
+      <slot name="item" :item="item"> {{ item[control.displayField] }} </slot>
+    </div>
+
+    <!-- Search Input -->
+    <input
+      v-model="search"
+      :style="searchStyle"
+      @focus="isFocused = true"
+      @blur="isFocused = false"
+      type="text"
+      class="MultiSelect-input"
+      :placeholder="control.placeholder"
+      @keydown="handleKeyDown"
+    />
+
+    <!-- Ghost Input for Dynamic Width -->
+    <span
+      ref="ghostRef"
+      class="MultiSelect-input MultiSelect-inputGhost"
+      v-html="ghostValue"
+    ></span>
+  </div>
+
+  <!-- Dropdown -->
+  <div class="MultiSelect-dropdown" v-show="showDropdown" ref="listRef">
+    <div
+      v-for="(option, index) in availableOptions"
+      :key="option[control.valueField]"
+      class="MultiSelectOption"
+      :class="{ 's-selected': selectedOptionIndex === index }"
+      @mousedown.prevent="toggleOption(option)"
+      @mouseenter="selectedOptionIndex = index"
+    >
+      <slot name="option" :option="option">
+        {{ option[control.displayField] }}
+      </slot>
+    </div>
+
+    <!-- No Results Slot -->
+    <slot name="noResults" v-if="search && !availableOptions.length">
+      <div class="MultiSelect-noResults">No available results</div>
+    </slot>
+  </div>
+</div>

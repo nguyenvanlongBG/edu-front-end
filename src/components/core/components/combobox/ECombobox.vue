@@ -11,12 +11,17 @@ export default {
       type: ComboboxControl,
       required: true,
     },
+    bindingText: {
+      type: String,
+      required: false,
+      default: '',
+    },
     modelValue: {
       required: true,
     },
   },
   watch: {
-    'control.bindingText'(newValue) {
+    bindingText(newValue) {
       this.inputValue = newValue
     },
   },
@@ -24,7 +29,7 @@ export default {
   emits: ['update:modelValue'],
   setup(props, { emit }) {
     const options = ref(props.control.data as Array<Record<string, unknown>>)
-    const inputValue = ref<string>(props.control.bindingText ?? '')
+    const inputValue = ref<string>(props.bindingText ?? '')
     const internalValue = ref(props.modelValue)
     const isFirstLoad = ref(true)
     const controlInternal = reactive<ComboboxControl>(props.control)

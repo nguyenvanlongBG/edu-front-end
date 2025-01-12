@@ -42,7 +42,7 @@
           <input
             type="email"
             id="email"
-            v-model="user.email"
+            v-model="user.user_name"
             placeholder="Email"
           />
           <label for="password">Mật khẩu</label>
@@ -58,9 +58,9 @@
               <input
                 type="radio"
                 id="role_student"
-                v-model="user.role"
+                v-model="user.role_id"
                 name="role"
-                value="6"
+                :value="1"
                 class="radio"
               />
               <label for="role_student" class="label-role">Học sinh</label>
@@ -69,21 +69,24 @@
               <input
                 type="radio"
                 id="role_teacher"
-                v-model="user.role"
+                v-model="user.role_id"
                 name="role"
-                value="4"
+                :value="2"
                 class="radio"
               />
               <label for="role_teacher" class="label-role">Giáo viên</label>
             </div>
           </div>
-          <div class="button-register">Đăng ký</div>
+          <div class="button-register" @click="onRegister">Đăng ký</div>
         </div>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
+import router from '@/router'
+import AuthService from '@/services/auth-service'
+import { StatusCodes } from 'http-status-codes'
 import { ref } from 'vue'
 
 export default {
@@ -91,12 +94,24 @@ export default {
   setup() {
     const user = ref({
       name: '',
-      email: '',
+      user_name: '',
       password: '',
-      role: null,
+      role_id: null,
     })
+    async function onRegister() {
+      const authService = new AuthService()
+      const resultResiter = await authService.register(user.value)
+      if (
+        resultResiter &&
+        resultResiter.status == StatusCodes.OK &&
+        resultResiter.data
+      ) {
+        router.push({ name: 'login' })
+      }
+    }
     return {
       user,
+      onRegister,
     }
   },
 }

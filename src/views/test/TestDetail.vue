@@ -35,6 +35,10 @@ import { PopupControl } from '@/components/core/models/popup/popup-control'
 import { AnswerQuestion } from '@/models/answer-question/answer-question'
 import ExamService from '@/services/exam-service'
 import { ExamDto } from '@/models/exam/Dto/exam-dto'
+import questionHelper from '@/helper/question/question-helper'
+import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
+import type { User } from '@/models/user/user'
+import { LocalStorageKey } from '@/constants/local-storage-key'
 export default {
   components: {
     EQuestion,
@@ -220,7 +224,7 @@ export default {
 
       switch (testMode.value) {
         case TestMode.Add:
-          masterData.value = new TestDto()
+          masterData.value = new TestDto(masterData.value)
           masterData.value.State = ModelState.INSERT
           masterData.value.test_id = commonFunction.generateID()
           questions.value = []
@@ -238,10 +242,12 @@ export default {
             questionsResult as unknown as Record<string, unknown>[],
             Question,
           )
+          questionHelper.mapObjectContentQuestions(questions.value)
           questionsOrigin = commonFunction.convertToInstances<Question>(
             questionsResult as unknown as Record<string, unknown>[],
             Question,
           )
+          questionHelper.mapObjectContentQuestions(questionsOrigin)
           break
         case TestMode.Do:
           tasks.push(testService.getInfoDoTest(masterData.value.test_id))
@@ -259,10 +265,12 @@ export default {
             masterData.value.questions as unknown as Record<string, unknown>[],
             Question,
           )
+          questionHelper.mapObjectContentQuestions(questions.value)
           questionsOrigin = commonFunction.convertToInstances<Question>(
             masterData.value.questions as unknown as Record<string, unknown>[],
             Question,
           )
+          questionHelper.mapObjectContentQuestions(questionsOrigin)
           break
       }
     }
@@ -416,25 +424,7 @@ export default {
             questionsDelete.forEach(q => (q.State = ModelState.DELETE))
             questionsHandle = questionsHandle.concat(questionsDelete)
           }
-          questionsHandle.forEach(q => {
-            q.content =
-              typeof q.object_content == 'object' &&
-              !Array.isArray(q.object_content)
-                ? commonFunction.convertToString(
-                    'ops' in q.object_content ? q.object_content.ops : [],
-                  )
-                : commonFunction.convertToString(q.object_content)
-            q.options?.forEach(
-              o =>
-                (o.content =
-                  typeof o.object_content == 'object' &&
-                  !Array.isArray(o.object_content)
-                    ? commonFunction.convertToString(
-                        'ops' in o.object_content ? o.object_content.ops : [],
-                      )
-                    : commonFunction.convertToString(o.object_content)),
-            )
-          })
+          questionHelper.mapQuestionToSave(questionsHandle)
           test.questions = questionsHandle
           if (masterData.value && masterData.value.State == ModelState.INSERT) {
             await testService.post(test)
@@ -490,6 +480,12 @@ export default {
       switch (route.name) {
         case RouterNameTest.Add:
           masterData.value.test_id = commonFunction.generateID()
+          const user = localStorageLibrary.getValueByKey<User>(
+            LocalStorageKey.User,
+          )
+          if (user && user.user_id) {
+            masterData.value.user_id = user.user_id
+          }
           testMode.value = TestMode.Add
           break
         case RouterNameTest.Edit:

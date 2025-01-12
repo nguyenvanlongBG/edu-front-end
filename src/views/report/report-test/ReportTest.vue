@@ -2,12 +2,57 @@
 import { ref } from 'vue'
 import ApexCharts from 'vue3-apexcharts'
 import ReportService from '@/services/report-service'
+import ETable from '@/components/core/components/table/ETable.vue'
+import { TableControl } from '@/components/core/models/table/table-control'
+import { ColumnControl } from '@/components/core/models/table/column/column-control'
+import { Role } from '@/enums/role'
+import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
+import { LocalStorageKey } from '@/constants/local-storage-key'
+import type { User } from '@/models/user/user'
+import EMultiCombobox from '@/components/core/components/e-multi-combobox/EMultiCombobox.vue'
+import { MultiComboboxControl } from '@/components/core/models/multi-combobox/multi-combobox-control'
+import { ReportParam } from '@/models/report/report-param'
+import TestService from '@/services/test-service'
 
 export default {
   components: {
     apexchart: ApexCharts,
+    ETable,
+    EMultiCombobox,
   },
   setup() {
+    const tableControl = ref(
+      new TableControl({
+        columns: [
+          new ColumnControl({
+            name: 'Tên học sinh',
+            valueKey: 'name',
+            flex: 8,
+          }),
+          new ColumnControl({
+            name: 'Đề 1',
+            valueKey: '123',
+            flex: 2,
+          }),
+        ],
+        data: [
+          {
+            name: 'Nguyễn Văn A',
+            '123': '9',
+            price: 14.99,
+            discount: 14.99,
+          },
+        ],
+      }),
+    )
+    const testIds = ref([] as string[])
+    const testCbb = ref(
+      new MultiComboboxControl({
+        displayField: 'name',
+        valueField: 'test_id',
+        data: [],
+      }),
+    )
     const series = ref([
       {
         name: 'SL',
@@ -88,25 +133,123 @@ export default {
         },
       },
     })
-    async function loadData() {
-      const reportService = new ReportService()
-      const result = await reportService.reportTest()
+    const isShowChartSummary = ref(true)
+    async function handleLoadData() {
+      await getTestOfUser()
+      await handleLoadReport()
       // Chuyển đổi dữ liệu cho biểu đồ
-      const scores = Object.keys(result) // Chuyển đổi khóa từ string sang number
-      const counts = Object.values(result) // Lấy các giá trị (số lượng bài thi cho mỗi điểm)
-      series.value[0].data = counts
-      scores.forEach(score => {
-        chartOptions.value.xaxis.categories.push(score)
+      // const scores = Object.keys(result) // Chuyển đổi khóa từ string sang number
+      // const counts = Object.values(result) // Lấy các giá trị (số lượng bài thi cho mỗi điểm)
+      // series.value[0].data = counts
+      // scores.forEach(score => {
+      //   chartOptions.value.xaxis.categories.push(score)
+      // })
+    }
+    function buildReportParam() {
+      const reportParam = new ReportParam()
+      if (testIds.value && testIds.value.length) {
+        reportParam.testIds = testIds.value
+      }
+      return reportParam
+    }
+    function initData() {
+      const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
+      if (user) {
+        isShowChartSummary.value =
+          user.role_id == Role.Admin || user.role_id == Role.Teacher
+      }
+    }
+    async function getTestOfUser() {
+      const testService = new TestService()
+      const tests = await testService.getAllTestOfUser()
+      testCbb.value.data = tests as unknown as Array<Record<string, unknown>>
+    }
+    async function handleLoadReport() {
+      const reportService = new ReportService()
+      let tests = testCbb.value.data
+      if (testIds.value?.length) {
+        tests = tests?.filter(
+          test =>
+            'test_id' in test && testIds.value.includes(test.test_id as string),
+        )
+      }
+      tableControl.value.columns = [
+        new ColumnControl({
+          name: 'Tên học sinh',
+          valueKey: 'name',
+          flex: 1,
+        }),
+      ]
+      tests.forEach(test => {
+        tableControl.value.columns.push(
+          new ColumnControl({
+            name: test.name as string,
+            valueKey: test.test_id as string,
+            width: '80px',
+          }),
+        )
+      })
+      const reportParam = buildReportParam()
+      const result = await reportService.reportTest(
+        reportParam as unknown as Record<string, unknown>,
+      )
+      const recordsReport = result as unknown as Array<Record<string, unknown>>
+      tableControl.value.data = recordsReport
+      handleDataSummary(recordsReport)
+    }
+    function handleDataSummary(data: Array<Record<string, unknown>>) {
+      const result: Record<number, number> = {} // Phổ điểm (score -> frequency)
+      if (data?.length) {
+        data.forEach(student => {
+          Object.keys(student).forEach(key => {
+            if (key?.length == 36) {
+              const scores = student[key] as number[] // Lấy danh sách điểm
+              scores.forEach(score => {
+                result[score] = (result[score] || 0) + 1 // Đếm số lần xuất hiện
+              })
+            }
+          })
+        })
+      }
+      const scores = Object.keys(result).map(String) // Chuyển đổi khóa từ string sang number
+      const counts = Object.values(result) // Lấy số lần xuất hiện
+
+      series.value[0].data = counts // Gán số lần xuất hiện cho trục Y
+      chartOptions.value.xaxis.categories.splice(
+        0,
+        chartOptions.value.xaxis.categories.length,
+      ) // Xóa toàn bộ phần tử
+      scores?.forEach(score => {
+        chartOptions.value.xaxis.categories.push(score) // Gán danh sách điểm cho trục X
       })
     }
+    async function onUpdateTestIds(ids: string[]) {
+      testIds.value = ids
+      setTimeout(async () => {
+        await handleLoadReport() // Gọi vào hàm load dữ liệu với danh sách test ID
+      }, 500)
+    }
     return {
+      testCbb,
+      onUpdateTestIds,
+      handleLoadReport,
+      testIds,
+      isShowChartSummary,
+      handleDataSummary,
+      buildReportParam,
       chartOptions,
+      tableControl,
       series,
-      loadData,
+      handleLoadData,
+      initData,
+      getTestOfUser,
     }
   },
-  mounted() {
-    this.loadData()
+  created() {
+    this.initData()
+  },
+  async mounted() {
+    await this.handleLoadData()
   },
 }
 </script>

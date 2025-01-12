@@ -1,0 +1,129 @@
+.MultiSelect {
+  position: relative;
+  font-family: Arial, sans-serif;
+  width: 100%;
+  max-width: 300px;
+
+  // Control styling
+  &-control {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+    transition:
+      border-color 0.3s ease,
+      box-shadow 0.3s ease;
+
+    &.s-focused {
+      border-color: #007bff;
+      box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+    }
+
+    &:hover {
+      border-color: #007bff;
+    }
+  }
+
+  // Placeholder styling
+  &-placeholder {
+    color: #aaa;
+    font-size: 14px;
+  }
+
+  // Selected item styling
+  .MultiSelectItem {
+    background-color: #007bff;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+
+    &.s-selected {
+      background-color: #0056b3;
+    }
+
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+
+  // Input field styling
+  .MultiSelect-input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    min-width: 50px;
+
+    &::placeholder {
+      color: #ccc;
+    }
+  }
+
+  .MultiSelect-inputGhost {
+    visibility: hidden;
+    position: absolute;
+    white-space: pre;
+  }
+
+  // Dropdown styling
+  &-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1050; // Ensure it appears above other elements
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
+  }
+
+  // Option group styling
+  .MultiSelectOptionGroup {
+    padding: 5px 10px;
+
+    &-label {
+      font-weight: bold;
+      font-size: 12px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+  }
+
+  // Option styling
+  .MultiSelectOption {
+    padding: 8px 10px;
+    border-radius: 3px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #f1f1f1;
+    }
+
+    &.s-selected {
+      background-color: #007bff;
+      color: #fff;
+    }
+  }
+
+  // No results styling
+  .MultiSelect-noResults {
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    color: #999;
+  }
+}

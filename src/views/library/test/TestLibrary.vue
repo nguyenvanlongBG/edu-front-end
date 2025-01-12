@@ -27,16 +27,7 @@ export default {
   },
   setup() {
     const { t } = useI18n()
-    const tests = ref<TestDto[]>([
-      new TestDto({
-        test_id: commonFunction.generateID(),
-        name: 'Đề thi cuối kì 1',
-      }),
-      new TestDto({
-        test_id: commonFunction.generateID(),
-        name: 'Đề thi cuối kì 2',
-      }),
-    ])
+    const tests = ref<TestDto[]>([])
     const createTestBtn = ref(
       new ButtonControl({
         classType: 'solid',

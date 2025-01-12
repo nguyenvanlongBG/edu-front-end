@@ -6,6 +6,7 @@ export interface IComboboxControl extends IBaseControl {
   data?: Array<Record<string, unknown>>
   displayField?: string
   valueField?: string
+  width?: string
   bindingText?: string
   placeholder?: string
   paging?: PagingParam

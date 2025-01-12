@@ -35,7 +35,7 @@
             type="email"
             id="email"
             placeholder="Email"
-            v-model="account.email"
+            v-model="account.user_name"
           />
           <label for="password">Mật khẩu</label>
           <input
@@ -54,17 +54,33 @@
   </div>
 </template>
 <script lang="ts">
+import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
+import { LocalStorageKey } from '@/constants/local-storage-key'
+import router from '@/router'
+import AuthService from '@/services/auth-service'
 import { ref } from 'vue'
 
 export default {
   name: 'LoginComponent',
   setup() {
     const account = ref({
-      email: '',
+      user_name: '',
       password: '',
     })
     const isSubmiting = ref(false)
     async function handleSubmit() {
+      const authService = new AuthService()
+      const resultLogin = await authService.login(account.value)
+      if (resultLogin && 'token' in resultLogin && 'user' in resultLogin) {
+        localStorageLibrary.setValue(
+          LocalStorageKey.AccessToken,
+          resultLogin.token as string,
+        )
+        localStorageLibrary.setValue(LocalStorageKey.User, resultLogin.user)
+        router.push({
+          name: 'forum',
+        })
+      }
       isSubmiting.value = true
     }
     return {

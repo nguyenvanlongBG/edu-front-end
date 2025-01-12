@@ -17,7 +17,7 @@ export class QuestionControl extends BaseControl {
   value: Question = new Question()
   isShowAnswer: boolean = false
   isShowResult: boolean = false
-  isShowLevel: boolean = true
+  isShowLevel: boolean = false
   isShowActionToolbar: boolean = false
   isShowNote: boolean = false
   isShowPoint: boolean = false

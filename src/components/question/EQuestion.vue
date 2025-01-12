@@ -2,7 +2,7 @@
 <style src="./e-question.scss" scoped lang="scss"></style>
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { QuestionType, QuestionMode } from '@/enums/question' // Giả sử các enum đã được định nghĩa đúng cách
+import { QuestionType, QuestionMode, QuestionLevel } from '@/enums/question' // Giả sử các enum đã được định nghĩa đúng cách
 import { EditorControl } from '../core/models/editor/editor-control'
 import Editor from '@core/components/editor/EEditor.vue'
 import type { OptionQuestion } from '@/models/option-question/option-question'
@@ -17,6 +17,7 @@ import ENote from '../core/components/note/ENote.vue'
 import ENumber from '../core/components/number/ENumber.vue'
 import { NumberControl } from '../core/models/number/number-control'
 import commonFunction from '../core/commons/CommonFunction'
+import type { Question } from '@/models/question/question'
 
 export default defineComponent({
   name: 'EQuestion',
@@ -81,6 +82,32 @@ export default defineComponent({
         ],
       }),
     )
+    const questionLevelControl = ref(
+      new ComboboxControl({
+        value: QuestionLevel.Recognition,
+        bindingText: t('i18nQuestion.Recognition'),
+        isOnlySelect: true,
+        width: '200px',
+        data: [
+          {
+            display: t('i18nQuestion.Recognition'),
+            value: QuestionLevel.Recognition,
+          },
+          {
+            display: t('i18nQuestion.Comprehension'),
+            value: QuestionLevel.Comprehension,
+          },
+          {
+            display: t('i18nQuestion.Application'),
+            value: QuestionLevel.Application,
+          },
+          {
+            display: t('i18nQuestion.AdvancedApplication'),
+            value: QuestionLevel.AdvancedApplication,
+          },
+        ],
+      }),
+    )
     const pointControl = ref(new NumberControl())
     function getClassForOption(option: OptionQuestion) {
       const question = props.control.value
@@ -123,7 +150,7 @@ export default defineComponent({
       }
     }
     function initControls() {
-      const question = props.control.value
+      const question = props.control.value as Question
       const questionControl = props.control
       if (questionControl && !questionControl.isShowToolEditor) {
         questionEditorControl.value.isHideToolbar = true
@@ -136,6 +163,29 @@ export default defineComponent({
           break
         case QuestionType.MultiChoice:
           questionTypeControl.value.bindingText = t('i18nQuestion.MultiChoice')
+          break
+        case QuestionType.FillResult:
+          questionTypeControl.value.bindingText = t('i18nQuestion.FillResult')
+          break
+      }
+
+      questionLevelControl.value.value = question.level
+      switch (question.level) {
+        case QuestionLevel.Recognition:
+          questionLevelControl.value.bindingText = t('i18nQuestion.Recognition')
+          break
+        case QuestionLevel.Comprehension:
+          questionLevelControl.value.bindingText = t(
+            'i18nQuestion.Comprehension',
+          )
+          break
+        case QuestionLevel.Application:
+          questionLevelControl.value.bindingText = t('i18nQuestion.Application')
+          break
+        case QuestionLevel.AdvancedApplication:
+          questionLevelControl.value.bindingText = t(
+            'i18nQuestion.AdvancedApplication',
+          )
           break
       }
 
@@ -161,9 +211,7 @@ export default defineComponent({
             singleOptionSelected.value = question.results[0].content
             break
           case QuestionType.MultiChoice:
-            multiOptionSelected.value = question.results.map(
-              answer => answer.content,
-            )
+            multiOptionSelected.value = question.results[0].content.split(',')
             break
           case QuestionType.FillResult:
             if (question.results?.length) {
@@ -190,11 +238,6 @@ export default defineComponent({
         typeof control.customAction == 'function'
       ) {
         control.customAction(button.name, control.value)
-      } else {
-        questionEditorControl.value.isHideToolbar = false
-        questionEditorControl.value.readonly = false
-        control.isShowQuestionType = true
-        control.readonly = false
       }
     }
     function onNoteQuestion() {
@@ -229,6 +272,7 @@ export default defineComponent({
     }
     return {
       QuestionMode,
+      questionLevelControl,
       noteEditorControl,
       pointControl,
       onActionQuestion,

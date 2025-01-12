@@ -1,5 +1,7 @@
 <script lang="ts">
 import commonFunction from '@/components/core/commons/CommonFunction'
+import editorFunction from '@/components/core/commons/editorFunction'
+import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
 import EButton from '@/components/core/components/button/EButton.vue'
 import ELoading from '@/components/core/components/loading/ELoading.vue'
 import EPopup from '@/components/core/components/popup/EPopup.vue'
@@ -9,9 +11,14 @@ import { ButtonControl } from '@/components/core/models/button/button-control'
 import { LoadingControl } from '@/components/core/models/loading/loading-control'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
 import EQuestion from '@/components/question/EQuestion.vue'
+import { GuidEmpty } from '@/constants/consstant'
+import { LocalStorageKey } from '@/constants/local-storage-key'
+import { QuestionType } from '@/enums/question'
+import { Role } from '@/enums/role'
 import { OptionQuestion } from '@/models/option-question/option-question'
 import { Question } from '@/models/question/question'
 import { QuestionControl } from '@/models/question/question-control'
+import type { User } from '@/models/user/user'
 import FileQuestionService from '@/services/file-question-service'
 import { nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -189,8 +196,27 @@ export default {
     }
     function onSave() {
       const control = props.control
-      if (control && typeof control.handleEmit == 'function') {
-        control.handleEmit('ok', questions.value)
+      const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
+      if (user && control && typeof control.handleEmit == 'function') {
+        const questionsTmp = commonFunction.convertToData<Question[]>(
+          commonFunction.convertToString(questions.value),
+        )
+        questionsTmp.forEach(item => {
+          item.content = editorFunction.getContent(item.object_content)
+          item.user_id = user.role_id == Role.Admin ? GuidEmpty : user.user_id
+          item.subject_id = GuidEmpty
+          item.options?.forEach(o => {
+            o.State = ModelState.INSERT
+            o.content = editorFunction.getContent(o.object_content)
+          })
+          item.results?.forEach(o => {
+            o.State = ModelState.INSERT
+            if (item.type == QuestionType.FillResult) {
+              o.content = editorFunction.getContent(o.object_content)
+            }
+          })
+        })
+        control.handleEmit('ok', questionsTmp)
       }
     }
     return {
