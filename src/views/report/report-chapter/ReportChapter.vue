@@ -10,6 +10,7 @@ import type { User } from '@/models/user/user'
 import { LocalStorageKey } from '@/constants/local-storage-key'
 import { Role } from '@/enums/role'
 import EMultiCombobox from '@/components/core/components/e-multi-combobox/EMultiCombobox.vue'
+import ClassroomService from '@/services/classroom-service'
 
 export default {
   components: {
@@ -67,6 +68,7 @@ export default {
       new MultiComboboxControl({
         displayField: 'name',
         valueField: 'test_id',
+        placeholder: 'Đề thi',
         data: [],
       }),
     )
@@ -75,6 +77,7 @@ export default {
       new MultiComboboxControl({
         displayField: 'name',
         valueField: 'class_id',
+        placeholder: 'Lớp học',
         data: [],
       }),
     )
@@ -82,6 +85,13 @@ export default {
     async function handleLoadData() {
       await getTestOfUser()
       await handleLoadReport()
+      const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
+      if (
+        user &&
+        (user.role_id == Role.Admin || user?.role_id == Role.Teacher)
+      ) {
+        await getClassroomOfTeacher()
+      }
     }
     async function handleLoadReport() {
       const reportService = new ReportService()
@@ -99,7 +109,7 @@ export default {
         chartOptions.value.xaxis.categories.length,
       ) // Xóa toàn bộ phần tử
       series.value.forEach(s => {
-        s.data.splice(0, series.value.length)
+        s.data.splice(0, s.data.length)
       })
       // Chuẩn bị dữ liệu cho series và categories
       const correctData: number[] = []
@@ -149,6 +159,25 @@ export default {
           user.role_id == Role.Admin || user.role_id == Role.Teacher
       }
     }
+    async function onUpdateTestIds(ids: string[]) {
+      testIds.value = ids
+      setTimeout(async () => {
+        await handleLoadReport() // Gọi vào hàm load dữ liệu với danh sách test ID
+      }, 500)
+    }
+    async function onUpdateClassIds(ids: string[]) {
+      classIds.value = ids
+      setTimeout(async () => {
+        await handleLoadReport() // Gọi vào hàm load dữ liệu với danh sách test ID
+      }, 500)
+    }
+    async function getClassroomOfTeacher() {
+      const classroomService = new ClassroomService()
+      const classrooms = await classroomService.getAllClassOfUser()
+      classCbb.value.data = classrooms as unknown as Array<
+        Record<string, unknown>
+      >
+    }
     return {
       initData,
       testIds,
@@ -158,11 +187,14 @@ export default {
       isShowRoleTeacher,
       series,
       buildReportParam,
+      onUpdateTestIds,
+      onUpdateClassIds,
       chartOptions,
       handleLoadData,
       handleLoadReport,
       handleLoadChart,
       getTestOfUser,
+      getClassroomOfTeacher,
     }
   },
   created() {

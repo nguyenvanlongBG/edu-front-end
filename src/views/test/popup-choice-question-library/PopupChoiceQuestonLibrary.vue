@@ -1,12 +1,14 @@
 <script lang="ts">
 import commonFunction from '@/components/core/commons/CommonFunction'
 import EButton from '@/components/core/components/button/EButton.vue'
+import EMultiCombobox from '@/components/core/components/e-multi-combobox/EMultiCombobox.vue'
 import EPaging from '@/components/core/components/paging/EPaging.vue'
 import EPopup from '@/components/core/components/popup/EPopup.vue'
 import { LoadingType } from '@/components/core/enums/Common'
 import { ModelState } from '@/components/core/enums/model-state'
 import { ButtonControl } from '@/components/core/models/button/button-control'
 import { LoadingControl } from '@/components/core/models/loading/loading-control'
+import { MultiComboboxControl } from '@/components/core/models/multi-combobox/multi-combobox-control'
 import { PagingControl } from '@/components/core/models/paging/paging-control'
 import { PagingParam } from '@/components/core/models/paging/paging-param'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
@@ -15,6 +17,7 @@ import { QuestionType } from '@/enums/question'
 import questionHelper from '@/helper/question/question-helper'
 import { Question } from '@/models/question/question'
 import { QuestionControl } from '@/models/question/question-control'
+import ChapterService from '@/services/chapter-service'
 import QuestionService from '@/services/question-service'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -25,6 +28,7 @@ export default {
     EButton,
     EPopup,
     EPaging,
+    EMultiCombobox,
   },
   props: {
     control: {
@@ -38,6 +42,14 @@ export default {
     const loadingControl = ref(
       new LoadingControl({
         type: LoadingType.LoadingNormal,
+      }),
+    )
+    const chapterControl = ref(
+      new MultiComboboxControl({
+        displayField: 'name',
+        valueField: 'chapter_id',
+        data: [],
+        readonly: true,
       }),
     )
     const cancelBtn = new ButtonControl({
@@ -67,6 +79,7 @@ export default {
           isShowActionToolbar: true,
           isShowLevel: true,
           readonly: true,
+          isShowResult: true,
         })
       }
       return dicQuestionControl.value[question.question_id]
@@ -87,7 +100,22 @@ export default {
         question.question_id = commonFunction.generateID()
         question.options?.forEach(option => {
           option.State = ModelState.INSERT
-          option.option_question_id = commonFunction.generateID()
+          const newOptionQuestionId = commonFunction.generateID()
+          if (
+            question.type == QuestionType.SingleChoice ||
+            question.type == QuestionType.MultiChoice
+          ) {
+            question.results?.forEach(result => {
+              if (result.content?.includes(option.option_question_id)) {
+                // Thay thế giá trị trong result.content
+                result.content = result.content.replace(
+                  option.option_question_id,
+                  newOptionQuestionId, // Giá trị thay thế (thay "new_value" bằng giá trị bạn muốn)
+                )
+              }
+            })
+          }
+          option.option_question_id = newOptionQuestionId
           option.question_id = question.question_id
         })
         question.results?.forEach(result => {
@@ -97,6 +125,11 @@ export default {
         })
       })
       questionHelper.mapObjectContentQuestions(questions.value)
+      const chapterService = new ChapterService()
+      const resultChapter = await chapterService.filter([])
+      chapterControl.value.data = (resultChapter ?? []) as unknown as Array<
+        Record<string, unknown>
+      >
       isLoading.value = false
     }
     function onSave() {
@@ -108,6 +141,7 @@ export default {
     return {
       isLoading,
       loadingControl,
+      chapterControl,
       dicQuestionControl,
       getQuestionControl,
       questions,

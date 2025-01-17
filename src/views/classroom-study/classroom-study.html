@@ -1,13 +1,31 @@
 <div class="classroom-container">
   <!-- Danh sách bài viết -->
   <div class="content-section">
-    <h2>Danh sách bài viết</h2>
-    <ul class="post-list">
-      <li>Bài viết 1</li>
-      <li>Bài viết 2</li>
-      <li>Bài viết 3</li>
-      <li>Bài viết 4</li>
-    </ul>
+    <div class="d-flex-end">
+      <EButton :control="addPostBtn" @click="onAddPost" />
+    </div>
+    <div v-for="post in posts" class="p-8px">
+      <div class="d-flex-end" v-if="isShowAction(post)">
+        <div class="box-action-classroom">
+          <i
+            class="fa-solid fa-ellipsis icon-tool-classroom"
+            @click.stop="toggleAction(post)"
+            >...</i
+          >
+          <ul class="menu-action-classroom" v-if="dicStatus[post.post_id]">
+            <li>
+              <div class="action-classroom" @click.stop="onEditPost(post)">
+                Sửa bài viết
+              </div>
+            </li>
+            <li>
+              <div class="action-classroom">Xóa bài viết</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <editor :control="editorControl" v-model="post.object_content" />
+    </div>
   </div>
 
   <!-- Danh sách học sinh -->
@@ -28,7 +46,7 @@
               v-for="enroll in enrollSuccess"
               :key="enroll.enrollmen_class_id"
             >
-              {{enroll.user_id}}
+              {{enroll.name}}
             </li>
           </ul>
         </div>
@@ -38,7 +56,7 @@
           <p>{{enrollPending?.length}} Yêu cầu chờ duyệt</p>
           <!-- Icon thay đổi theo trạng thái -->
           <span id="toggle-icon" class="toggle-icon">
-            {{ isShowListStudent ? '▲' : '▼' }}
+            {{ isShowListRequest ? '▲' : '▼' }}
           </span>
         </div>
         <div id="student-list" class="student-list" v-show="isShowListRequest">
@@ -46,8 +64,19 @@
             <li
               v-for="enroll in enrollPending"
               :key="enroll.enrollmen_class_id"
+              class="d-flex-between d-flex-vcenter col-gap-4px"
             >
-              {{enroll.name}}
+              <div>{{enroll.name}}</div>
+              <div class="d-flex col-gap-4px">
+                <EButton
+                  :control="acceptBtn"
+                  @click="onAcceptRequest(enroll)"
+                />
+                <EButton
+                  :control="rejectBtn"
+                  @click="onRejectRequest(enroll)"
+                />
+              </div>
             </li>
           </ul>
         </div>

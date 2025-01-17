@@ -25,6 +25,7 @@ import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
 import { User } from '@/models/user/user'
 import { LocalStorageKey } from '@/constants/local-storage-key'
 import { EnrollmentStatus } from '@/enums/classroom'
+import router from '@/router'
 
 export default {
   name: 'ClassroomList',
@@ -57,8 +58,12 @@ export default {
     const pagingControl = ref(new PagingControl())
     const detailPopupControl = new PopupControl()
     function onClassroom(classroom: Classroom) {
-      classroom.State = ModelState.EDIT
-      viewDetail(classroom as unknown as Record<string, unknown>)
+      router.push({
+        name: 'classroom-detail',
+        params: {
+          classroom_id: classroom.classroom_id,
+        },
+      })
     }
     const changePage = (page: number) => {
       currentPage.value = page
@@ -106,7 +111,9 @@ export default {
     async function loadListData() {
       const classroomService = new ClassroomService()
       const pagingParam = buildPagingParam()
-      const dataRes = await classroomService.getPaging(pagingParam)
+      const dataRes = await classroomService.pagingClassroom(
+        pagingParam as unknown as Record<string, unknown>,
+      )
       classrooms.value = dataRes as unknown as Classroom[]
     }
     function buildPagingParam() {

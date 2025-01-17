@@ -5,7 +5,7 @@ import type { OptionQuestion } from '../option-question/option-question'
 import type { ResultQuestion } from '../result-question/result-question'
 import commonFunction from '@/components/core/commons/CommonFunction'
 import type { AnswerQuestion } from '../answer-question/answer-question'
-import { GuidEmpty } from '@/constants/consstant'
+import { MathSubjectId } from '@/constants/consstant'
 
 export class Question extends BaseEntity {
   constructor(question?: IQuestion) {
@@ -22,7 +22,7 @@ export class Question extends BaseEntity {
   question_id: string = ''
   content: string = ''
   user_id: string = ''
-  subject_id: string = GuidEmpty
+  subject_id: string = MathSubjectId
   lstChapterId?: string[] = []
   chapter_ids: string = ''
   object_content: object[] | object = []
@@ -30,6 +30,9 @@ export class Question extends BaseEntity {
   level: QuestionLevel = QuestionLevel.Recognition
   options?: OptionQuestion[] = []
   results?: ResultQuestion[] = []
+  note?: string = ''
   mode?: QuestionMode = QuestionMode.ViewCanEdit
   answer?: AnswerQuestion
+  from?: number = 1
+  point: number = 1
 }

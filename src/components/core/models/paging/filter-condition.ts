@@ -1,6 +1,6 @@
 // CheckboxControl.ts
 import commonFunction from '@core/commons/CommonFunction'
-import { FilterOperator } from '../../enums/Common'
+import { FilterOperator, LogicalOperator } from '../../enums/Common'
 import type { IFilterCondition } from './i-filter-condition'
 
 export class FilterCondition {
@@ -13,4 +13,6 @@ export class FilterCondition {
   Field: string = ''
   Operator: FilterOperator = FilterOperator.Equal
   Value: unknown
+  SubConditions?: Array<FilterCondition> = []
+  LogicalOperator?: LogicalOperator = LogicalOperator.AND
 }

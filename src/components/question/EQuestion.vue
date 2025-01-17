@@ -5,19 +5,19 @@ import { defineComponent, ref } from 'vue'
 import { QuestionType, QuestionMode, QuestionLevel } from '@/enums/question' // Giả sử các enum đã được định nghĩa đúng cách
 import { EditorControl } from '../core/models/editor/editor-control'
 import Editor from '@core/components/editor/EEditor.vue'
-import type { OptionQuestion } from '@/models/option-question/option-question'
+import { OptionQuestion } from '@/models/option-question/option-question'
 import ECombobox from '../core/components/combobox/ECombobox.vue'
 import { QuestionControl } from '@/models/question/question-control'
 import { ComboboxControl } from '../core/models/combobox/combobox-control'
 import EButton from '../core/components/button/EButton.vue'
 import { ButtonControl } from '../core/models/button/button-control'
 import { useI18n } from 'vue-i18n'
-import { NoteControl } from '../core/models/note/note-control'
 import ENote from '../core/components/note/ENote.vue'
 import ENumber from '../core/components/number/ENumber.vue'
 import { NumberControl } from '../core/models/number/number-control'
 import commonFunction from '../core/commons/CommonFunction'
 import type { Question } from '@/models/question/question'
+import { ModelState } from '../core/enums/model-state'
 
 export default defineComponent({
   name: 'EQuestion',
@@ -56,11 +56,10 @@ export default defineComponent({
       }
     },
   },
-  emits: ['change-answer'],
+  emits: ['change-answer', 'change-point'],
   setup(props, { emit }) {
     const { t } = useI18n()
     const questionEditorControl = ref(new EditorControl())
-    const noteEditorControl = ref(new NoteControl())
     const questionTypeControl = ref(
       new ComboboxControl({
         value: QuestionType.SingleChoice,
@@ -129,10 +128,7 @@ export default defineComponent({
               question.results.length &&
               question.answer
             ) {
-              if (
-                question.results[0].result_question_id ==
-                question.answer.content
-              )
+              if (question.results[0].content == question.answer.content)
                 return 'correct'
               return 'incorrect'
             }
@@ -143,9 +139,21 @@ export default defineComponent({
               question.results.length &&
               question.answer
             ) {
-              return 'incorrect'
+              // Chuyển chuỗi thành mảng
+              const resultIds = question.results[0].content
+                ?.split(',')
+                .map(id => id.trim())
+              const answerIds = question.answer.content
+                ?.split(',')
+                .map(id => id.trim())
+
+              // So sánh nếu cùng danh sách
+              const isEqual =
+                resultIds.length === answerIds.length &&
+                resultIds.sort().join(',') === answerIds.sort().join(',')
+
+              return isEqual ? 'correct' : 'incorrect'
             }
-            return 'correct'
         }
       }
     }
@@ -224,7 +232,7 @@ export default defineComponent({
         }
       }
       if (props.control.isShowLevel && props.control.isReadonlyLevel) {
-        questionTypeControl.value.readonly = true
+        questionLevelControl.value.readonly = true
       }
       if (props.control.isShowPoint && props.control.isReadonlyPoint) {
         pointControl.value.readonly = true
@@ -238,12 +246,6 @@ export default defineComponent({
         typeof control.customAction == 'function'
       ) {
         control.customAction(button.name, control.value)
-      }
-    }
-    function onNoteQuestion() {
-      const control = props.control
-      if (control) {
-        control.isShowNote = true
       }
     }
     const singleOptionSelected = ref('')
@@ -262,6 +264,26 @@ export default defineComponent({
         }
       }
     }
+    function onAddOption() {
+      const control = props.control
+      if (control.isReadonlyToolEditor) return
+      const question = props.control.value
+      if (
+        question.type == QuestionType.SingleChoice ||
+        question.type == QuestionType.MultiChoice
+      ) {
+        if (!question.options) question.options = []
+        question.options.push(
+          new OptionQuestion({
+            option_question_id: commonFunction.generateID(),
+            content: '',
+            object_content: [],
+            question_id: question.question_id,
+            State: ModelState.INSERT,
+          }),
+        )
+      }
+    }
     function onUpdateFillResult() {
       const question = props.control.value
       emit(
@@ -270,13 +292,16 @@ export default defineComponent({
         commonFunction.convertToString(fillResult.value),
       )
     }
+    function onUpdatePoint(point: number) {
+      const question = props.control.value
+      emit('change-point', question, point)
+    }
     return {
       QuestionMode,
       questionLevelControl,
-      noteEditorControl,
       pointControl,
+      onUpdatePoint,
       onActionQuestion,
-      onNoteQuestion,
       initControls,
       questionTypeControl,
       QuestionType,
@@ -287,6 +312,7 @@ export default defineComponent({
       fillResult,
       onUpdateFillResult,
       onChangeChoice,
+      onAddOption,
     }
   },
   created() {},

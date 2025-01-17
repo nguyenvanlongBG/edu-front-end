@@ -9,14 +9,18 @@ export default defineComponent({
       type: Object as () => CheckboxControl,
       required: true,
     },
+    modelValue: {
+      type: Array<unknown>,
+      required: true,
+    },
   },
-  emits: ['change'],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     function handleChange(event: Event) {
       // Chỉ phát sự kiện nếu không ở chế độ readonly
       if (!props.control.readonly) {
         const input = event.target as HTMLInputElement
-        emit('change', input.checked)
+        emit('update:modelValue', input.checked)
       }
     }
 

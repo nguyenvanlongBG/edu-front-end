@@ -60,7 +60,7 @@
                 id="role_student"
                 v-model="user.role_id"
                 name="role"
-                :value="1"
+                :value="3"
                 class="radio"
               />
               <label for="role_student" class="label-role">Học sinh</label>

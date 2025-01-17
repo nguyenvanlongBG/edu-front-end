@@ -8,10 +8,7 @@
     </div>
     <div v-show="!isLoading" class="list-question">
       <div v-for="question in questions" :key="question.question_id">
-        <EQuestion
-          :control="getQuestionControl(question)"
-          @change-answer="onChangeAnswer"
-        >
+        <EQuestion :control="getQuestionControl(question)">
           <template #right-default-tool-bar>
             <EMultiCombobox
               v-if="getQuestionControl(question).isShowQuestionType"

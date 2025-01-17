@@ -7,4 +7,5 @@ export interface IExam extends IBaseEntity {
   test_id?: string
   point?: number
   status?: ExamStatus
+  question_ids_attention?: string
 }

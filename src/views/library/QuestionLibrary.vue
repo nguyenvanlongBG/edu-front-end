@@ -18,7 +18,11 @@ import QuestionCreatePopup from '@views/library/popup/QuestionCreatePopup.vue'
 import FileQuestionService from '@/services/file-question-service'
 import { QuestionControl } from '@/models/question/question-control'
 import { LoadingControl } from '@/components/core/models/loading/loading-control'
-import { FilterOperator, LoadingType } from '@/components/core/enums/Common'
+import {
+  FilterOperator,
+  LoadingType,
+  LogicalOperator,
+} from '@/components/core/enums/Common'
 import ELoading from '@/components/core/components/loading/ELoading.vue'
 import { nextTick } from 'vue'
 import editorFunction from '@/components/core/commons/editorFunction'
@@ -34,6 +38,7 @@ import { MultiComboboxControl } from '@/components/core/models/multi-combobox/mu
 import ChapterService from '@/services/chapter-service'
 import EMultiCombobox from '@/components/core/components/e-multi-combobox/EMultiCombobox.vue'
 import questionHelper from '@/helper/question/question-helper'
+import { GuidEmpty } from '@/constants/consstant'
 export default {
   components: {
     EQuestion,
@@ -222,19 +227,32 @@ export default {
       await questionService.insertQuestionLibrary(items)
     }
     function buildFilterQuestion() {
-      let filters = [] as FilterCondition[]
+      const filters = [] as FilterCondition[]
       const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
-      if (user) {
-        if (user.role_id == Role.Teacher) {
-          filters = [
-            new FilterCondition({
-              Field: 'user_id',
-              Operator: FilterOperator.Equal,
-              Value: user.user_id,
-            }),
-          ]
-        }
+      if (user && user.user_id) {
+        filters.push(
+          new FilterCondition({
+            Field: 'user_id',
+            Operator: FilterOperator.Equal,
+            Value: user?.user_id,
+            LogicalOperator: LogicalOperator.OR,
+            SubConditions: [
+              new FilterCondition({
+                Field: 'user_id',
+                Operator: FilterOperator.Equal,
+                Value: GuidEmpty,
+              }),
+            ],
+          }),
+        )
       }
+      filters.push(
+        new FilterCondition({
+          Field: 'from',
+          Operator: FilterOperator.Equal,
+          Value: 0,
+        }),
+      )
       return filters
     }
     async function onAddQuestion() {
@@ -242,7 +260,7 @@ export default {
         '@views/library/popup/QuestionCreatePopup.vue'
       )
       const popupControl = new PopupControl({
-        width: '600px',
+        width: '1200px',
       })
       const methodHandle = async (event: string, data: unknown) => {
         if (event == 'close') {

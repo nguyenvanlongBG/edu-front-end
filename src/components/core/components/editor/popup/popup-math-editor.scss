@@ -1,0 +1,40 @@
+.mathlive-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.mathlive-modal {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.mathlive-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+math-field {
+  width: 400px; /* Set the width of the math input */
+  height: 50px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.virtual-keyboard {
+  z-index: 1002 !important; /* Force the z-index */
+}
+.ML__keyboard {
+  z-index: 1002;
+}

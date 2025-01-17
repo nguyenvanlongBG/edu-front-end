@@ -30,7 +30,14 @@
           <EInput :control="inputControl" v-model="masterData.name" />
           <EDate :control="startTimeControl" v-model="masterData.start_time" />
           <ENumber :control="durationControl" v-model="masterData.duration" />
-          <EButton :control="saveBtn" @click="onSave" />
+          <div class="d-flex col-gap-4px">
+            <EButton :control="saveBtn" @click="onSave" />
+            <EButton
+              v-if="testMode == TestMode.Do"
+              :control="submitBtn"
+              @click="onsubmit"
+            />
+          </div>
         </div>
         <div class="table-label-question p-x-8px p-t-8px">
           <ETableLabel :control="tableLabel" @selected="onSelectLabel" />

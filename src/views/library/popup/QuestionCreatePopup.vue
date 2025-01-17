@@ -3,22 +3,26 @@ import commonFunction from '@/components/core/commons/CommonFunction'
 import editorFunction from '@/components/core/commons/editorFunction'
 import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
 import EButton from '@/components/core/components/button/EButton.vue'
+import EMultiCombobox from '@/components/core/components/e-multi-combobox/EMultiCombobox.vue'
 import ELoading from '@/components/core/components/loading/ELoading.vue'
 import EPopup from '@/components/core/components/popup/EPopup.vue'
 import { LoadingType } from '@/components/core/enums/Common'
 import { ModelState } from '@/components/core/enums/model-state'
 import { ButtonControl } from '@/components/core/models/button/button-control'
 import { LoadingControl } from '@/components/core/models/loading/loading-control'
+import { MultiComboboxControl } from '@/components/core/models/multi-combobox/multi-combobox-control'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
 import EQuestion from '@/components/question/EQuestion.vue'
-import { GuidEmpty } from '@/constants/consstant'
+import { GuidEmpty, MathSubjectId } from '@/constants/consstant'
 import { LocalStorageKey } from '@/constants/local-storage-key'
 import { QuestionType } from '@/enums/question'
 import { Role } from '@/enums/role'
 import { OptionQuestion } from '@/models/option-question/option-question'
 import { Question } from '@/models/question/question'
 import { QuestionControl } from '@/models/question/question-control'
+import { ResultQuestion } from '@/models/result-question/result-question'
 import type { User } from '@/models/user/user'
+import ChapterService from '@/services/chapter-service'
 import FileQuestionService from '@/services/file-question-service'
 import { nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -29,6 +33,7 @@ export default {
     EButton,
     EPopup,
     ELoading,
+    EMultiCombobox,
   },
   props: {
     control: {
@@ -61,6 +66,13 @@ export default {
         label: t('i18nQuestion.ChoiceLibraryQuestion'),
       }),
     )
+    const chapterControl = ref(
+      new MultiComboboxControl({
+        displayField: 'name',
+        valueField: 'chapter_id',
+        data: [],
+      }),
+    )
     // Object lưu trữ các refs động
     const questionRefs = ref<{ [key: string]: HTMLElement | null }>({})
 
@@ -79,7 +91,9 @@ export default {
         dicQuestionControl.value[question.question_id] = new QuestionControl({
           value: question,
           isShowActionToolbar: false,
-          isShowLevel: false,
+          isShowQuestionType: true,
+          isShowLevel: true,
+          isShowChapter: true,
           readonly: true,
         })
       }
@@ -89,6 +103,7 @@ export default {
       const newQuestion = new Question()
       newQuestion.State = ModelState.INSERT
       newQuestion.question_id = commonFunction.generateID()
+      newQuestion.from = 1
       newQuestion.options = [
         new OptionQuestion({
           State: ModelState.INSERT,
@@ -158,7 +173,10 @@ export default {
             Question,
           )
           if (!newQuestions || !newQuestions.length) return
-          newQuestions.forEach(question => (question.State = ModelState.INSERT))
+          newQuestions.forEach(question => {
+            question.State = ModelState.INSERT
+            question.from = 0
+          })
           handleAddQuestion(newQuestions)
         }
       } catch (error: unknown) {
@@ -179,6 +197,7 @@ export default {
             isShowActionToolbar: true,
             isShowLevel: true,
             isShowToolEditor: true,
+            isShowQuestionType: true,
             readonly: false,
           })
         }
@@ -204,19 +223,47 @@ export default {
         questionsTmp.forEach(item => {
           item.content = editorFunction.getContent(item.object_content)
           item.user_id = user.role_id == Role.Admin ? GuidEmpty : user.user_id
-          item.subject_id = GuidEmpty
+          item.subject_id = MathSubjectId
           item.options?.forEach(o => {
             o.State = ModelState.INSERT
             o.content = editorFunction.getContent(o.object_content)
           })
           item.results?.forEach(o => {
             o.State = ModelState.INSERT
-            if (item.type == QuestionType.FillResult) {
-              o.content = editorFunction.getContent(o.object_content)
-            }
           })
         })
         control.handleEmit('ok', questionsTmp)
+      }
+    }
+    function onChangeAnswer(question: Question, answer: string) {
+      if (!question.results || !question.results?.length) {
+        question.results = [] as ResultQuestion[]
+        const result = new ResultQuestion({
+          result_question_id: commonFunction.generateID(),
+          question_id: question.question_id,
+          State: ModelState.INSERT,
+        })
+        question.results.push(result)
+      }
+      switch (question.type) {
+        case QuestionType.SingleChoice:
+          const resultTmpSi = question.results[0]
+          resultTmpSi.content = answer as string
+          resultTmpSi.State = ModelState.INSERT
+          break
+        case QuestionType.MultiChoice:
+          const resultTmpMu = question.results[0]
+          resultTmpMu.content = answer as string
+          resultTmpMu.State = ModelState.INSERT
+        case QuestionType.FillResult:
+          const resultFill = question.results[0]
+          const objectContent = commonFunction.convertToData<object>(answer)
+          resultFill.content =
+            'ops' in objectContent
+              ? commonFunction.convertToString(objectContent.ops)
+              : '[]'
+          resultFill.State = ModelState.INSERT
+          break
       }
     }
     return {
@@ -227,6 +274,7 @@ export default {
       fileInputRef,
       onImportQuestion,
       handleFileChange,
+      chapterControl,
       scrollToQuestion,
       questions,
       handleAddQuestion,
@@ -241,7 +289,15 @@ export default {
       changeLoading,
       onClose,
       onSave,
+      onChangeAnswer,
     }
+  },
+  async mounted() {
+    const chapterService = new ChapterService()
+    const resultChapter = await chapterService.filter([])
+    this.chapterControl.data = (resultChapter ?? []) as unknown as Array<
+      Record<string, unknown>
+    >
   },
 }
 </script>

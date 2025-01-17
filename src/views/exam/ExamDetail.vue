@@ -33,7 +33,18 @@ import { AnswerQuestion } from '@/models/answer-question/answer-question'
 import ECheckbox from '@/components/core/components/checkbox/ECheckbox.vue'
 import { CheckboxControl } from '@/components/core/models/checkbox/checkbox-control'
 import questionHelper from '@/helper/question/question-helper'
+import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
+import { LocalStorageKey } from '@/constants/local-storage-key'
+import type { User } from '@/models/user/user'
+import ENote from '@/components/core/components/note/ENote.vue'
+import { NoteControl } from '@/components/core/models/note/note-control'
+import { ExamNote } from '@/models/exam-note/exam-note'
+import editorFunction from '@/components/core/commons/editorFunction'
 
+interface QuestionNote {
+  status: boolean
+  note: ExamNote
+}
 export default {
   components: {
     EQuestion,
@@ -45,6 +56,7 @@ export default {
     EDate,
     ENumber,
     ECheckbox,
+    ENote,
   },
   props: {
     exam: {
@@ -57,6 +69,7 @@ export default {
     const { t } = useI18n()
     const masterData = ref(new ExamDto(props.exam))
     const test = ref(new TestDto())
+    const noteEditorControl = ref(new NoteControl())
     const saveBtn = ref(
       new ButtonControl({
         label: t('i18nTest.Button.Save'),
@@ -68,7 +81,7 @@ export default {
         type: LoadingType.LoadingNormal,
       }),
     )
-    const questionAttention = ref([])
+    const questionAttention = ref([] as string[])
     const checkboxControl = ref(new CheckboxControl())
     const inputControl = ref(
       new InputControl({
@@ -78,6 +91,8 @@ export default {
     const startTimeControl = ref(new DateControl())
     const finishTimeControl = ref(new DateControl())
     const dicQuestionControl = ref<Record<string, QuestionControl>>({})
+    const dicQuestionAttention = ref<Record<string, CheckboxControl>>({})
+    const dicQuestionNote = ref<Record<string, QuestionNote>>({})
     const durationControl = ref(
       new NumberControl({
         min: 2,
@@ -157,32 +172,101 @@ export default {
         case ExamMode.History:
           dicQuestionControl.value[question.question_id].isShowAnswer = true
           dicQuestionControl.value[question.question_id].isShowResult = true
+          dicQuestionControl.value[question.question_id].isShowActionToolbar =
+            true
+          dicQuestionControl.value[question.question_id].isReadonlyToolEditor =
+            true
           dicQuestionControl.value[question.question_id].isShowPoint = true
           dicQuestionControl.value[question.question_id].isReadonlyPoint = true
+          dicQuestionControl.value[question.question_id].isShowNote = false
+          dicQuestionControl.value[question.question_id].btnActions = [
+            new ButtonControl({
+              label: 'Ghi chú',
+              name: 'note',
+              classType: 'outline',
+            }),
+          ]
+          dicQuestionControl.value[question.question_id].customAction =
+            handleActionQuestion
+          break
         case ExamMode.Mark:
           dicQuestionControl.value[question.question_id].isShowAnswer = true
           dicQuestionControl.value[question.question_id].isShowResult = true
           dicQuestionControl.value[question.question_id].isShowPoint = true
           dicQuestionControl.value[question.question_id].isReadonlyPoint = false
+          break
       }
       return dicQuestionControl.value[question.question_id]
     }
+    function handleActionQuestion(eventName: string, question: Question) {
+      if (eventName && question) {
+        if (eventName == 'note') {
+          const noteHandle = getNote(question)
+          if (noteHandle) {
+            noteHandle.status = true
+            noteHandle.note.State =
+              noteHandle.note.State == ModelState.VIEW
+                ? ModelState.EDIT
+                : noteHandle.note.State
+          }
+        }
+      }
+    }
     function getCheckboxControl(question: Question) {
-      if (!question || !question.question_id) return
-      return new CheckboxControl({
-        value: question.question_id,
-        label: 'Cần chữa',
-      })
+      if (!question || !question.question_id) return null
+      if (!(question.question_id in dicQuestionAttention.value)) {
+        dicQuestionAttention.value[question.question_id] = new CheckboxControl({
+          value: question.question_id,
+          checked: false,
+          label: 'Cần chữa',
+        })
+      }
+      return dicQuestionAttention.value[question.question_id]
+    }
+    function getNote(question: Question) {
+      if (!question || !question.question_id) return null
+      if (!(question.question_id in dicQuestionNote.value)) {
+        const note = masterData.value.notes?.find(
+          n => n.question_id == question.question_id,
+        )
+        if (note) {
+          dicQuestionNote.value[question.question_id] = {
+            status: false,
+            note: new ExamNote({
+              exam_note_id: note.exam_note_id,
+              exam_id: masterData.value.exam_id,
+              question_id: question.question_id,
+              object_content: commonFunction.convertToData<object[]>(
+                note.content,
+              ),
+              State: ModelState.VIEW,
+            }),
+          }
+        } else {
+          dicQuestionNote.value[question.question_id] = {
+            status: false,
+            note: new ExamNote({
+              State: ModelState.INSERT,
+              exam_note_id: commonFunction.generateID(),
+              exam_id: masterData.value.exam_id,
+              question_id: question.question_id,
+            }),
+          }
+        }
+      }
+      return dicQuestionNote.value[question.question_id]
     }
     async function handleLoadData() {
       const examService = new ExamService()
       const tasks = []
+      const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
       switch (masterData.value.mode) {
         case ExamMode.Do:
           tasks.push(examService.getTestOfExam(masterData.value.exam_id))
           const [testDetailResult] = await Promise.all(tasks)
           test.value = testDetailResult as unknown as TestDto
           masterData.value.test_id = test.value.test_id
+          masterData.value.user_id = user?.user_id ?? ''
           // Xử lý kết quả
           questions.value = commonFunction.convertToInstances<Question>(
             test.value.questions as unknown as Record<string, unknown>[],
@@ -195,12 +279,28 @@ export default {
           const [testHistory] = await Promise.all(tasks)
           test.value = testHistory as unknown as TestDto
           masterData.value.test_id = test.value.test_id
+          masterData.value.user_id = test.value.exam
+            ? test.value.exam.user_id
+            : ''
+          masterData.value.point = test.value.exam ? test.value.exam.point : 0
+          masterData.value.notes = test.value.exam ? test.value.exam.notes : []
           // Xử lý kết quả
           questions.value = commonFunction.convertToInstances<Question>(
             test.value.questions as unknown as Record<string, unknown>[],
             Question,
           )
           questionHelper.mapObjectContentQuestions(questions.value)
+          questionAttention.value = test.value.exam?.question_ids_attention
+            ? test.value.exam?.question_ids_attention.split(',')
+            : []
+          questions.value.forEach(question => {
+            const checkboxControl = getCheckboxControl(question)
+            if (checkboxControl) {
+              checkboxControl.checked = questionAttention.value?.includes(
+                question.question_id,
+              )
+            }
+          })
           break
         case ExamMode.Mark:
           tasks.push(examService.historyExam(masterData.value.exam_id))
@@ -260,6 +360,25 @@ export default {
           break
         case ExamMode.Mark:
           break
+        case ExamMode.History:
+          masterData.value.question_ids_attention = Object.keys(
+            dicQuestionAttention.value,
+          )
+            .filter(key => dicQuestionAttention.value[key].checked)
+            .map(k => k)
+            ?.join(',')
+          const notes = Object.keys(dicQuestionNote.value)
+            .filter(key => {
+              return dicQuestionNote.value[key].note.State != ModelState.VIEW
+            })
+            .map(k => dicQuestionNote.value[k].note)
+          notes.forEach(
+            note =>
+              (note.content = editorFunction.getContent(note.object_content)),
+          )
+          masterData.value.notes = notes
+          await examService.noteExam(masterData.value)
+          break
       }
     }
 
@@ -284,20 +403,39 @@ export default {
         question.answer.content = answer
       }
     }
+    function onChangePoint(question: Question, point: number) {
+      if (masterData.value.mode == ExamMode.Mark) {
+        if (!question.answer) {
+          question.answer = new AnswerQuestion({
+            exam_id: masterData.value.exam_id,
+            answer_id: commonFunction.generateID(),
+            question_id: question.question_id,
+            State: ModelState.INSERT,
+          })
+        } else if (question.answer.State == ModelState.VIEW) {
+          question.answer.State = ModelState.EDIT
+        }
+        question.answer.point = point
+      }
+    }
     return {
       test,
       ExamMode,
+      noteEditorControl,
       questionAttention,
       checkboxControl,
       masterData,
       saveBtn,
       dicQuestionControl,
+      dicQuestionNote,
+      getNote,
       startTimeControl,
       finishTimeControl,
       durationControl,
       loadingControl,
       isLoading,
       changeLoading,
+      handleActionQuestion,
       getQuestionControl,
       getCheckboxControl,
       comboboxControl,
@@ -320,6 +458,7 @@ export default {
       initData,
       initControl,
       onChangeAnswer,
+      onChangePoint,
     }
   },
   created() {

@@ -1,15 +1,17 @@
-<div>
-  <div>
-    <math-field
-      :macros="macros"
-      ref="mathLive"
-      virtual-keyboard-mode="manual"
-      v-model:value="formula"
-      @input="handleInput"
-    ></math-field>
-  </div>
-  <div class="d-flex col-gap-8px">
-    <EButton :control="cancelBtn" @click="onClose" />
-    <EButton :control="saveBtn" @click="emitMath" />
+<div class="mathlive-container">
+  <div class="mathlive-modal">
+    <div class="mathlive-content">
+      <math-field
+        :macros="macros"
+        ref="mathLive"
+        virtual-keyboard-mode="manual"
+        v-model:value="formula"
+        @input="handleInput"
+      ></math-field>
+      <div class="d-flex col-gap-8px">
+        <EButton :control="cancelBtn" @click="onClose" />
+        <EButton :control="saveBtn" @click="emitMath" />
+      </div>
+    </div>
   </div>
 </div>

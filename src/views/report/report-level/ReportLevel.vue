@@ -68,6 +68,7 @@ export default {
       new MultiComboboxControl({
         displayField: 'name',
         valueField: 'test_id',
+        placeholder: 'Đề thi',
         data: [],
       }),
     )
@@ -76,6 +77,7 @@ export default {
       new MultiComboboxControl({
         displayField: 'name',
         valueField: 'class_id',
+        placeholder: 'Lớp học',
         data: [],
       }),
     )
@@ -107,7 +109,7 @@ export default {
         chartOptions.value.xaxis.categories.length,
       ) // Xóa toàn bộ phần tử
       series.value.forEach(s => {
-        s.data.splice(0, series.value.length)
+        s.data.splice(0, s.data.length)
       })
       // Chuẩn bị dữ liệu cho series và categories
       const correctData: number[] = []
@@ -156,6 +158,12 @@ export default {
         await handleLoadReport() // Gọi vào hàm load dữ liệu với danh sách test ID
       }, 500)
     }
+    async function onUpdateClassIds(ids: string[]) {
+      classIds.value = ids
+      setTimeout(async () => {
+        await handleLoadReport() // Gọi vào hàm load dữ liệu với danh sách test ID
+      }, 500)
+    }
     async function getClassroomOfTeacher() {
       const classroomService = new ClassroomService()
       const classrooms = await classroomService.getAllClassOfUser()
@@ -181,6 +189,7 @@ export default {
       getClassroomOfTeacher,
       buildReportParam,
       onUpdateTestIds,
+      onUpdateClassIds,
       chartOptions,
       handleLoadData,
       handleLoadReport,

@@ -24,7 +24,17 @@
           :key="question.question_id"
           :ref="setQuestionRef(question.question_id)"
         >
-          <EQuestion :control="getQuestionControl(question)" />
+          <EQuestion
+            :control="getQuestionControl(question)"
+            @change-answer="onChangeAnswer"
+          >
+            <template #right-default-tool-bar>
+              <EMultiCombobox
+                :control="chapterControl"
+                v-model="question.lstChapterId"
+              />
+            </template>
+          </EQuestion>
         </div>
       </div>
     </div>

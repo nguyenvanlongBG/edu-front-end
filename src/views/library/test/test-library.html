@@ -26,15 +26,33 @@
             </div>
           </div>
           <div class="buttons">
-            <EButton :control="doTestBtn" @click.stop="onDoTest(test)" />
-            <EButton :control="editTestBtn" @click.stop="onEditTest(test)" />
             <EButton
+              v-if="isShowBtnAction(doTestBtn, test)"
+              :control="doTestBtn"
+              @click.stop="onDoTest(test)"
+            />
+            <EButton
+              v-if="isShowBtnAction(editTestBtn, test)"
+              :control="editTestBtn"
+              @click.stop="onEditTest(test)"
+            />
+            <EButton
+              v-if="isShowBtnAction(historyTestBtn, test)"
               :control="historyTestBtn"
               @click.stop="onHistoryTest(test)"
             />
-            <EButton :control="tryTestBtn" @click.stop="onTryTest(test)" />
-            <EButton :control="markTestBtn" @click.stop="onMarkTest(test)" />
             <EButton
+              v-if="isShowBtnAction(tryTestBtn, test)"
+              :control="tryTestBtn"
+              @click.stop="onTryTest(test)"
+            />
+            <EButton
+              v-if="isShowBtnAction(markTestBtn, test)"
+              :control="markTestBtn"
+              @click.stop="onMarkTest(test)"
+            />
+            <EButton
+              v-if="isShowBtnAction(reportTestBtn, test)"
               :control="reportTestBtn"
               @click.stop="onReportTest(test)"
             />

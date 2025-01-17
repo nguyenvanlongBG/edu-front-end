@@ -1,6 +1,7 @@
 import { BaseEntity } from '../base/base-entity'
 import commonFunction from '@/components/core/commons/CommonFunction'
 import type { IClassroom } from './i-classroom'
+import { EnrollmentStatus } from '@/enums/classroom'
 
 export class Classroom extends BaseEntity {
   constructor(question?: IClassroom) {
@@ -20,4 +21,5 @@ export class Classroom extends BaseEntity {
   description: string = ''
   avatar: string = ''
   user_id: string = ''
+  status?: EnrollmentStatus = EnrollmentStatus.NONE
 }

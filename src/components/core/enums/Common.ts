@@ -53,6 +53,10 @@ export enum FilterOperator {
   /// </summary>
   In,
 }
+export enum LogicalOperator {
+  AND,
+  OR,
+}
 export enum ComboboxMode {
   Local = 1,
   Remote = 2,

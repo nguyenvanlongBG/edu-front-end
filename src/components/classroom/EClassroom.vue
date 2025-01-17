@@ -8,6 +8,7 @@ import localStorageLibrary from '../core/commons/LocalStorageLibrary'
 import type { User } from '@/models/user/user'
 import { LocalStorageKey } from '@/constants/local-storage-key'
 import { Role } from '@/enums/role'
+import { EnrollmentStatus } from '@/enums/classroom'
 
 export default {
   name: 'EClassroom',
@@ -16,7 +17,7 @@ export default {
       type: Classroom,
     },
   },
-  emits: ['edit', 'leave'],
+  emits: ['edit', 'enroll', 'leave'],
   setup(props, { emit }) {
     const state = reactive({
       displayNavClassroom: false,
@@ -51,6 +52,16 @@ export default {
       }
       return false
     }
+    function isShowEnroll() {
+      const classroom = props.classroom
+      if (
+        classroom &&
+        (!classroom.status || classroom.status == EnrollmentStatus.REJECT)
+      ) {
+        return true
+      }
+      return false
+    }
     function avatarClass() {
       if (props.classroom && props.classroom.avatar) {
         return props.classroom.avatar
@@ -70,6 +81,7 @@ export default {
     return {
       state,
       isShowEdit,
+      isShowEnroll,
       toggleActionClassroom,
       avatarClass,
       onEdit,

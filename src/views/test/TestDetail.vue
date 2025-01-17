@@ -37,7 +37,7 @@ import ExamService from '@/services/exam-service'
 import { ExamDto } from '@/models/exam/Dto/exam-dto'
 import questionHelper from '@/helper/question/question-helper'
 import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
-import type { User } from '@/models/user/user'
+import { User } from '@/models/user/user'
 import { LocalStorageKey } from '@/constants/local-storage-key'
 export default {
   components: {
@@ -63,6 +63,11 @@ export default {
     const saveBtn = ref(
       new ButtonControl({
         label: t('i18nTest.Button.Save'),
+      }),
+    )
+    const submitBtn = ref(
+      new ButtonControl({
+        label: t('i18nTest.Button.Submit'),
       }),
     )
     const isLoading = ref(false)
@@ -195,23 +200,14 @@ export default {
             questionControl.isShowToolEditor = true
             questionControl.isReadonlyToolEditor = false
             questionControl.isShowQuestionType = true
+            questionControl.isShowPoint = true
             questionControl.readonly = false
             question.State =
               question.State == ModelState.INSERT
                 ? ModelState.INSERT
                 : ModelState.EDIT
-            question.options?.forEach(o =>
-              o.State == ModelState.INSERT || o.State == ModelState.DELETE
-                ? o.State
-                : question.State,
-            )
-            question.results?.forEach(r =>
-              r.State == ModelState.INSERT || r.State == ModelState.DELETE
-                ? r.State
-                : question.State,
-            )
-          } else if (eventName == 'note') {
-            questionControl.isShowNote = true
+            question.options?.forEach(o => (o.State = question.State))
+            question.results?.forEach(r => r.State == question.State)
           }
         }
       }
@@ -375,17 +371,36 @@ export default {
         } else if (event == 'ok') {
           const questions = data as Question[]
           if (questions?.length) {
-            questions.forEach(q => {
-              q.question_id = commonFunction.generateID()
-              q.options?.forEach(o => {
-                o.question_id = q.question_id
-                o.option_question_id = commonFunction.generateID()
+            questions.forEach(question => {
+              question.State = ModelState.INSERT
+              question.question_id = commonFunction.generateID()
+              question.options?.forEach(option => {
+                option.State = ModelState.INSERT
+                const newOptionQuestionId = commonFunction.generateID()
+                if (
+                  question.type == QuestionType.SingleChoice ||
+                  question.type == QuestionType.MultiChoice
+                ) {
+                  question.results?.forEach(result => {
+                    if (result.content?.includes(option.option_question_id)) {
+                      // Thay thế giá trị trong result.content
+                      result.content = result.content.replace(
+                        option.option_question_id,
+                        newOptionQuestionId, // Giá trị thay thế (thay "new_value" bằng giá trị bạn muốn)
+                      )
+                    }
+                  })
+                }
+                option.option_question_id = newOptionQuestionId
+                option.question_id = question.question_id
               })
-              q.results?.forEach(o => {
-                o.question_id = q.question_id
-                o.result_question_id = commonFunction.generateID()
+              question.results?.forEach(result => {
+                result.result_question_id = commonFunction.generateID()
+                result.question_id = question.question_id
+                result.State = ModelState.INSERT
               })
             })
+            questionHelper.mapObjectContentQuestions(questions)
             handleAddQuestion(questions)
             popupControl.close()
             const lastQuestion = questions[questions.length - 1]
@@ -437,6 +452,7 @@ export default {
       }
     }
     async function onSave() {
+      const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
       masterData.value.questions = questions.value
       switch (testMode.value) {
         case TestMode.Edit:
@@ -472,6 +488,7 @@ export default {
             ?.filter(q => q.answer)
             .map(question => question.answer)
           const exam = new ExamDto({
+            user_id: user?.user_id,
             exam_id: masterData.value.exam_id,
             test_id: masterData.value.test_id,
             answers: (answers ?? []) as AnswerQuestion[],
@@ -505,6 +522,18 @@ export default {
           testAdd.questions = questionsHandleAdd
           await testServiceAdd.post(testAdd)
       }
+    }
+    async function onsubmit() {
+      const examService = new ExamService()
+      const answers = questions.value
+        ?.filter(q => q.answer)
+        .map(question => question.answer)
+      const exam = new ExamDto({
+        exam_id: masterData.value.exam_id,
+        test_id: masterData.value.test_id,
+        answers: (answers ?? []) as AnswerQuestion[],
+      })
+      await examService.submitExam(exam)
     }
     function initData() {
       const route = useRoute()
@@ -634,6 +663,8 @@ export default {
       TestMode,
       masterData,
       saveBtn,
+      submitBtn,
+      onsubmit,
       btnActionsQuestion,
       dicQuestionControl,
       startTimeControl,

@@ -22,4 +22,7 @@ export interface IQuestion extends IBaseEntity {
   level: QuestionLevel
   mode?: QuestionMode
   answer?: AnswerQuestion
+  from?: number
+  point?: number
+  note?: string
 }

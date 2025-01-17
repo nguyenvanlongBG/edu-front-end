@@ -7,14 +7,21 @@
       <div style="height: 36px" v-if="isLoading">
         <ELoading :control="loadingControl" v-model="isLoading" />
       </div>
-      <div v-show="!isLoading">
+      <div v-show="!isLoading" class="d-flex-column row-gap-4px">
         <div
           v-for="question in questions"
           :key="question.question_id"
           :ref="setQuestionRef(question.question_id)"
           class="d-flex"
         >
-          <EQuestion :control="getQuestionControl(question)" />
+          <EQuestion :control="getQuestionControl(question)">
+            <template #right-default-tool-bar>
+              <EMultiCombobox
+                :control="chapterControl"
+                v-model="question.lstChapterId"
+              />
+            </template>
+          </EQuestion>
         </div>
       </div>
       <div>

@@ -5,4 +5,5 @@ export interface IEnrollmentClass extends IBaseEntity {
   user_id?: string
   classroom_id?: string
   status?: EnrollmentStatus
+  name?: string
 }

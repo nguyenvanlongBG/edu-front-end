@@ -1,6 +1,9 @@
 .list-test {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Tạo 4 cột có kích thước bằng nhau */
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(200px, 500px)
+  ); /* Tạo 4 cột có kích thước bằng nhau */
   gap: 20px; /* Khoảng cách giữa các đề thi */
   margin: 20px; /* Khoảng cách xung quanh danh sách */
 }

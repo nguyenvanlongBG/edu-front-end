@@ -39,6 +39,12 @@ export default defineComponent({
     },
     'control.readOnly'(newValue: boolean) {
       this.editorOptions.readOnly = newValue
+      if (this.myQuillEditor) {
+        const quillInstance = this.myQuillEditor.getQuill()
+        if (quillInstance) {
+          quillInstance.readOnly = true
+        }
+      }
     },
   },
   created() {
@@ -66,6 +72,12 @@ export default defineComponent({
         })
       })
     }
+    if (this.myQuillEditor) {
+      const quillInstance = this.myQuillEditor.getQuill()
+      if (quillInstance) {
+        quillInstance.readOnly = this.control.readonly
+      }
+    }
   },
   setup(props, { emit }) {
     const myQuillEditor = ref<InstanceType<typeof QuillEditor> | null>(null)
@@ -76,16 +88,22 @@ export default defineComponent({
       actionEditor: ActionEditor = ActionEditor.EDIT,
     ) {
       const popupControl = new PopupControl()
-      popupControl.handleEmit = (eventName: string, data: string) => {
-        if (eventName == 'emitFormula') {
-          transferMainEditor(data, actionEditor)
-        }
-      }
       const component = import('./popup/PopupMathEditor.vue')
-      poupLibrary.showPopup(component, {
-        control: popupControl,
-        formulaValue: formulaStr,
-      })
+      popupControl.show(
+        component,
+        {
+          control: popupControl,
+          formulaValue: formulaStr,
+        },
+        async (eventName: string, data: unknown) => {
+          if (eventName == 'emitFormula') {
+            transferMainEditor(data as string, actionEditor)
+            popupControl.close()
+          } else if (eventName == 'close') {
+            popupControl.close()
+          }
+        },
+      )
     }
     const idToolbar = 'toolbar-' + commonFunction.generateID()
     const editorOptions = ref({

@@ -65,8 +65,15 @@ export default defineComponent({
       props.control.handleEmit('emitFormula', formula.value)
       ctx.emit('emitFormula', formula.value)
     }
+    function onClose() {
+      const control = props.control
+      if (control.close && typeof control.close == 'function') {
+        control.close()
+      }
+    }
     return {
       macros,
+      onClose,
       formula,
       cancelBtn,
       saveBtn,
@@ -76,3 +83,4 @@ export default defineComponent({
   },
 })
 </script>
+<style src="./popup-math-editor.scss" />

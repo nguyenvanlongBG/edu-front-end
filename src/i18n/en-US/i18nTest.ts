@@ -12,6 +12,7 @@ export default {
     MarkTest: 'Chấm điểm',
     ReportTest: 'Báo cáo',
     Save: 'Lưu lại',
+    Submit: 'Nộp bài',
   },
   TestName: 'Tên đề thi',
   DurationTest: 'Thời gian làm bài',

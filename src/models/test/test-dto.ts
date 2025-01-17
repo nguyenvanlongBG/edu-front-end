@@ -3,6 +3,7 @@ import { Test } from './test'
 import type { ITestDto } from './i-test-dto'
 import { TestMode } from '@/enums/test'
 import type { Question } from '../question/question'
+import type { ExamDto } from '../exam/Dto/exam-dto'
 
 export class TestDto extends Test {
   constructor(test?: ITestDto) {
@@ -17,4 +18,5 @@ export class TestDto extends Test {
   exam_id: string = ''
   mode: TestMode = TestMode.None // Nếu mode View thì cần dùng
   questions: Question[] = []
+  exam: ExamDto | null = null
 }

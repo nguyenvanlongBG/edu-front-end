@@ -16,4 +16,5 @@ export class Exam extends BaseEntity {
   test_id: string = ''
   point: number = 0
   status: ExamStatus = ExamStatus.None
+  question_ids_attention: string = ''
 }

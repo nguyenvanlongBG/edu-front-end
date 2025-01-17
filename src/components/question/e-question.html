@@ -19,7 +19,7 @@
           <ENumber
             v-if="control.isShowPoint"
             :control="pointControl"
-            v-model="control.value.point"
+            @update:modelValue="onUpdatePoint"
           />
           <slot name="right-default-tool-bar"></slot>
         </div>
@@ -78,6 +78,13 @@
                 v-model="option.object_content"
               />
             </div>
+            <div
+              :class="['option-question']"
+              v-if="control.isShowToolEditor"
+              @click="onAddOption"
+            >
+              Thêm lựa chọn
+            </div>
           </div>
         </div>
         <div v-if="control.value.type === QuestionType.FillResult">
@@ -89,10 +96,6 @@
         </div>
       </div>
     </div>
-    <ENote
-      v-if="control.isShowNote"
-      :control="noteEditorControl"
-      v-model="control.value.object_content"
-    />
+    <slot name="notes"></slot>
   </div>
 </div>

@@ -17,4 +17,5 @@ export class EnrollmentClass extends BaseEntity {
   user_id?: string = ''
   classroom_id?: string = ''
   status?: EnrollmentStatus = EnrollmentStatus.NONE
+  name: string = ''
 }
