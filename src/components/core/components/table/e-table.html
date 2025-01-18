@@ -17,10 +17,11 @@
             v-if="actionColumn && actionColumn.toolbarItems?.length"
             :style="getColumnStyle(actionColumn)"
           >
-            <div>
+            <div v-for="button in actionColumn.toolbarItems">
               <EButton
-                :control="item"
-                v-for="item in actionColumn.toolbarItems"
+                v-if="control.isDisplayAction(button, item)"
+                :control="button"
+                @click="onClickActionRecord(button, item)"
               ></EButton>
             </div>
           </td>

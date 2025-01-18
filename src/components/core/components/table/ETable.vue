@@ -4,6 +4,7 @@ import { TableControl } from '../../models/table/table-control'
 import { computed, type CSSProperties } from 'vue'
 import EButton from '../button/EButton.vue'
 import type { ColumnControl } from '../../models/table/column/column-control'
+import type { ButtonControl } from '../../models/button/button-control'
 
 export default {
   components: {
@@ -15,7 +16,8 @@ export default {
       required: true,
     },
   },
-  setup(props) {
+  emits: ['action-record'],
+  setup(props, { emit }) {
     const dataColumn = computed(() => {
       return props.control.columns.filter(
         column => column.type == ColumnType.TextBox,
@@ -43,10 +45,17 @@ export default {
       // Trả về các kiểu được tính toán
       return styles
     }
+    function onClickActionRecord(
+      btn: ButtonControl,
+      item: Record<string, unknown>,
+    ) {
+      emit('action-record', btn, item)
+    }
     return {
       getColumnStyle,
       dataColumn,
       actionColumn,
+      onClickActionRecord,
     }
   },
 }

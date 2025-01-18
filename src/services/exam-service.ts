@@ -22,4 +22,7 @@ export default class ExamService extends BaseService {
   async noteExam(exam: ExamDto) {
     return await this.put(exam, 'note')
   }
+  async markExam(examId: string) {
+    return await this.get(examId + '/mark')
+  }
 }
