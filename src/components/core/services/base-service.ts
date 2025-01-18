@@ -7,10 +7,16 @@ export class BaseService {
   }
   async getPaging(pagingParam: PagingParam) {
     const controller = this.getController()
+    const data = {
+      page: pagingParam.page,
+      filters: pagingParam.filters,
+      take: pagingParam.take,
+      skip: pagingParam.skip,
+    }
     return await request({
       url: `${controller}/paging`,
       method: 'POST',
-      data: pagingParam,
+      data: data,
     })
   }
   async getSummary(pagingParam: PagingParam) {

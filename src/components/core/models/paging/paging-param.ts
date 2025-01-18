@@ -14,6 +14,6 @@ export class PagingParam {
   page: number = 1
   filters: Array<FilterCondition> = []
   get skip() {
-    return (this.page >= 1 ? this.page - 1 : 1) * (this.take ?? 20)
+    return (this.page >= 1 ? this.page - 1 : 0) * (this.take ?? 20)
   }
 }

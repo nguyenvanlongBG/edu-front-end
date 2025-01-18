@@ -81,6 +81,8 @@ export default {
         placeholder: t('i18nTest.TestName'),
       }),
     )
+    const pointControl = ref(new NumberControl())
+
     const startTimeControl = ref(new DateControl())
     const finishTimeControl = ref(new DateControl())
     const dicQuestionControl = ref<Record<string, QuestionControl>>({})
@@ -200,7 +202,6 @@ export default {
             questionControl.isShowToolEditor = true
             questionControl.isReadonlyToolEditor = false
             questionControl.isShowQuestionType = true
-            questionControl.isShowPoint = true
             questionControl.readonly = false
             question.State =
               question.State == ModelState.INSERT
@@ -337,6 +338,7 @@ export default {
       if (!items || !items.length) return
       let startIndex = questions.value.length
       items.forEach(question => {
+        question.from = 1
         startIndex += 1
         tableLabel.value.data.push(
           new ItemTableLabel({
@@ -451,6 +453,11 @@ export default {
         console.error(`Không tìm thấy phần tử với index ${questionId}`)
       }
     }
+    function onChangePoint(question: Question, point: number) {
+      if (testMode.value == TestMode.Edit) {
+        question.point = point
+      }
+    }
     async function onSave() {
       const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
       masterData.value.questions = questions.value
@@ -525,11 +532,13 @@ export default {
     }
     async function onsubmit() {
       const examService = new ExamService()
+      const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
       const answers = questions.value
         ?.filter(q => q.answer)
         .map(question => question.answer)
       const exam = new ExamDto({
         exam_id: masterData.value.exam_id,
+        user_id: user?.user_id,
         test_id: masterData.value.test_id,
         answers: (answers ?? []) as AnswerQuestion[],
       })
@@ -660,6 +669,7 @@ export default {
     }
     return {
       testMode,
+      onChangePoint,
       TestMode,
       masterData,
       saveBtn,
@@ -676,6 +686,7 @@ export default {
       getQuestionControl,
       comboboxControl,
       inputControl,
+      pointControl,
       fileInputRef,
       addQuestionBtn,
       autoGenQuestionBtn,

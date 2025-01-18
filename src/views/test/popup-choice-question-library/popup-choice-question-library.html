@@ -14,6 +14,10 @@
           :ref="setQuestionRef(question.question_id)"
           class="d-flex"
         >
+          <ECheckbox
+            :control="checkBoxControl"
+            @update:modelValue="(checked) => onSelectedQuestion(checked, question)"
+          />
           <EQuestion :control="getQuestionControl(question)">
             <template #right-default-tool-bar>
               <EMultiCombobox
@@ -25,7 +29,7 @@
         </div>
       </div>
       <div>
-        <EPaging :control="pagingControl" />
+        <EPaging :control="pagingControl" @page-change="onChangePage" />
       </div>
     </div>
   </template>

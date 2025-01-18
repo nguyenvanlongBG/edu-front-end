@@ -8,13 +8,11 @@ export interface IQuestionControl extends IBaseControl {
   isShowResult?: boolean
   isShowLevel?: boolean
   isShowChapter?: boolean
-  isShowPoint?: boolean
   isShowNote?: boolean
   isShowQuestionType?: boolean
   isShowActionToolbar?: boolean
   isShowToolEditor?: boolean
   isReadonlyResult?: boolean
-  isReadonlyPoint?: boolean
   isReadonlyLevel?: boolean
   isReadonlyChapter?: boolean
   btnActions?: Array<ButtonControl>

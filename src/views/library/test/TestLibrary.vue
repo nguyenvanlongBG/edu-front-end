@@ -136,7 +136,8 @@ export default {
         if (
           btn.name == 'EditTest' ||
           btn.name == 'TryTest' ||
-          btn.name == 'ReportTest'
+          btn.name == 'ReportTest' ||
+          btn.name == 'MarkTest'
         )
           return true
       } else if (user && user.role_id == Role.Admin) {

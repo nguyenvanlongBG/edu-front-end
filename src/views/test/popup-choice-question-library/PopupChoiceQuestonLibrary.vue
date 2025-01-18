@@ -1,22 +1,33 @@
 <script lang="ts">
 import commonFunction from '@/components/core/commons/CommonFunction'
+import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
 import EButton from '@/components/core/components/button/EButton.vue'
+import ECheckbox from '@/components/core/components/checkbox/ECheckbox.vue'
 import EMultiCombobox from '@/components/core/components/e-multi-combobox/EMultiCombobox.vue'
 import EPaging from '@/components/core/components/paging/EPaging.vue'
 import EPopup from '@/components/core/components/popup/EPopup.vue'
-import { LoadingType } from '@/components/core/enums/Common'
+import {
+  FilterOperator,
+  LoadingType,
+  LogicalOperator,
+} from '@/components/core/enums/Common'
 import { ModelState } from '@/components/core/enums/model-state'
 import { ButtonControl } from '@/components/core/models/button/button-control'
+import { CheckboxControl } from '@/components/core/models/checkbox/checkbox-control'
 import { LoadingControl } from '@/components/core/models/loading/loading-control'
 import { MultiComboboxControl } from '@/components/core/models/multi-combobox/multi-combobox-control'
+import { FilterCondition } from '@/components/core/models/paging/filter-condition'
 import { PagingControl } from '@/components/core/models/paging/paging-control'
 import { PagingParam } from '@/components/core/models/paging/paging-param'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
 import EQuestion from '@/components/question/EQuestion.vue'
+import { GuidEmpty } from '@/constants/consstant'
+import { LocalStorageKey } from '@/constants/local-storage-key'
 import { QuestionType } from '@/enums/question'
 import questionHelper from '@/helper/question/question-helper'
 import { Question } from '@/models/question/question'
 import { QuestionControl } from '@/models/question/question-control'
+import type { User } from '@/models/user/user'
 import ChapterService from '@/services/chapter-service'
 import QuestionService from '@/services/question-service'
 import { ref } from 'vue'
@@ -29,6 +40,7 @@ export default {
     EPopup,
     EPaging,
     EMultiCombobox,
+    ECheckbox,
   },
   props: {
     control: {
@@ -39,11 +51,13 @@ export default {
   setup(props) {
     const { t } = useI18n()
     const isLoading = ref(false)
+    const questionSelected = ref([] as Question[])
     const loadingControl = ref(
       new LoadingControl({
         type: LoadingType.LoadingNormal,
       }),
     )
+    const checkBoxControl = ref(new CheckboxControl())
     const chapterControl = ref(
       new MultiComboboxControl({
         displayField: 'name',
@@ -124,22 +138,78 @@ export default {
           result.State = ModelState.INSERT
         })
       })
-      questionHelper.mapObjectContentQuestions(questions.value)
-      const chapterService = new ChapterService()
-      const resultChapter = await chapterService.filter([])
-      chapterControl.value.data = (resultChapter ?? []) as unknown as Array<
-        Record<string, unknown>
-      >
+      questionHelper.mapQuestionsToUI(questions.value)
       isLoading.value = false
     }
     function onSave() {
       const control = props.control
       if (control && typeof control.handleEmit == 'function') {
-        control.handleEmit('ok', questions.value)
+        control.handleEmit('ok', questionSelected.value)
+      }
+    }
+    function buildFilterQuestion() {
+      const filters = [] as FilterCondition[]
+      const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
+      if (user && user.user_id) {
+        filters.push(
+          new FilterCondition({
+            Field: 'user_id',
+            Operator: FilterOperator.Equal,
+            Value: user?.user_id,
+            LogicalOperator: LogicalOperator.OR,
+            SubConditions: [
+              new FilterCondition({
+                Field: 'user_id',
+                Operator: FilterOperator.Equal,
+                Value: GuidEmpty,
+              }),
+            ],
+          }),
+        )
+      }
+      filters.push(
+        new FilterCondition({
+          Field: 'from',
+          Operator: FilterOperator.Equal,
+          Value: 0,
+        }),
+      )
+      return filters
+    }
+    function buildPagingParam() {
+      const param = new PagingParam()
+      param.page =
+        pagingControl.value.currentPage > 0
+          ? pagingControl.value.currentPage
+          : 1
+      param.filters = buildFilterQuestion()
+      return param
+    }
+    async function onChangePage(page: number) {
+      pagingControl.value.currentPage = page
+      const pagingParam = buildPagingParam()
+      await handleLoadData(pagingParam)
+    }
+    function onSelectedQuestion(checked: boolean, question: Question) {
+      if (checked) {
+        const indexExisted = questionSelected.value.findIndex(
+          q => q.question_id == question.question_id,
+        )
+        if (indexExisted < 0) {
+          questionSelected.value.push(question)
+        }
+      } else {
+        questionSelected.value = questionSelected.value.filter(
+          q => q.question_id != question.question_id,
+        )
       }
     }
     return {
       isLoading,
+      questionSelected,
+      checkBoxControl,
+      buildPagingParam,
+      buildFilterQuestion,
       loadingControl,
       chapterControl,
       dicQuestionControl,
@@ -152,12 +222,26 @@ export default {
       setQuestionRef,
       changeLoading,
       handleLoadData,
+      onSelectedQuestion,
       onSave,
+      onChangePage,
     }
   },
   async mounted() {
-    const param = new PagingParam()
-    this.handleLoadData(param)
+    const chapterService = new ChapterService()
+    const resultChapter = await chapterService.filter([])
+    this.chapterControl.data = (resultChapter ?? []) as unknown as Array<
+      Record<string, unknown>
+    >
+    const param = this.buildPagingParam()
+    await this.handleLoadData(param)
+    const questionService = new QuestionService()
+    const result = await questionService.getSummary(param)
+    this.pagingControl.currentPage = 1
+    this.pagingControl.totalPage = Math.ceil(
+      (result as unknown as number) /
+        (this.pagingControl.value.take > 0 ? this.pagingControl.value.take : 1),
+    )
   },
 }
 </script>

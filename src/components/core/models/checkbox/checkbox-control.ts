@@ -12,4 +12,5 @@ export class CheckboxControl extends BaseControl {
     )
   }
   checked: boolean = false // Trạng thái ban đầu của checkbox
+  width: string = '20px'
 }

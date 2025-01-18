@@ -12,12 +12,16 @@ export default {
       required: true,
     },
   },
-  methods: {
-    goToPage(page: number) {
-      if (page >= 1 && page <= this.control.totalPage) {
-        this.$emit('page-changed', page)
+  emits: ['page-change'],
+  setup(props, { emit }) {
+    function goToPage(page: number) {
+      if (page >= 1 && page <= props.control.totalPage) {
+        emit('page-change', page)
       }
-    },
+    }
+    return {
+      goToPage,
+    }
   },
 }
 </script>

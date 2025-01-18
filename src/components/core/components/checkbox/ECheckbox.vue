@@ -11,7 +11,8 @@ export default defineComponent({
     },
     modelValue: {
       type: Array<unknown>,
-      required: true,
+      required: false,
+      default: false,
     },
   },
   emits: ['update:modelValue'],

@@ -87,6 +87,17 @@ export default {
         fileInput.value = input.files[0] // Lưu tệp vào biến `fileInput`
       }
     }
+    function buildPagingParam() {
+      const param = new PagingParam()
+      param.page = pagingControl.value.currentPage
+      param.filters = buildFilterQuestion()
+      return param
+    }
+    async function onChangePage(page: number) {
+      pagingControl.value.currentPage = page
+      const pagingParam = buildPagingParam()
+      await handleLoadQuestion(pagingParam)
+    }
     async function handleLoadData(pagingParam: PagingParam) {
       await handleLoadQuestion(pagingParam)
       const chapterService = new ChapterService()
@@ -94,6 +105,12 @@ export default {
       chapterControl.value.data = (resultChapter ?? []) as unknown as Array<
         Record<string, unknown>
       >
+      const questionService = new QuestionService()
+      const result = await questionService.getSummary(pagingParam)
+      pagingControl.value.currentPage = 1
+      pagingControl.value.totalPage = Math.ceil(
+        (result as unknown as number) / pagingControl.value.take,
+      )
     }
     async function handleLoadQuestion(pagingParam: PagingParam) {
       isLoading.value = true
@@ -181,6 +198,9 @@ export default {
             questionControl.isShowChapter = true
             questionControl.isShowToolEditor = true
             questionControl.isReadonlyToolEditor = false
+            question.State = ModelState.EDIT
+            question.options?.forEach(o => (o.State = question.State))
+            question.results?.forEach(r => r.State == question.State)
             if (btnSave) {
               btnSave.readonly = false
             }
@@ -337,6 +357,7 @@ export default {
       chapterControl,
       handleLoadData,
       handleLoadQuestion,
+      onChangePage,
       buildFilterQuestion,
       handleActionQuestion,
       dicQuestionControl,
@@ -353,6 +374,7 @@ export default {
       onSelectQuestionLabel,
       onAddQuestion,
       scrollToQuestion,
+      buildPagingParam,
     }
   },
   async created() {},

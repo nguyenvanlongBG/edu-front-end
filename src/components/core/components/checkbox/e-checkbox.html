@@ -2,6 +2,7 @@
 <label :class="['checkbox', { 'checkbox--readonly': control.readonly }]">
   <!-- Input checkbox -->
   <input
+    :style="{ width: control.width, height: control.width}"
     type="checkbox"
     :checked="control.checked"
     :disabled="control.readonly"

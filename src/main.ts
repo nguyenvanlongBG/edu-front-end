@@ -12,5 +12,6 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 app.use(i18n)
+app.config.globalProperties.$t = i18n.global.t // Thêm vào global
 app.component('math-field', MathfieldElement)
 app.mount('#app')

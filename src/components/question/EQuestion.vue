@@ -234,9 +234,6 @@ export default defineComponent({
       if (props.control.isShowLevel && props.control.isReadonlyLevel) {
         questionLevelControl.value.readonly = true
       }
-      if (props.control.isShowPoint && props.control.isReadonlyPoint) {
-        pointControl.value.readonly = true
-      }
     }
     function onActionQuestion(button: ButtonControl) {
       const control = props.control

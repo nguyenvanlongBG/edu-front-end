@@ -82,7 +82,8 @@ export default {
       }),
     )
     const questionAttention = ref([] as string[])
-    const checkboxControl = ref(new CheckboxControl())
+    const pointControl = ref(new NumberControl())
+
     const inputControl = ref(
       new InputControl({
         placeholder: t('i18nTest.TestName'),
@@ -176,8 +177,6 @@ export default {
             true
           dicQuestionControl.value[question.question_id].isReadonlyToolEditor =
             true
-          dicQuestionControl.value[question.question_id].isShowPoint = true
-          dicQuestionControl.value[question.question_id].isReadonlyPoint = true
           dicQuestionControl.value[question.question_id].isShowNote = false
           dicQuestionControl.value[question.question_id].btnActions = [
             new ButtonControl({
@@ -192,8 +191,6 @@ export default {
         case ExamMode.Mark:
           dicQuestionControl.value[question.question_id].isShowAnswer = true
           dicQuestionControl.value[question.question_id].isShowResult = true
-          dicQuestionControl.value[question.question_id].isShowPoint = true
-          dicQuestionControl.value[question.question_id].isReadonlyPoint = false
           break
       }
       return dicQuestionControl.value[question.question_id]
@@ -387,6 +384,17 @@ export default {
       inputControl.value.readonly = true
       startTimeControl.value.readonly = true
       durationControl.value.readonly = true
+      switch (masterData.value.mode) {
+        case ExamMode.Do:
+          pointControl.value.readonly = true
+          break
+        case ExamMode.History:
+          pointControl.value.readonly = true
+          break
+        case ExamMode.Mark:
+          pointControl.value.readonly = false
+          break
+      }
     }
     function onChangeAnswer(question: Question, answer: string) {
       if (masterData.value.mode == ExamMode.Do) {
@@ -423,7 +431,7 @@ export default {
       ExamMode,
       noteEditorControl,
       questionAttention,
-      checkboxControl,
+      pointControl,
       masterData,
       saveBtn,
       dicQuestionControl,

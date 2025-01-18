@@ -7,13 +7,13 @@
     <div v-if="pageFocus == Menu.FORUM">
       <div class="main-menu-block">
         <ul class="main-menu">
-          <li class="item-menu" @click="navigateToPage('post')">
+          <li class="item-menu" @click="navigateToPage('forum')">
             <div class="block-img-menu-item">
               <img src="../../assets/pictures/forum.png" alt="" />
             </div>
             <span class="title-menu-item">Diễn đàn</span>
           </li>
-          <li class="item-menu" @click="navigateToPage('test-library')">
+          <li class="item-menu" @click="navigateToPage('question-library')">
             <div class="block-img-menu-item">
               <img src="../../assets/pictures/library.png" alt="" />
             </div>

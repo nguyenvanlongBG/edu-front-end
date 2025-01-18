@@ -34,7 +34,7 @@
           <input
             type="email"
             id="email"
-            placeholder="Email"
+            placeholder="Tài khoản"
             v-model="account.user_name"
           />
           <label for="password">Mật khẩu</label>
@@ -46,7 +46,7 @@
           />
           <div class="button-login-register">
             <div class="button" @click="handleSubmit">Đăng nhập</div>
-            <a class="button" href="#/register">Đăng ký</a>
+            <a class="button" href="register">Đăng ký</a>
           </div>
         </div>
       </div>

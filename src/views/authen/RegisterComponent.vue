@@ -38,12 +38,12 @@
             v-model="user.name"
             placeholder="Họ và tên"
           />
-          <label for="email">Email</label>
+          <label for="email">Tài khoản</label>
           <input
             type="email"
             id="email"
             v-model="user.user_name"
-            placeholder="Email"
+            placeholder="Tên đăng nhập"
           />
           <label for="password">Mật khẩu</label>
           <input

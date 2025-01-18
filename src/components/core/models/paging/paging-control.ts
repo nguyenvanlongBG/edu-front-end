@@ -16,4 +16,11 @@ export class PagingControl extends BaseControl {
   value: PagingParam = new PagingParam()
   currentPage: number = 0
   totalPage: number = 0
+  get take(): number {
+    return this.value.take
+  }
+
+  set take(value: number) {
+    this.value.take = value
+  }
 }

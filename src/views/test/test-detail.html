@@ -21,7 +21,18 @@
             <EQuestion
               :control="getQuestionControl(question)"
               @change-answer="onChangeAnswer"
-            />
+            >
+              <template #left-default-toolbar>
+                <div class="d-flex col-gap-8px">
+                  <ENumber
+                    v-if="getQuestionControl(question).isShowQuestionType"
+                    :control="pointControl"
+                    @update:modelValue="(point) => onChangePoint(question,point)"
+                    v-model="question.point"
+                  />
+                </div>
+              </template>
+            </EQuestion>
           </div>
         </div>
       </div>

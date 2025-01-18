@@ -28,13 +28,17 @@
             <EQuestion
               :control="getQuestionControl(question)"
               @change-answer="onChangeAnswer"
-              @change-point="onChangePoint"
             >
               <template #left-default-toolbar>
                 <div class="d-flex col-gap-8px">
                   <ECheckbox
                     :control="getCheckboxControl(question)"
                     v-model="getCheckboxControl(question).checked"
+                  />
+                  <ENumber
+                    :control="pointControl"
+                    @update:modelValue="(point) => onChangePoint(question,point)"
+                    v-model="question.answer.point"
                   />
                 </div>
               </template>

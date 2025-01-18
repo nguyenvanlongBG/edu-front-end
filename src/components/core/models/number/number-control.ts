@@ -2,7 +2,6 @@
 import { BaseControl } from '@core/models/base/base-control'
 import commonFunction from '@core/commons/CommonFunction'
 import type { INumberControl } from './i-number-control'
-import { useI18n } from 'vue-i18n'
 
 export class NumberControl extends BaseControl {
   constructor(control?: INumberControl) {
@@ -22,7 +21,7 @@ export class NumberControl extends BaseControl {
   styleClass: string = ''
 
   validateCustom(value: number | null) {
-    const { t } = useI18n()
+    const t = globalThis.$t // Lấy từ globalProperties
 
     if (this.required && (value === null || value === undefined)) {
       this.messageWarning = t('i18nCommon.NotEmptyValueWarning')

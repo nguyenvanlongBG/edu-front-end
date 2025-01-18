@@ -17,6 +17,7 @@ import { GuidEmpty, MathSubjectId } from '@/constants/consstant'
 import { LocalStorageKey } from '@/constants/local-storage-key'
 import { QuestionType } from '@/enums/question'
 import { Role } from '@/enums/role'
+import questionHelper from '@/helper/question/question-helper'
 import { OptionQuestion } from '@/models/option-question/option-question'
 import { Question } from '@/models/question/question'
 import { QuestionControl } from '@/models/question/question-control'
@@ -221,17 +222,16 @@ export default {
           commonFunction.convertToString(questions.value),
         )
         questionsTmp.forEach(item => {
-          item.content = editorFunction.getContent(item.object_content)
           item.user_id = user.role_id == Role.Admin ? GuidEmpty : user.user_id
           item.subject_id = MathSubjectId
           item.options?.forEach(o => {
             o.State = ModelState.INSERT
-            o.content = editorFunction.getContent(o.object_content)
           })
           item.results?.forEach(o => {
             o.State = ModelState.INSERT
           })
         })
+        questionHelper.mapQuestionToSave(questionsTmp)
         control.handleEmit('ok', questionsTmp)
       }
     }
