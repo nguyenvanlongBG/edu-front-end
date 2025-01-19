@@ -31,7 +31,7 @@
             </div>
             <span class="title-menu-item">Lớp học</span>
           </li>
-          <li class="item-menu" @click="navigateToPage('report-test')">
+          <li class="item-menu" @click="navigateToPage('report-tabs')">
             <div class="block-img-menu-item">
               <img src="../../assets/pictures/analysis.png" alt="" />
             </div>

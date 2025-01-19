@@ -1,0 +1,14 @@
+<div class="history-exam">
+  <ETab :control="tabControl" @change="onChangeTab">
+    <template #tab-content>
+      <div style="height: 36px" v-if="isLoading">
+        <ELoading :control="loadingControl" v-model="isLoading" />
+      </div>
+      <div v-else class="p-t-8px">
+        <ReportTest v-if="tabControl.value == 1" />
+        <ReportChapter v-if="tabControl.value == 2" />
+        <ReportLevel v-if="tabControl.value == 3" />
+      </div>
+    </template>
+  </ETab>
+</div>

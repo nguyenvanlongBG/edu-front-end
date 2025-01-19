@@ -25,6 +25,9 @@ export default class TestService extends BaseService {
   async autoGenQuestion(param: Record<string, unknown>) {
     return await this.post(param, 'auto-gen')
   }
+  async usersCorrection(testId: string, questionId: string) {
+    return await this.get(testId + '/user-correction/' + questionId)
+  }
   async getInfoDoTest(testId: string) {
     return await request({
       url: `Test/${testId}/do`,

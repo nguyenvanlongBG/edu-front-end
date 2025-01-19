@@ -167,7 +167,14 @@ export default {
         },
       })
     }
-    function onTryTest(test: TestDto) {}
+    function onReportTest(test: TestDto) {
+      router.push({
+        name: RouterNameTest.Summary,
+        params: {
+          test_id: test.test_id,
+        },
+      })
+    }
     function onHistoryTest(test: TestDto) {
       router.push({
         name: RouterNameTest.History,
@@ -200,7 +207,7 @@ export default {
       onDoTestAgain,
       onEditTest,
       onHistoryTest,
-      onTryTest,
+      onReportTest,
       loadData,
       buildPagingParam,
       onCreateTest,

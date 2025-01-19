@@ -39,6 +39,11 @@ import questionHelper from '@/helper/question/question-helper'
 import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
 import { User } from '@/models/user/user'
 import { LocalStorageKey } from '@/constants/local-storage-key'
+export interface CorrectionQuestion {
+  loaded: boolean
+  status: boolean
+  users: string[]
+}
 export default {
   components: {
     EQuestion,
@@ -86,6 +91,7 @@ export default {
     const startTimeControl = ref(new DateControl())
     const finishTimeControl = ref(new DateControl())
     const dicQuestionControl = ref<Record<string, QuestionControl>>({})
+    const dicCorrection = ref<Record<string, CorrectionQuestion>>({})
     const durationControl = ref(
       new NumberControl({
         min: 2,
@@ -191,10 +197,28 @@ export default {
           dicQuestionControl.value[question.question_id].customAction =
             handleActionQuestion
           break
+        case TestMode.Summary:
+          dicQuestionControl.value[question.question_id].isShowToolEditor =
+            false
+          dicQuestionControl.value[question.question_id].isReadonlyToolEditor =
+            true
+          dicQuestionControl.value[question.question_id].isShowActionToolbar =
+            true
+          dicQuestionControl.value[question.question_id].isShowLevel = false
+          dicQuestionControl.value[question.question_id].btnActions = [
+            new ButtonControl({
+              label: t('i18nQuestion.ShowCorrection'),
+              name: 'show-correction',
+              classType: 'outline',
+            }),
+          ]
+          dicQuestionControl.value[question.question_id].customAction =
+            handleActionQuestion
+          break
       }
       return dicQuestionControl.value[question.question_id]
     }
-    function handleActionQuestion(eventName: string, question: Question) {
+    async function handleActionQuestion(eventName: string, question: Question) {
       if (eventName && question) {
         const questionControl = dicQuestionControl.value[question.question_id]
         if (questionControl) {
@@ -209,11 +233,31 @@ export default {
                 : ModelState.EDIT
             question.options?.forEach(o => (o.State = question.State))
             question.results?.forEach(r => r.State == question.State)
+          } else if (eventName == 'show-correction') {
+            if (!dicCorrection.value[question.question_id]) {
+              const testService = new TestService()
+              const resultUsers = (await testService.usersCorrection(
+                masterData.value.test_id,
+                question.question_id,
+              )) as unknown as Array<Record<string, unknown>>
+              dicCorrection.value[question.question_id] = {
+                loaded: true,
+                status: true,
+                users:
+                  resultUsers &&
+                  resultUsers?.length &&
+                  'users' in resultUsers[0]
+                    ? (resultUsers[0].users as string[])
+                    : [],
+              }
+            }
+            dicCorrection.value[question.question_id].status = true
           }
         }
       }
     }
     async function handleLoadData() {
+      isLoading.value = true
       const testService = new TestService()
 
       // Chuẩn bị các Promise cho các cuộc gọi API
@@ -246,6 +290,27 @@ export default {
           )
           questionHelper.mapObjectContentQuestions(questionsOrigin)
           break
+        case TestMode.Summary:
+          tasks.push(testService.getById(masterData.value.test_id))
+          tasks.push(
+            testService.getQuestionOfTestEdit(masterData.value.test_id),
+          )
+          const [testDetailResultSum, questionsResultSum] =
+            await Promise.all(tasks)
+          masterData.value = testDetailResultSum as unknown as TestDto
+          masterData.value.State = ModelState.EDIT
+          // Xử lý kết quả
+          questions.value = commonFunction.convertToInstances<Question>(
+            questionsResultSum as unknown as Record<string, unknown>[],
+            Question,
+          )
+          questionHelper.mapObjectContentQuestions(questions.value)
+          questionsOrigin = commonFunction.convertToInstances<Question>(
+            questionsResultSum as unknown as Record<string, unknown>[],
+            Question,
+          )
+          questionHelper.mapObjectContentQuestions(questionsOrigin)
+          break
         case TestMode.Do:
           tasks.push(testService.getInfoDoTest(masterData.value.test_id))
 
@@ -271,6 +336,7 @@ export default {
           questionHelper.mapObjectContentQuestions(questionsOrigin)
           break
       }
+      isLoading.value = false
     }
     async function handleSetTimeoutSubmit(test: TestDto) {
       if (test) {
@@ -336,9 +402,11 @@ export default {
     }
     function handleAddQuestion(items: Question[]) {
       if (!items || !items.length) return
+      questionHelper.mapQuestionsToUI(items)
       let startIndex = questions.value.length
       items.forEach(question => {
         question.from = 1
+        question.point = 1
         startIndex += 1
         tableLabel.value.data.push(
           new ItemTableLabel({
@@ -402,7 +470,6 @@ export default {
                 result.State = ModelState.INSERT
               })
             })
-            questionHelper.mapObjectContentQuestions(questions)
             handleAddQuestion(questions)
             popupControl.close()
             const lastQuestion = questions[questions.length - 1]
@@ -561,6 +628,10 @@ export default {
           masterData.value.test_id = route.params.test_id as string
           testMode.value = TestMode.Edit
           break
+        case RouterNameTest.Summary:
+          masterData.value.test_id = route.params.test_id as string
+          testMode.value = TestMode.Summary
+          break
         case RouterNameTest.Do:
           masterData.value.test_id = route.params.test_id as string
           testMode.value = TestMode.Do
@@ -580,6 +651,11 @@ export default {
           inputControl.value.readonly = false
           startTimeControl.value.readonly = false
           durationControl.value.readonly = false
+          break
+        case TestMode.Summary:
+          inputControl.value.readonly = true
+          startTimeControl.value.readonly = true
+          durationControl.value.readonly = true
           break
         case TestMode.Do:
           inputControl.value.readonly = true
@@ -670,6 +746,7 @@ export default {
     return {
       testMode,
       onChangePoint,
+      dicCorrection,
       TestMode,
       masterData,
       saveBtn,

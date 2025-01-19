@@ -10,7 +10,7 @@ export default {
     History: 'Lịch sử',
     TryTest: 'Thi thử',
     MarkTest: 'Chấm điểm',
-    ReportTest: 'Báo cáo',
+    ReportTest: 'Tổng hợp',
     Save: 'Lưu lại',
     Submit: 'Nộp bài',
   },

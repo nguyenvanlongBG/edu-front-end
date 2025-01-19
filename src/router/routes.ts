@@ -49,6 +49,11 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@views/test/TestDetail.vue'),
           },
           {
+            path: ':test_id/summary',
+            name: RouterNameTest.Summary,
+            component: () => import('@views/test/TestDetail.vue'),
+          },
+          {
             path: ':test_id/do',
             name: RouterNameTest.Do,
             component: () => import('@views/test/TestDetail.vue'),
@@ -124,6 +129,11 @@ const routes: RouteRecordRaw[] = [
         path: '/report',
         name: 'report',
         children: [
+          {
+            path: '',
+            name: 'report-tabs',
+            component: () => import('@views/report/ReportTabs.vue'),
+          },
           {
             path: 'test',
             name: 'report-test',

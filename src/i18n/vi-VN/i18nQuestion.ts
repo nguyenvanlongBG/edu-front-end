@@ -5,6 +5,7 @@ export default {
   ImportQuestion: 'Nhập khẩu',
   ChoiceLibraryQuestion: 'Chọn từ thư viện',
   Edit: 'Sửa',
+  ShowCorrection: 'DS Cần chữa',
   SingleChoice: 'Một đáp án',
   MultiChoice: 'Nhiều đáp án',
   FillResult: 'Điền đáp án',

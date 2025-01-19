@@ -41,7 +41,7 @@ import { NoteControl } from '@/components/core/models/note/note-control'
 import { ExamNote } from '@/models/exam-note/exam-note'
 import editorFunction from '@/components/core/commons/editorFunction'
 
-interface QuestionNote {
+export interface QuestionNote {
   status: boolean
   note: ExamNote
 }

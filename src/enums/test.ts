@@ -5,4 +5,5 @@ export enum TestMode {
   Edit = 3,
   Do = 4,
   History = 5, // Xem lịch sử
+  Summary = 6,
 }

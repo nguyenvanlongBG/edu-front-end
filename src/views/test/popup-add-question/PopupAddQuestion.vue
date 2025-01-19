@@ -9,6 +9,7 @@ import { ButtonControl } from '@/components/core/models/button/button-control'
 import { LoadingControl } from '@/components/core/models/loading/loading-control'
 import { PopupControl } from '@/components/core/models/popup/popup-control'
 import EQuestion from '@/components/question/EQuestion.vue'
+import questionHelper from '@/helper/question/question-helper'
 import { OptionQuestion } from '@/models/option-question/option-question'
 import { Question } from '@/models/question/question'
 import { QuestionControl } from '@/models/question/question-control'
@@ -187,6 +188,7 @@ export default {
     function onSave() {
       const control = props.control
       if (control && typeof control.handleEmit == 'function') {
+        questionHelper.mapQuestionToSave(questions.value)
         control.handleEmit('ok', questions.value)
       }
     }

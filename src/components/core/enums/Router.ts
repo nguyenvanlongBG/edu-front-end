@@ -6,6 +6,7 @@ export enum RouterNameTest {
   History = 'history-test',
   Mark = 'mark-test',
   MarkList = 'mark',
+  Summary = 'summary-test',
 }
 export enum RouterNameExam {
   View = 'view-exam',
