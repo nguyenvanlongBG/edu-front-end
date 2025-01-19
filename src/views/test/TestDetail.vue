@@ -39,6 +39,9 @@ import questionHelper from '@/helper/question/question-helper'
 import localStorageLibrary from '@/components/core/commons/LocalStorageLibrary'
 import { User } from '@/models/user/user'
 import { LocalStorageKey } from '@/constants/local-storage-key'
+import { MultiComboboxControl } from '@/components/core/models/multi-combobox/multi-combobox-control'
+import ChapterService from '@/services/chapter-service'
+import EMultiCombobox from '@/components/core/components/e-multi-combobox/EMultiCombobox.vue'
 export interface CorrectionQuestion {
   loaded: boolean
   status: boolean
@@ -54,6 +57,7 @@ export default {
     ELoading,
     EDate,
     ENumber,
+    EMultiCombobox,
   },
   props: {
     test: {
@@ -65,6 +69,14 @@ export default {
     const { t } = useI18n()
     const testMode = ref(TestMode.None)
     const masterData = ref(new TestDto(props.test))
+    const chapterControl = ref(
+      new MultiComboboxControl({
+        displayField: 'name',
+        valueField: 'chapter_id',
+        data: [],
+        readonly: true,
+      }),
+    )
     const saveBtn = ref(
       new ButtonControl({
         label: t('i18nTest.Button.Save'),
@@ -259,7 +271,7 @@ export default {
     async function handleLoadData() {
       isLoading.value = true
       const testService = new TestService()
-
+      const chapterService = new ChapterService()
       // Chuẩn bị các Promise cho các cuộc gọi API
       const tasks = []
 
@@ -269,47 +281,60 @@ export default {
           masterData.value.State = ModelState.INSERT
           masterData.value.test_id = commonFunction.generateID()
           questions.value = []
+          const chapterAdd = await chapterService.filter([])
+          chapterControl.value.data = chapterAdd as unknown as Array<
+            Record<string, unknown>
+          >
           break
         case TestMode.Edit:
           tasks.push(testService.getById(masterData.value.test_id))
           tasks.push(
             testService.getQuestionOfTestEdit(masterData.value.test_id),
           )
-          const [testDetailResult, questionsResult] = await Promise.all(tasks)
+          tasks.push(chapterService.filter([]))
+          const [testDetailResult, questionsResult, chapters] =
+            await Promise.all(tasks)
           masterData.value = testDetailResult as unknown as TestDto
+          chapterControl.value.data = chapters as unknown as Array<
+            Record<string, unknown>
+          >
           masterData.value.State = ModelState.EDIT
           // Xử lý kết quả
           questions.value = commonFunction.convertToInstances<Question>(
             questionsResult as unknown as Record<string, unknown>[],
             Question,
           )
-          questionHelper.mapObjectContentQuestions(questions.value)
+          questionHelper.mapQuestionsToUI(questions.value)
           questionsOrigin = commonFunction.convertToInstances<Question>(
             questionsResult as unknown as Record<string, unknown>[],
             Question,
           )
-          questionHelper.mapObjectContentQuestions(questionsOrigin)
+          questionHelper.mapQuestionsToUI(questionsOrigin)
           break
         case TestMode.Summary:
           tasks.push(testService.getById(masterData.value.test_id))
           tasks.push(
             testService.getQuestionOfTestEdit(masterData.value.test_id),
           )
-          const [testDetailResultSum, questionsResultSum] =
+          tasks.push(chapterService.filter([]))
+          const [testDetailResultSum, questionsResultSum, chaptersSum] =
             await Promise.all(tasks)
           masterData.value = testDetailResultSum as unknown as TestDto
           masterData.value.State = ModelState.EDIT
+          chapterControl.value.data = chaptersSum as unknown as Array<
+            Record<string, unknown>
+          >
           // Xử lý kết quả
           questions.value = commonFunction.convertToInstances<Question>(
             questionsResultSum as unknown as Record<string, unknown>[],
             Question,
           )
-          questionHelper.mapObjectContentQuestions(questions.value)
+          questionHelper.mapQuestionsToUI(questions.value)
           questionsOrigin = commonFunction.convertToInstances<Question>(
             questionsResultSum as unknown as Record<string, unknown>[],
             Question,
           )
-          questionHelper.mapObjectContentQuestions(questionsOrigin)
+          questionHelper.mapQuestionsToUI(questionsOrigin)
           break
         case TestMode.Do:
           tasks.push(testService.getInfoDoTest(masterData.value.test_id))
@@ -745,6 +770,7 @@ export default {
     }
     return {
       testMode,
+      chapterControl,
       onChangePoint,
       dicCorrection,
       TestMode,

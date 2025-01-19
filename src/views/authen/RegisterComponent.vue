@@ -86,7 +86,6 @@
 <script lang="ts">
 import router from '@/router'
 import AuthService from '@/services/auth-service'
-import { StatusCodes } from 'http-status-codes'
 import { ref } from 'vue'
 
 export default {
@@ -101,11 +100,7 @@ export default {
     async function onRegister() {
       const authService = new AuthService()
       const resultResiter = await authService.register(user.value)
-      if (
-        resultResiter &&
-        resultResiter.status == StatusCodes.OK &&
-        resultResiter.data
-      ) {
+      if (resultResiter) {
         router.push({ name: 'login' })
       }
     }

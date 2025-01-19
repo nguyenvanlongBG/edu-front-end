@@ -63,7 +63,8 @@ class QuestionHelper {
   mapQuestionsToUI(questions: Question[]) {
     this.mapObjectContentQuestions(questions)
     questions?.forEach(question => {
-      question.lstChapterId = question.chapter_ids?.split(',')
+      if (question.chapter_ids)
+        question.lstChapterId = question.chapter_ids?.split(',')
     })
   }
 }

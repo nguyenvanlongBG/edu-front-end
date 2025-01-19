@@ -32,6 +32,13 @@
                   />
                 </div>
               </template>
+              <template #right-default-tool-bar>
+                <EMultiCombobox
+                  v-if="(testMode == TestMode.Add || testMode == TestMode.Edit) && getQuestionControl(question).isShowQuestionType"
+                  :control="chapterControl"
+                  v-model="question.lstChapterId"
+                />
+              </template>
               <template #notes>
                 <div
                   class="d-flex-column p-l-8px"

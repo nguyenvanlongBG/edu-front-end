@@ -90,7 +90,6 @@ export default {
       const classTmp = new Classroom(classroom)
       viewDetail(classTmp as unknown as Record<string, unknown>)
     }
-    async function onLeave(classroom: Classroom) {}
     async function onEnroll(classroom: Classroom) {
       const user = localStorageLibrary.getValueByKey<User>(LocalStorageKey.User)
       const enrollServicec = new EnrollmentClassService()
@@ -156,11 +155,10 @@ export default {
       viewDetail,
       onEnroll,
       onEdit,
-      onLeave,
     }
   },
-  mounted() {
-    this.loadListData()
+  async mounted() {
+    await this.loadListData()
   },
 }
 </script>
